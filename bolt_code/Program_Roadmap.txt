@@ -1,0 +1,14 @@
+DONE
+
+1. Linux on CHIP, headless setup 		--done
+
+
+
+
+
+
+TODO
+2. Add Arduino as an i2c device 		--pending, need pull up resisters
+3. Set up peripherals (motor, projector, etc)	--pending
+4. Set up control logic				--pending
+5. Set up web frontend for controlling		--pending

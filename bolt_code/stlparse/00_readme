@@ -1,0 +1,5 @@
+STL Parser - 1.0.0  (Moduleno.Majorversion.Minorversion)
+
+	Library for parsing ASCII and Binary STL Files
+	Includes functionality for creating Triangle Mesh
+

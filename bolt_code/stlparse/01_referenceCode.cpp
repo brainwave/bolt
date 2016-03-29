@@ -144,8 +144,7 @@ public:
 // read the given STL file name (ascii or binary is set using ‘isBinaryFormat’)
 // and generate a Triangle Mesh object in output parameter ‘mesh’
 int stlToMeshInMemory(const char *stlFile, TriangleMesh *mesh, bool isBinaryFormat) {    
-    if (!isBinaryFormat) {
-        ifstream in(stlFile);
+    if (!isBinaryFormat) { ifstream in(stlFile);
         if (!in.good()) return 1;
         char title[80];
         std::string s0, s1;

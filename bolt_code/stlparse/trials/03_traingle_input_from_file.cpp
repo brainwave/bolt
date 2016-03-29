@@ -1,101 +1,92 @@
 
 #include <iostream>
 #include <vector>
-#include <fstream>
 #include <string>
+#include <stdio.h>
 using namespace std;
 
 //#include <vector>
 	//commented out vector library since we want to do vector IO with GLM library
-
 #include "../glm/glm.hpp"
+	//Later use a standard path, or include relevant header files in project specific include directory
 
 
 //code to overload << and >> operators to enable output and input of data into glm::vec3 type
 //
-std::ostream& operator<<(std::ostream &output, glm::vec3 &myVector)
-{
-	return output<<myVector.x<<" "<<myVector.y<<" "<<myVector.z;
-}
 
-std::istream& operator>>(std::istream &input, glm::vec3 &myVector)
-{
-	return input>>myVector.x>>myVector.y>>myVector.z;
-}
+struct vec3 {
+	vec3(float x_=0, float y_=0, float z_=0):x(x_), y(y_), z(z_){}
+	float x, y, z;
+	friend vec3& operator>>(const vec3& read_vec, vec3& vec){vec.x=read_vec.x; vec.y=read_vec.y;vec.z=read_vec.z; return vec;}
+	friend ostream& operator<<(ostream& output, const vec3 vec)
+	{	output<<"\n Outputting Vector "<<vec.x<<"i+"<<vec.y<<"j+"<<vec.z<<"k "; return output;}
+};
 
 struct triangle{
-	//Just defining an array of 3 vertices for now. Later will add functions, etc to it.
-	triangle(glm::vec3 v0
-		,glm::vec3 v1
-		,glm::vec3 v2
-		,glm::vec3 n)
-		:normal(n) {
-				vertices[0]=v0;
-				vertices[1]=v1;
-				vertices[2]=v2;
-			}
+	
+	friend triangle& operator>>(const vec3 vertex[4], triangle &t){ t.vertex[0]=vertex[0]; t.vertex[1]=vertex[1]
+								; t.vertex[2]=vertex[2]; t.normal=vertex[4];
+								return t;
+	}
+	
+	friend ostream& operator<<(ostream &output, const triangle &t){	
+		output<<"Vertex 1 components are : "<<t.vertex[1].x<<" "<<t.vertex[1].y<<" "<<t.vertex[1].z<<" ";
+		return output;
+	}
 
-	glm::vec3 vertices[3], normal;
-
+	vec3 vertex[3], normal;
 };
 
 struct triangleMesh{
 	vector<triangle> mesh;
-	void display(triangle t)
-	{
-	    cout<<"\n"<<t.vertices[0]
-		<<" "<<t.vertices[1]
-		<<" "<<t.vertices[2]
-		<<" "<<t.normal;
-	}
-};
+	void displayMesh(triangle &t) { cout<<"\n"<<t; }
+	void push_back(triangle t) { mesh.push_back(t); }
+	};
 
-void readStlFile(const char *filename, triangleMesh *mesh){
+int readStlFile(const char *filename, triangleMesh *mesh){
 
-	ifstream file(filename, ios::binary);
-	char modelName[80];
-	string identifier;
+	char modelName[80], discarder[2];
 	size_t facetNo;
+	triangle t;
+	vec3 vertex[4];
 
-/*	float normalx, normaly, normalz,
-	      vertex1x, vertex1y, vertex1z,
-	      vertex2x, vertex2y ,vertex2z,
-	      vertex3x, vertex3y, vertex3z;
-*/	
-	float Points[12];
-	char discarder[2];
-
-	file.read(modelName, 80);
-	cout<<"\nModel Name is : "<<modelName;
-
-	file.read((char *)facetNo, 4);
-	cout<<"\nNo. Of Facets is : "<<facetNo;
-	getchar();	
-	while(!file.eof()){
-	
-		for(int i=0;i<12;i++){
-			file.read((char *)&Points[i],sizeof(float));
+	FILE *file = fopen(filename, "rb");
+	if(!file) {
+			cout<<"\nfile opening failed";
+			perror("Error");
+			return 1;
 		}
+		fread(modelName, 80, 1, file);
+	fread((void *)&facetNo, 4, 1, file);
+	cout<<"\nNo. Of Facets is : "<<facetNo;
 
-	file.read(discarder,2);
+	while(!feof(file)){
+		for(int i=0;i<4;i++)
+		{
+			fread((void *)&vertex[0], sizeof(float), 3 , file);
+			fread((void *)&vertex[1], sizeof(float), 3 , file);
+			fread((void *)&vertex[2], sizeof(float), 3 , file);
+			fread((void *)&vertex[0], sizeof(float), 3 , file);
 			
+			vertex>>t;
+			mesh->push_back(t);
+		
+		}
+		fread((void *)discarder, 2, 1, file);
 	}
-			
-	//	for(int i=0;i<12;i++)
-	//		cout<<"\n"<<Points[i]<<" ";
-
+	return 0;
 }	
 
-
-
-
 int main(int argc, char *argv[]){
-	cout<<"\nProgram Starts\n";
+	cout<<"\nProgram Starts, file name is : ";
 	cout<<argv[1];
 	
 	triangleMesh mesh;
 
-	readStlFile(argv[1],  &mesh);
-	cout<<"\nProgram ends";
+	if(readStlFile(argv[1],  &mesh))
+		cout<<"\nProgram Failed";
+	else
+		cout<<"\nProgram Sucess";
+	cin.get();
 
 }

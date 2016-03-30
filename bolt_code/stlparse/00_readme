@@ -3,10 +3,12 @@ STL Parser - 1.0.0  (Moduleno.Majorversion.Minorversion)
 	Library for parsing ASCII and Binary STL Files
 	Includes functionality for creating Triangle Mesh
 
+	Implemented binary/ASCII detection
+
+	Sorted ASCII file being incorrectly read
 
 TO DO
-	File not being read correctly, need to sort out the IEEE specification for STL
-	
+
+	Check if binary file is correctly read, implement fix if needed
 	Check for endianness, make code portable
-	Add support for ASCII Files	
 	Restrict file read (to determine ascii) to a few kilobytes instead of the full file (efficiency improvement)

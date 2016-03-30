@@ -25,7 +25,7 @@ struct vec3 {
 	}
 
 	friend ostream& operator<<(ostream& output, const vec3 vec){
-		output<<"\n Outputting Vector "<<vec.x<<"i+"<<vec.y<<"j+"<<vec.z<<"k ";
+		output<<vec.x<<"i+"<<vec.y<<"j+"<<vec.z<<"k ";
 		return output;
 	}
 
@@ -35,10 +35,18 @@ struct triangle{
 	
 	friend triangle& operator>>(const vec3 vertex[4], triangle &t){ 
 		
-		t.vertex[0] 	= vertex[1]; 
-		t.vertex[1] 	= vertex[2]; 
-		t.vertex[2] 	= vertex[3]; 
-		t.normal 	= vertex[0];
+		t.vertex[0].x	= vertex[1].x; 
+		t.vertex[0].y	= vertex[1].y; 
+		t.vertex[0].z	= vertex[1].z; 
+		t.vertex[1].x	= vertex[1].x; 
+		t.vertex[1].y	= vertex[1].y; 
+		t.vertex[1].z	= vertex[1].z; 
+		t.vertex[2].x	= vertex[1].x; 
+		t.vertex[2].y	= vertex[1].y; 
+		t.vertex[2].z	= vertex[1].z; 
+		t.normal.x 	= vertex[0].x;
+		t.normal.y 	= vertex[0].y;
+		t.normal.z	= vertex[0].z;
 			//vertex[0] is normal, vertex 1, 2, 3 are the vertices. Read accordingly.
 		return t;
 	}
@@ -145,32 +153,45 @@ bool isASCII=false; //false -binary, true -ASCII
 				char string0[11], string1[11];
 				
 				fscanf(file,"%s", string0);
+
+				if(!strcmp(string0,"endsolid"))
+					return 1;
+
 				fscanf(file,"%s", string1);
 
 				if( !strcmp(string0, "facet") && !strcmp(string1,"normal")) {
 
-					fread((void *)&vertex[0], 4, 3 , file);
+					fscanf(file, "%f", &vertex[0].x);
+					fscanf(file, "%f", &vertex[0].y);
+					fscanf(file, "%f", &vertex[0].z);
 
 					fscanf(file, "%s", string0);
 					fscanf(file, "%s", string1);
-
+						
 					if( !strcmp(string0, "outer") && !strcmp(string1,"loop")){
 				
 						for(int i=1; i<=3; i++){
 
 								fscanf(file, "%s", string0);
 								
-								if( !strcmp(string0, "vertex"))
-									fread((void *)&vertex[i], 4, 3, file);
+								if( !strcmp(string0, "vertex")){
+
+									fscanf(file, "%f", &vertex[i].x);
+									fscanf(file, "%f", &vertex[i].y);
+									fscanf(file, "%f", &vertex[i].z);
+								}
+	
 						}
-						
+
 						fscanf(file, "%s", string0);
-						fscanf(file, "%s", string1);
-
 						if( strcmp(string0, "endloop"))
+						{
+							cout<<"\nEndloop not found";
 							return 1;
+						}
 
-						if( strcmp(string1, "endfacet"))
+						fscanf(file, "%s", string0);
+						if( strcmp(string0, "endfacet"))
 							return 1;
 
 					}
@@ -182,6 +203,7 @@ bool isASCII=false; //false -binary, true -ASCII
 
 			}
 		}
+	
 		else
 			cout<<"\nHeader Mismatch, incorrect ASCII file";
 
@@ -200,6 +222,6 @@ int main(int argc, char *argv[]){
 		cout<<"\nProgram Failed";
 	else
 		cout<<"\nProgram Sucess";
-	cin.get();
+	//cin.get();
 
 }

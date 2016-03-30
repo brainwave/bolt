@@ -5,6 +5,8 @@ STL Parser - 1.0.0  (Moduleno.Majorversion.Minorversion)
 
 
 TO DO
-	Check for endianness, make code portable
-	Add support for ASCII Files
+	File not being read correctly, need to sort out the IEEE specification for STL
 	
+	Check for endianness, make code portable
+	Add support for ASCII Files	
+	Restrict file read (to determine ascii) to a few kilobytes instead of the full file (efficiency improvement)

@@ -115,21 +115,22 @@ bool isASCII=false; //false -binary, true -ASCII
 			fread((void *)&facetNo, 4, 1, file);
 			
 			cout<<"\nNo. Of Facets is : "<<facetNo;
+			cin.get();
 
 			while(!feof(file)){
 				for(int i=0;i<4;i++){
 
-					fread((void *)&vertex[0], 4, 3 , file);
-					fread((void *)&vertex[1], 4, 3 , file);
-					fread((void *)&vertex[2], 4, 3 , file);
-					fread((void *)&vertex[0], 4, 3 , file);
-					
-					vertex>>t;
-					mesh->push_back(t);
-					mesh->displayMesh(t);
-				
+					fread((void *)&vertex[i].x, 4, 1 , file);
+					fread((void *)&vertex[i].y, 4, 1 , file);
+					fread((void *)&vertex[i].z, 4, 1 , file);
 				}
+	
+				vertex>>t;
+
+				mesh->push_back(t);
+
 				fread((void *)discarder, 2, 1, file);
+					//discard 2 bytes end of each loop
 			}
 		return 0;
 	}
@@ -154,8 +155,11 @@ bool isASCII=false; //false -binary, true -ASCII
 				
 				fscanf(file,"%s", string0);
 
-				if(!strcmp(string0,"endsolid"))
+				if(!strcmp(string0,"endsolid")) {
+
+					cout<<"\nEnd of file reached";
 					return 1;
+				}
 
 				fscanf(file,"%s", string1);
 
@@ -186,20 +190,22 @@ bool isASCII=false; //false -binary, true -ASCII
 						fscanf(file, "%s", string0);
 						if( strcmp(string0, "endloop"))
 						{
-							cout<<"\nEndloop not found";
+							cout<<"\nERROR - Expected 'endloop', found "<<string0<<" instead";
 							return 1;
 						}
 
 						fscanf(file, "%s", string0);
-						if( strcmp(string0, "endfacet"))
-							return 1;
 
+						if( strcmp(string0, "endfacet")) {
+
+							cout<<"ERROR - expected 'endfacet', found "<<string1<<" instead";
+							return 1;
+						}
 					}
 				}
 
 				vertex>>t;
 				mesh->push_back(t);
-				mesh->displayMesh(t);
 
 			}
 		}
@@ -222,6 +228,5 @@ int main(int argc, char *argv[]){
 		cout<<"\nProgram Failed";
 	else
 		cout<<"\nProgram Sucess";
-	//cin.get();
 
 }

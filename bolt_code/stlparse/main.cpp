@@ -77,6 +77,22 @@ struct triangle{
 	vec3 vertex[3], normal;
 };
 
+struct plane {
+
+	plane (vec3 n=0, float d=0.0f) {
+
+		normal.x=n.x; normal.y=n.y; normal.z=n.z;
+		distance=d;
+	}
+
+	vec3 normal; float distance;
+
+	float distanceFromPoint (vec3 point) {
+
+		normal.normalize();
+		return normal.dot(point)-distance;
+	}
+};
 
 class triangleMesh{
 	//Using class since data in triangleMesh accessible only to member functions
@@ -89,6 +105,16 @@ class triangleMesh{
 
 	void push_back(triangle t) { mesh.push_back(t); }
 	
+	float planeTriangleIntersect ( triangle &t, plane &p)
+	{
+		
+		for (int i=0; i < 3; i++) {
+			float dp1 = p.distanceFromPoint(t.vertex[i]);
+			float dp2 = p.distanceFromPoint(t.vertex[(i+1)%3]);
+			
+			return dp1*dp2;
+		}
+	}
 
 };
 

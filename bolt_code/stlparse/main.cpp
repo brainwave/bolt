@@ -2,10 +2,14 @@
 //
 #include <iostream>
 #include <vector>
-#include <string.h>
 #include <string>
-#include <stdio.h>
+
 using namespace std;
+
+#include <stdio.h>
+#include <math.h>
+#include <string.h>
+
 
 struct vec3 {
 		//
@@ -13,6 +17,7 @@ struct vec3 {
 		// 	Store all relevant vectors of each triangle in struct 'triangle', then
 		//	Read all triangles sequentially into memory
 		//
+		// Using struct since data in vec changed using external functions
 	vec3(float x_=0, float y_=0, float z_=0):x(x_), y(y_), z(z_){}
 
 	float x, y, z;
@@ -29,10 +34,19 @@ struct vec3 {
 	}
 		//overload << to print values conveniently 
 
+	float dot(const vec3& vec) {
+		return x*vec.x+y*vec.y+z*vec.z;
+	}
+
+	void normalize(){
+		float magnitude = sqrt(x*x+y*y+z*z);
+		x /= magnitude; y /= magnitude; z/= magnitude;
+	}
 };
 
 struct triangle{
-	
+	//using struct since 'triangle' data pushed from external function
+
 	friend triangle& operator>>(const vec3 vertex[4], triangle &t){ 
 
 		t.normal.x 	= vertex[0].x;
@@ -63,10 +77,14 @@ struct triangle{
 	vec3 vertex[3], normal;
 };
 
-struct triangleMesh{
 
+class triangleMesh{
+	//Using class since data in triangleMesh accessible only to member functions
+	
+	private:
 	vector<triangle> mesh;
 
+	public:
 	void displayMesh(triangle &t) { cout<<"\n"<<t; }
 
 	void push_back(triangle t) { mesh.push_back(t); }
@@ -166,7 +184,7 @@ bool isASCII=false; //false -binary, true -ASCII
 				if(!strcmp(string0,"endsolid")) {
 
 					cout<<"\nEnd of file reached";
-					return 1;
+					break;
 				}
 
 				fscanf(file,"%s", string1);
@@ -226,3 +244,16 @@ bool isASCII=false; //false -binary, true -ASCII
 		
 }	
 
+int main(int argc, char *argv[]){
+
+	cout<<"\nProgram Starts, file name is : ";
+	cout<<argv[1];
+	
+	triangleMesh mesh;
+
+	if(readStlFile(argv[1],  &mesh))
+		cout<<"\nProgram Failed";
+	else
+		cout<<"\nProgram Sucess";
+
+}

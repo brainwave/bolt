@@ -10,7 +10,6 @@ using namespace std;
 #include <math.h>
 #include <string.h>
 
-
 struct vec3 {
 		//
 		// Idea is to store a vector from file in struct vec3, then
@@ -34,6 +33,20 @@ struct vec3 {
 	}
 		//overload << to print values conveniently 
 
+
+	
+
+	/*
+
+	void operator=(const vec3& vector) {
+
+		if((x!=vector.x)||(y!=vector.y)||(z!=vector.z)) {
+			x=vector.x; y=vector.y; z=vector.z;
+			}
+				//To avoid circular assignment if equating vector to itself
+	}
+				Commenting since looks to be implemented already in C++11
+	*/
 	float dot(const vec3& vec) {
 		return x*vec.x+y*vec.y+z*vec.z;
 	}
@@ -64,11 +77,10 @@ struct triangle{
 	
 	friend ostream& operator<<(ostream &output, const triangle &t) {
 	
-		output	<<"Triangle\n"
-			<<"Vertex 1 : "<<t.vertex[0].x<<"i+"<<t.vertex[0].y<<"j+"<<t.vertex[0].z<<"k\n"
-			<<"Vertex 2 : "<<t.vertex[1].x<<"i+"<<t.vertex[1].y<<"j+"<<t.vertex[1].z<<"k\n"
-			<<"Vertex 3 : "<<t.vertex[2].x<<"i+"<<t.vertex[2].y<<"j+"<<t.vertex[2].z<<"k\n"
-			<<"Normal   : "<<t.normal.x<<"i+"<<t.normal.y<<"j+"<<t.normal.z<<"k\n";
+		output	<<"\nVertex 1 : "<<t.vertex[0].x<<"i+"<<t.vertex[0].y<<"j+"<<t.vertex[0].z<<"k"
+			<<"\nVertex 2 : "<<t.vertex[1].x<<"i+"<<t.vertex[1].y<<"j+"<<t.vertex[1].z<<"k"
+			<<"\nVertex 3 : "<<t.vertex[2].x<<"i+"<<t.vertex[2].y<<"j+"<<t.vertex[2].z<<"k"
+			<<"\nNormal   : "<<t.normal.x<<"i+"<<t.normal.y<<"j+"<<t.normal.z<<"k";
 
 		return output;
 	}
@@ -94,29 +106,63 @@ struct plane {
 	}
 };
 
+struct line {
+
+	line (vec3 point1 = 0, vec3 point2 = 0) {
+	
+	startpoint = point1;
+	endpoint = point2;
+	
+	}
+
+	vec3 startpoint, endpoint;
+};
+
 class triangleMesh{
 	//Using class since data in triangleMesh accessible only to member functions
 	
 	private:
 	vector<triangle> mesh;
-
+	
 	public:
 	void displayMesh(triangle &t) { cout<<"\n"<<t; }
 
 	void push_back(triangle t) { mesh.push_back(t); }
+
+	void display_all_elements () {
+
+		int counter=0;
+
+		cout<<"\nData in Mesh : ";
+		for( auto meshIterator=mesh.begin();meshIterator!=mesh.end();meshIterator++ )				
+			cout<<"\nTriangle No. "<<++counter<<" "<<*meshIterator;
+
+	}
 	
 	float planeTriangleIntersect ( triangle &t, plane &p)
 	{
+		vector<vec3> intersections;
 		
 		for (int i=0; i < 3; i++) {
+
 			float dp1 = p.distanceFromPoint(t.vertex[i]);
 			float dp2 = p.distanceFromPoint(t.vertex[(i+1)%3]);
 			
-			return dp1*dp2;
+			if( dp1*dp2 < 0) {
+				float ratio= dp1/(dp1-dp2);
+				intersections.push_back(t.vertex[i]+(t.vertex[(i+1)%3]-t.vertex[i])*s]);
+			}
+
 		}
 	}
 
 };
+
+int sliceMesh (const float sliceSize, const vec3 sliceAxis, triangleMesh *mesh) {
+	
+	
+	return 0;
+}
 
 int readStlFile(const char *filename, triangleMesh *mesh){
 
@@ -124,7 +170,6 @@ bool isASCII=false; //false -binary, true -ASCII
 
 	triangle t;
 	vec3 vertex[4];
-
 	//detect if the file is ASCII or not
 	int parser;
 	
@@ -274,12 +319,21 @@ int main(int argc, char *argv[]){
 
 	cout<<"\nProgram Starts, file name is : ";
 	cout<<argv[1];
-	
+
+	float sliceSize=atof(argv[2]);
 	triangleMesh mesh;
 
 	if(readStlFile(argv[1],  &mesh))
 		cout<<"\nProgram Failed";
-	else
+	else {
+
+		vec3 Zaxis(0,0,1.0);
+		sliceMesh(sliceSize, Zaxis, &mesh);
+
+		mesh.display_all_elements();
+
 		cout<<"\nProgram Sucess";
+	}
+		
 
 }

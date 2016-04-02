@@ -22,6 +22,7 @@ struct vec3 {
 	float x, y, z;
 
 	friend vec3& operator>>(const vec3& read_vec, vec3& vec){
+
 		vec.x=read_vec.x; vec.y=read_vec.y;vec.z=read_vec.z; 
 		return vec;
 	}
@@ -33,8 +34,18 @@ struct vec3 {
 	}
 		//overload << to print values conveniently 
 
-
+	vec3 operator-(const vec3& vector) {
+		return vec3((x - vector.x),(y-vector.y),(z-vector.z));
+	}
 	
+
+	vec3 operator+(const vec3& vector) {
+		return vec3((x + vector.x),(y+vector.y),(z+vector.z));
+	}
+
+	vec3 operator*(const float f) {
+		return vec3((x*f),(y*f),(z*f));
+	}
 
 	/*
 
@@ -106,25 +117,41 @@ struct plane {
 	}
 };
 
-struct line {
-
-	line (vec3 point1 = 0, vec3 point2 = 0) {
-	
-	startpoint = point1;
-	endpoint = point2;
-	
+struct linesegment {
+	linesegment ( vec3 point1=0, vec3 point2=0 ) {
+		lineSegment = point2 - point1;
 	}
-
-	vec3 startpoint, endpoint;
+	
+	vec3 lineSegment;
 };
 
 class triangleMesh{
 	//Using class since data in triangleMesh accessible only to member functions
 	
-	private:
 	vector<triangle> mesh;
+
+	vector<linesegment> slice2d;
 	
-	public:
+	void planeTriangleIntersect ( triangle &t, plane &p) {
+		vector<vec3> intersections;
+
+		for (int i=0; i < 3; i++) {
+
+			float dp1 = p.distanceFromPoint(t.vertex[i]);
+			float dp2 = p.distanceFromPoint(t.vertex[(i+1)%3]);
+			
+			if( dp1*dp2 < 0) 
+				intersections.push_back(t.vertex[i]+((t.vertex[(i+1)%3]-t.vertex[i])*(dp1/(dp1-dp2))) );
+		
+		}
+
+		if(intersections.size()==2)
+			slice2d.push_back(intersections[0]-intersections[1]);
+	}
+
+public:
+
+
 	void displayMesh(triangle &t) { cout<<"\n"<<t; }
 
 	void push_back(triangle t) { mesh.push_back(t); }
@@ -138,31 +165,30 @@ class triangleMesh{
 			cout<<"\nTriangle No. "<<++counter<<" "<<*meshIterator;
 
 	}
-	
-	float planeTriangleIntersect ( triangle &t, plane &p)
-	{
-		vector<vec3> intersections;
+
+	void display_slice () {
 		
-		for (int i=0; i < 3; i++) {
-
-			float dp1 = p.distanceFromPoint(t.vertex[i]);
-			float dp2 = p.distanceFromPoint(t.vertex[(i+1)%3]);
-			
-			if( dp1*dp2 < 0) {
-				float ratio= dp1/(dp1-dp2);
-				intersections.push_back(t.vertex[i]+(t.vertex[(i+1)%3]-t.vertex[i])*s]);
+		cout<<"\nData Per Slice : ";
+		for( auto sliceIterator = slice2d.begin(); sliceIterator != slice2d.end(); sliceIterator++ )
+			cout<<"\n"<<(*sliceIterator).lineSegment;
+	}	
+	void find_min_max_var_z ( float &min_z, float &max_z) {
+		for( auto meshIterator = mesh.begin();meshIterator!=mesh.end(); meshIterator++){
+			for(int i =0; i<3; i++) {
+				if(min_z>(*meshIterator).vertex[i].z)
+					min_z=(*meshIterator).vertex[i].z;
+				if(max_z<(*meshIterator).vertex[i].z)
+					max_z=(*meshIterator).vertex[i].z;
 			}
-
 		}
 	}
 
-};
+	void find_slice (plane &p) {
+		for ( auto meshIterator = mesh.begin(); meshIterator != mesh.end(); meshIterator++ ) 
+						planeTriangleIntersect(*meshIterator, p);
+	}	
 
-int sliceMesh (const float sliceSize, const vec3 sliceAxis, triangleMesh *mesh) {
-	
-	
-	return 0;
-}
+};
 
 int readStlFile(const char *filename, triangleMesh *mesh){
 
@@ -170,6 +196,7 @@ bool isASCII=false; //false -binary, true -ASCII
 
 	triangle t;
 	vec3 vertex[4];
+
 	//detect if the file is ASCII or not
 	int parser;
 	
@@ -193,7 +220,7 @@ bool isASCII=false; //false -binary, true -ASCII
 		
 			char modelName[80], discarder[2];
 			size_t facetNo;
-	
+
 			cout<<"\nFile is not ASCII, using binary format";
 
 			file = fopen(filename, "rb");
@@ -210,15 +237,16 @@ bool isASCII=false; //false -binary, true -ASCII
 			cout<<"\nNo. Of Facets is : "<<facetNo;
 			cin.get();
 
+
 			while(!feof(file)){
 				for(int i=0;i<4;i++){
 
 					fread((void *)&vertex[i].x, 4, 1 , file);
 					fread((void *)&vertex[i].y, 4, 1 , file);
 					fread((void *)&vertex[i].z, 4, 1 , file);
-				}
-	
-				vertex>>t;
+			}
+					
+			vertex>>t;
 
 				mesh->push_back(t);
 
@@ -236,7 +264,6 @@ bool isASCII=false; //false -binary, true -ASCII
 		file = fopen(filename, "r");
 		
 		char header[6], modelName[256];
-
 		fscanf(file,"%s",header);
 			//Again, choosing C style formatted read of C++ style stream.
 			//Check advantages of each approach, change if beneficial.
@@ -270,7 +297,8 @@ bool isASCII=false; //false -binary, true -ASCII
 					fscanf(file, "%s", string1);
 						
 					if( !strcmp(string0, "outer") && !strcmp(string1,"loop")){
-				
+					
+
 						for(int i=1; i<=3; i++){
 
 								fscanf(file, "%s", string0);
@@ -280,10 +308,13 @@ bool isASCII=false; //false -binary, true -ASCII
 									fscanf(file, "%f", &vertex[i].x);
 									fscanf(file, "%f", &vertex[i].y);
 									fscanf(file, "%f", &vertex[i].z);
-								}
-	
-						}
+								
+							
 
+								}
+		
+							
+						}
 						fscanf(file, "%s", string0);
 						if( strcmp(string0, "endloop"))
 						{
@@ -321,19 +352,27 @@ int main(int argc, char *argv[]){
 	cout<<argv[1];
 
 	float sliceSize=atof(argv[2]);
+	
 	triangleMesh mesh;
 
 	if(readStlFile(argv[1],  &mesh))
 		cout<<"\nProgram Failed";
 	else {
-
-		vec3 Zaxis(0,0,1.0);
-		sliceMesh(sliceSize, Zaxis, &mesh);
-
+		float min_z=0.0f, max_z=0.0f;
+		mesh.find_min_max_var_z(min_z, max_z);
+		cout<<"\nMin and max Z are : "<<min_z<<" "<<max_z;
 		mesh.display_all_elements();
 
-		cout<<"\nProgram Sucess";
-	}
+		for( float i = min_z; i <= max_z; i+=sliceSize ) {
+			plane sliceplane(vec3(0,0,1),i);
+			mesh.find_slice(sliceplane);
 		
+			mesh.display_slice();
+		
+		}
 
+		cout<<"\nProgram Sucess";
+			cin.get();
+		
+	}
 }

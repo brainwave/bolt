@@ -307,13 +307,9 @@ bool isASCII=false; //false -binary, true -ASCII
 
 									fscanf(file, "%f", &vertex[i].x);
 									fscanf(file, "%f", &vertex[i].y);
-									fscanf(file, "%f", &vertex[i].z);
-								
-							
+									fscanf(file, "%f", &vertex[i].z);			
 
-								}
-		
-							
+								}			
 						}
 						fscanf(file, "%s", string0);
 						if( strcmp(string0, "endloop"))

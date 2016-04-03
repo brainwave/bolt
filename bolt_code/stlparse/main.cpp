@@ -108,6 +108,11 @@ struct plane {
 		distance=d;
 	}
 
+	void create_plane (vec3 n=0, float d=0.0f) {
+		normal.x=n.x; normal.y=n.y; normal.z=n.z;
+		distance=d;
+	}
+
 	vec3 normal; float distance;
 
 	float distanceFromPoint (vec3 point) {
@@ -125,33 +130,23 @@ struct linesegment {
 	vec3 lineSegment;
 };
 
+struct slice {
+	vector<linesegment> Slice;
+
+	void display_slice () {
+		cout<<"\nDisplaying Slice ";
+		for (auto sliceIterator = Slice.begin(); sliceIterator != Slice.end(); sliceIterator++ )
+		cout<<(*sliceIterator).lineSegment;
+	}
+};
+
+
 class triangleMesh{
 	//Using class since data in triangleMesh accessible only to member functions
 	
 	vector<triangle> mesh;
 
-	vector<linesegment> slice2d;
-	
-	void planeTriangleIntersect ( triangle &t, plane &p) {
-		vector<vec3> intersections;
-
-		for (int i=0; i < 3; i++) {
-
-			float dp1 = p.distanceFromPoint(t.vertex[i]);
-			float dp2 = p.distanceFromPoint(t.vertex[(i+1)%3]);
-			
-			if( dp1*dp2 < 0) 
-				intersections.push_back(t.vertex[i]+((t.vertex[(i+1)%3]-t.vertex[i])*(dp1/(dp1-dp2))) );
-		
-		}
-
-		if(intersections.size()==2)
-			slice2d.push_back(intersections[0]-intersections[1]);
-	}
-
 public:
-
-
 	void displayMesh(triangle &t) { cout<<"\n"<<t; }
 
 	void push_back(triangle t) { mesh.push_back(t); }
@@ -166,12 +161,15 @@ public:
 
 	}
 
+/*
 	void display_slice () {
 		
 		cout<<"\nData Per Slice : ";
-		for( auto sliceIterator = slice2d.begin(); sliceIterator != slice2d.end(); sliceIterator++ )
+		for( auto sliceIterator = Slice.begin(); sliceIterator != Slice.end(); sliceIterator++ )
 			cout<<"\n"<<(*sliceIterator).lineSegment;
 	}	
+*/
+
 	void find_min_max_var_z ( float &min_z, float &max_z) {
 		for( auto meshIterator = mesh.begin();meshIterator!=mesh.end(); meshIterator++){
 			for(int i =0; i<3; i++) {
@@ -183,10 +181,30 @@ public:
 		}
 	}
 
-	void find_slice (plane &p) {
-		for ( auto meshIterator = mesh.begin(); meshIterator != mesh.end(); meshIterator++ ) 
-						planeTriangleIntersect(*meshIterator, p);
-	}	
+	void slicer (plane *p, slice *s) {
+		
+		vector<vec3> intersections;
+
+		for (int i=0; i < 3; i++) {
+			
+			for(auto meshIterator = mesh.begin(); meshIterator != mesh.end(); meshIterator++) {
+			float dp1 = p->distanceFromPoint(meshIterator->vertex[i]);
+			float dp2 = p->distanceFromPoint(meshIterator->vertex[(i+1)%3]);
+				
+			if( dp1*dp2 < 0) 
+				intersections.push_back (
+						meshIterator->vertex[i] + 
+						((meshIterator->vertex[(i+1)%3] - meshIterator->vertex[i]) * 
+						 (dp1/(dp1-dp2))) );
+			}	
+		}
+
+		if(intersections.size()==2) {
+//			(*s).Slice.push_back(intersections[0]-intersections[1]);
+			cout<<"\nPushed back vector";
+	
+		}
+	}
 
 };
 
@@ -351,21 +369,38 @@ int main(int argc, char *argv[]){
 	
 	triangleMesh mesh;
 
+	if(argc<2) {
+		cout<<"\nInsufficient Arguments, program failed ";
+		return 1;
+	}
+
 	if(readStlFile(argv[1],  &mesh))
 		cout<<"\nProgram Failed";
 	else {
 		float min_z=0.0f, max_z=0.0f;
+
 		mesh.find_min_max_var_z(min_z, max_z);
 		cout<<"\nMin and max Z are : "<<min_z<<" "<<max_z;
-		mesh.display_all_elements();
+		
+//		mesh.display_all_elements();
 
+		plane *p = new plane[(int)(((max_z-min_z)/sliceSize))];
+		cout<<"\nline 1 executed";	
+
+		slice *s = new slice[(int)(((max_z-min_z)/sliceSize))];
+		cout<<"\nSuccessfully created plane and slice arrays ";
+		
+		int counter=0;
+		
 		for( float i = min_z; i <= max_z; i+=sliceSize ) {
-			plane sliceplane(vec3(0,0,1),i);
-			mesh.find_slice(sliceplane);
-		
-			mesh.display_slice();
-		
+			
+			p->create_plane( vec3(0,0,1), i);
+			mesh.slicer(&p[counter],&s[counter]);
+			counter++;
 		}
+
+		for( int i = (int)min_z, counter=0; i <= (int)max_z; i+=sliceSize )
+			s[counter++].display_slice();
 
 		cout<<"\nProgram Sucess";
 			cin.get();

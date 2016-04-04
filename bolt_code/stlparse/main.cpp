@@ -46,8 +46,11 @@ struct vec3 {
 	vec3 operator*(const float f) {
 		return vec3((x*f),(y*f),(z*f));
 	}
-
-	/*
+/*
+	bool operator!=(const vec3& vector) {
+		return ((x!=vector.x)||(y!=vector.y)||(z!=vector.z))?true:false;
+	}
+*/		/*
 
 	void operator=(const vec3& vector) {
 
@@ -134,9 +137,9 @@ struct slice {
 	vector<linesegment> Slice;
 
 	void display_slice () {
-		cout<<"\nDisplaying Slice ";
 		for (auto sliceIterator = Slice.begin(); sliceIterator != Slice.end(); sliceIterator++ )
-		cout<<(*sliceIterator).lineSegment;
+			cout<<sliceIterator->lineSegment;
+			cout<<"\n";
 	}
 };
 
@@ -161,14 +164,6 @@ public:
 
 	}
 
-/*
-	void display_slice () {
-		
-		cout<<"\nData Per Slice : ";
-		for( auto sliceIterator = Slice.begin(); sliceIterator != Slice.end(); sliceIterator++ )
-			cout<<"\n"<<(*sliceIterator).lineSegment;
-	}	
-*/
 
 	void find_min_max_var_z ( float &min_z, float &max_z) {
 		for( auto meshIterator = mesh.begin();meshIterator!=mesh.end(); meshIterator++){
@@ -185,9 +180,10 @@ public:
 		
 		vector<vec3> intersections;
 
+		for(auto meshIterator = mesh.begin(); meshIterator != mesh.end(); meshIterator++) {
+
 		for (int i=0; i < 3; i++) {
 			
-			for(auto meshIterator = mesh.begin(); meshIterator != mesh.end(); meshIterator++) {
 			float dp1 = p->distanceFromPoint(meshIterator->vertex[i]);
 			float dp2 = p->distanceFromPoint(meshIterator->vertex[(i+1)%3]);
 				
@@ -196,14 +192,14 @@ public:
 						meshIterator->vertex[i] + 
 						((meshIterator->vertex[(i+1)%3] - meshIterator->vertex[i]) * 
 						 (dp1/(dp1-dp2))) );
+			
 			}	
-		}
 
-		if(intersections.size()==2) {
-//			(*s).Slice.push_back(intersections[0]-intersections[1]);
-			cout<<"\nPushed back vector";
-	
+			if(intersections.size()==2) {
+				s->Slice.push_back(intersections[1]-intersections[0]);
+			}
 		}
+		s->display_slice();
 	}
 
 };
@@ -385,23 +381,20 @@ int main(int argc, char *argv[]){
 //		mesh.display_all_elements();
 
 		plane *p = new plane[(int)(((max_z-min_z)/sliceSize))];
-		cout<<"\nline 1 executed";	
-
 		slice *s = new slice[(int)(((max_z-min_z)/sliceSize))];
+
 		cout<<"\nSuccessfully created plane and slice arrays ";
 		
-		int counter=0;
-		
 		for( float i = min_z; i <= max_z; i+=sliceSize ) {
-			
+		
 			p->create_plane( vec3(0,0,1), i);
-			mesh.slicer(&p[counter],&s[counter]);
-			counter++;
+			mesh.slicer(p,s);
+			p++;
+			s++;
 		}
-
-		for( int i = (int)min_z, counter=0; i <= (int)max_z; i+=sliceSize )
-			s[counter++].display_slice();
-
+/*
+		for( float i = min_z;  i <= max_z; i+=sliceSize )
+*/
 		cout<<"\nProgram Sucess";
 			cin.get();
 		

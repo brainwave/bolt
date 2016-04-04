@@ -77,11 +77,11 @@ struct Triangle    {
                 intersectPoints.push_back(a+bMinusa*s);
             }
             else if (0==da) { // plane falls exactly on one of the three Triangle vertices
-                if (intersectPoints.size()<2
+                if (intersectPoints.size()<2)
                     intersectPoints.push_back(a);
             }
             else if (0==db) { // plane falls exactly on one of the three Triangle vertices
-                if (intersectPoints.size()<2
+                if (intersectPoints.size()<2)
                     intersectPoints.push_back(b);
             }
         }

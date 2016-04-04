@@ -46,21 +46,7 @@ struct vec3 {
 	vec3 operator*(const float f) {
 		return vec3((x*f),(y*f),(z*f));
 	}
-/*
-	bool operator!=(const vec3& vector) {
-		return ((x!=vector.x)||(y!=vector.y)||(z!=vector.z))?true:false;
-	}
-*/		/*
 
-	void operator=(const vec3& vector) {
-
-		if((x!=vector.x)||(y!=vector.y)||(z!=vector.z)) {
-			x=vector.x; y=vector.y; z=vector.z;
-			}
-				//To avoid circular assignment if equating vector to itself
-	}
-				Commenting since looks to be implemented already in C++11
-	*/
 	float dot(const vec3& vec) {
 		return x*vec.x+y*vec.y+z*vec.z;
 	}
@@ -378,8 +364,6 @@ int main(int argc, char *argv[]){
 		mesh.find_min_max_var_z(min_z, max_z);
 		cout<<"\nMin and max Z are : "<<min_z<<" "<<max_z;
 		
-//		mesh.display_all_elements();
-
 		plane *p = new plane[(int)(((max_z-min_z)/sliceSize))];
 		slice *s = new slice[(int)(((max_z-min_z)/sliceSize))];
 
@@ -392,9 +376,7 @@ int main(int argc, char *argv[]){
 			p++;
 			s++;
 		}
-/*
-		for( float i = min_z;  i <= max_z; i+=sliceSize )
-*/
+
 		cout<<"\nProgram Sucess";
 			cin.get();
 		

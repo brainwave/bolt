@@ -11,6 +11,14 @@ TO DO
 
 	Check if binary file is correctly read, implement fix if needed
 	Check for endianness, make code portable
-	Restrict file read (to determine ascii) to a few kilobytes instead of the full file (efficiency improvement)
+	
+Restrict file read (to determine ascii) to a few kilobytes instead of the full file (efficiency improvement)
+	
 	Check for intersections only in small volume above and below each triangle, or use only triangles a certain volume and down a given Z
 	Improve intersection code to add the edge cases
+
+	Check the STL file for discrepencies (Porchse like that)
+
+	Modularize
+
+	Fill up the pixels

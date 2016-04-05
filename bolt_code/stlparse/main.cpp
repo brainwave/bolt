@@ -3,7 +3,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
-
+#include <fstream>
 using namespace std;
 
 #include <stdio.h>
@@ -55,6 +55,8 @@ struct vec3 {
 		float magnitude = sqrt(x*x+y*y+z*z);
 		x /= magnitude; y /= magnitude; z/= magnitude;
 	}
+
+
 };
 
 struct triangle{
@@ -120,6 +122,8 @@ struct linesegment {
 	vec3 startpoint, endpoint;
 };
 
+static int counter=0;
+
 struct slice {
 
 	vector<linesegment> Slice;
@@ -130,6 +134,20 @@ struct slice {
 			cout<<"E "<<sliceIterator->endpoint<<" || ";
 		}
 		cout<<"\n";
+	}
+
+	void write_slice () {
+		
+		ofstream outfile;
+		string filename="slice_"+to_string(counter++)+".dat";
+		outfile.open(filename);
+
+		for ( auto sliceIterator = Slice.begin(); sliceIterator != Slice.end(); sliceIterator++ ) {
+			outfile<<sliceIterator->startpoint.x<<" "<<sliceIterator->startpoint.y<<" "
+			       <<(sliceIterator->endpoint.x - sliceIterator->startpoint.x)<<" "
+			       <<(sliceIterator->endpoint.y - sliceIterator->startpoint.y)<<"\n";
+		}
+
 	}
 };
 
@@ -168,12 +186,14 @@ public:
 
 	void slicer (plane *p, slice *s) {
 		
-		vector<vec3> intersections;
 
 		for(auto meshIterator = mesh.begin(); meshIterator != mesh.end(); meshIterator++) {
 
+		vector<vec3> intersections;
+
 		for (int i=0; i < 3; i++) {
 			
+
 			float dp1 = p->distanceFromPoint(meshIterator->vertex[i]);
 			float dp2 = p->distanceFromPoint(meshIterator->vertex[(i+1)%3]);
 				
@@ -186,10 +206,12 @@ public:
 			}	
 
 			if(intersections.size()==2) {
-				  s->Slice.push_back( linesegment(intersections[0], intersections[1]));		
+				  s->Slice.push_back( linesegment(intersections[1], intersections[0]));		
 			}
 		}
-		s->display_slice();
+	
+		s->write_slice();
+		//s->display_slice();
 	}
 
 };
@@ -376,13 +398,13 @@ int main(int argc, char *argv[]){
 		for( float i = min_z; i <= max_z; i+=sliceSize ) {
 		
 			p->create_plane( vec3(0,0,1), i);
+			
 			mesh.slicer(p,s);
 			p++;
 			s++;
+
 		}
 
 		cout<<"\nProgram Sucess";
-			cin.get();
-		
 	}
 }

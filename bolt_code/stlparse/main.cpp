@@ -29,7 +29,7 @@ struct vec3 {
 		//overload >> to copy a vector
 		
 	friend ostream& operator<<(ostream& output, const vec3 vec){
-		output<<vec.x<<"i+"<<vec.y<<"j+"<<vec.z<<"k ";
+		output<<round(vec.x*1000.0)/1000.0<<"i+"<<round(vec.y*1000.0)/1000.0<<"j+"<<round(vec.z*1000.0)/1000.0<<"k ";
 		return output;
 	}
 		//overload << to print values conveniently 
@@ -81,7 +81,7 @@ struct triangle{
 			<<"\nVertex 2 : "<<t.vertex[1].x<<"i+"<<t.vertex[1].y<<"j+"<<t.vertex[1].z<<"k"
 			<<"\nVertex 3 : "<<t.vertex[2].x<<"i+"<<t.vertex[2].y<<"j+"<<t.vertex[2].z<<"k"
 			<<"\nNormal   : "<<t.normal.x<<"i+"<<t.normal.y<<"j+"<<t.normal.z<<"k";
-
+		
 		return output;
 	}
 			//overload to push data from a vector array (read from file) into struct triangle
@@ -113,19 +113,23 @@ struct plane {
 
 struct linesegment {
 	linesegment ( vec3 point1=0, vec3 point2=0 ) {
-		lineSegment = point2 - point1;
+		endpoint = point2;
+		startpoint = point1;
 	}
 	
-	vec3 lineSegment;
+	vec3 startpoint, endpoint;
 };
 
 struct slice {
+
 	vector<linesegment> Slice;
 
 	void display_slice () {
-		for (auto sliceIterator = Slice.begin(); sliceIterator != Slice.end(); sliceIterator++ )
-			cout<<sliceIterator->lineSegment;
-			cout<<"\n";
+		for (auto sliceIterator = Slice.begin(); sliceIterator != Slice.end(); sliceIterator++ ) {
+			cout<<"S "<<sliceIterator->startpoint<<" ";
+			cout<<"E "<<sliceIterator->endpoint<<" || ";
+		}
+		cout<<"\n";
 	}
 };
 
@@ -182,7 +186,7 @@ public:
 			}	
 
 			if(intersections.size()==2) {
-				s->Slice.push_back(intersections[1]-intersections[0]);
+				  s->Slice.push_back( linesegment(intersections[0], intersections[1]));		
 			}
 		}
 		s->display_slice();

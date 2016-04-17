@@ -3,12 +3,31 @@
 #include <vector>
 
 struct vec3 {
-	glm::vec3 position;
 
-	friend vec3& operator>>(const vec3& read_vec, vec3& vec);
+	glm::vec3 pv; //position vector
 
-	friend std::ostream& operator<<(std::ostream& output, const vec3 vec);
+	vec3(float x, float y, float z) {
+		
+		pv.x=x;
+		pv.y=y;
+		pv.z=z;
 
+	}
+
+	friend vec3& operator>>(const vec3& read_vec, vec3& vec) {
+		
+		vec.pv.x = read_vec.pv.x;
+		vec.pv.y = read_vec.pv.y;
+		vec.pv.z = read_vec.pv.z;
+
+		return vec;
+	}
+
+	friend std::ostream& operator<<(std::ostream& output, const vec3 vec){
+		output<<round((vec.pv.x)*1000.0)/1000.0<<"i+"<<round((vec.pv.y)*1000.0)/1000.0<<"j+"<<round((vec.pv.z)*1000.0)/1000.0<<"k ";
+		return output;
+	}
+	
 	vec3 operator-(const vec3& vector);
 
 	vec3 operator+(const vec3& vector);
@@ -64,6 +83,8 @@ class triangleMesh {
 	std::vector <triangle> mesh;
 
 public:
+	void slice_mesh (plane *p, slice *s) ;
+
 	void displayMEsh (triangle &t);
 
 	void push_back (triangle t);
@@ -71,8 +92,6 @@ public:
 	void display_all_elements ();
 
 	void find_min_max_var_z (float &min_z, float &max_z);
-
-	void slicer (plane *p, slice *s) ;
 	
 	int readStlFile (const char *filename);
 	//ideally functionality to read stl file should exist here

@@ -1,0 +1,6 @@
+*.swp
+*.swo
+*.o
+*.out
+*pycache*
+*.ycm_extra_conf*

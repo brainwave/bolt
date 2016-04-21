@@ -11,5 +11,6 @@ int main ( int argc, char *argv[] ) {
 		cout << "\nProgram Failed" ;
 	
 	else
-		mesh.display_all_elements();
+		mesh.set_min_max_var_z();
+		//mesh.display_all_elements();
 }

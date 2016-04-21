@@ -1,4 +1,6 @@
 #include <iostream>
+#include <string.h>
+
 #include "libs/glm/glm.hpp"
 #include "libs/glm/gtx/string_cast.hpp"
 #include <vector>
@@ -58,14 +60,16 @@ class triangleMesh {
 	
 	vector <triangle> mesh;
 
+	float min_z = 0.0f, max_z = 0.0f;
+
 public:
 	void slice_mesh (plane *p, slice *s) ;
 
-	void displayMEsh (triangle &t);
+	void displayMesh (triangle &t);
 
 	void display_all_elements ();
 
-	void find_min_max_var_z (float &min_z, float &max_z);
+	void set_min_max_var_z (void) ;
 	
 	int readStlFile (const char *filename);
 };
@@ -83,7 +87,6 @@ void slice::display_slice () {
 		cout<<"\n";
 	}
 
-
 void triangleMesh::display_all_elements () {
 
 	int counter=0;
@@ -93,8 +96,6 @@ void triangleMesh::display_all_elements () {
 		cout<<"\nTriangle No. "<<++counter<<" "<<*meshIterator;
 
 }
-
-
 
 int triangleMesh::readStlFile ( const char *filename ) {
 			
@@ -161,6 +162,103 @@ int triangleMesh::readStlFile ( const char *filename ) {
 				}
 			return 0;
 		}
+
+		else{
+		//block for ASCII
+		
+		cout<<"\nUsing ASCII format";
+		
+		file = fopen(filename, "r");
+		
+		char header[6], modelName[256];
+		fscanf(file,"%s",header);
+			//Again, choosing C style formatted read of C++ style stream.
+			//Check advantages of each approach, change if beneficial.
+			
+		if(!strcmp(header,"solid")){
+
+			fgets(modelName,255,file);
+			cout<<"\nModel Name is : "<<modelName;
+
+			while (!feof(file)){
+
+				char string0[11], string1[11];
+				
+				fscanf(file,"%s", string0);
+
+				if(!strcmp(string0,"endsolid")) {
+
+					cout<<"\nEnd of file reached";
+					break;
+				}
+
+				fscanf(file,"%s", string1);
+
+				if( !strcmp(string0, "facet") && !strcmp(string1,"normal")) {
+
+					fscanf(file, "%f", &vertex[0].x);
+					fscanf(file, "%f", &vertex[0].y);
+					fscanf(file, "%f", &vertex[0].z);
+
+					fscanf(file, "%s", string0);
+					fscanf(file, "%s", string1);
+						
+					if( !strcmp(string0, "outer") && !strcmp(string1,"loop")){
+					
+
+						for(int i=1; i<=3; i++){
+
+								fscanf(file, "%s", string0);
+								
+								if( !strcmp(string0, "vertex")){
+
+									fscanf(file, "%f", &vertex[i].x);
+									fscanf(file, "%f", &vertex[i].y);
+									fscanf(file, "%f", &vertex[i].z);			
+
+								}			
+						}
+						fscanf(file, "%s", string0);
+						if( strcmp(string0, "endloop"))
+						{
+							cout<<"\nERROR - Expected 'endloop', found "<<string0<<" instead";
+							return 1;
+						}
+
+						fscanf(file, "%s", string0);
+
+						if( strcmp(string0, "endfacet")) {
+
+							cout<<"ERROR - expected 'endfacet', found "<<string1<<" instead";
+							return 1;
+						}
+					}
+				}
+
+				vertex>>t;
+				mesh.push_back(t);
+
+			}
+		}
+	
+		else
+			cout<<"\nHeader Mismatch, incorrect ASCII file";
+
+		return 0;
+	}
 		return 1;
 }
 
+void triangleMesh::set_min_max_var_z () {
+	
+	for ( auto meshIterator = mesh.begin(); meshIterator != mesh.end(); meshIterator++ ) 
+		for ( int i = 0; i < 3; i++ ) {
+			
+			min_z = ( min_z > meshIterator -> vertex[i].z ) ? meshIterator -> vertex[i].z : min_z;
+			max_z = ( max_z < meshIterator -> vertex[i].z ) ? meshIterator -> vertex[i].z : max_z;
+			
+
+	}
+
+	cout<<"\n(Diagnostic Msg) Minimum and maximum z values are : "<<min_z<<", "<<max_z;
+}

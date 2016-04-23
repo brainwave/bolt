@@ -4,3 +4,4 @@
 *.out
 *pycache*
 *.ycm_extra_conf*
+*snippet

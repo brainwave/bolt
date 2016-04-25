@@ -9,8 +9,8 @@ void slice::display_slice () {
 		cout<<"\n(Diagnostic Msg)\n";
 
 		for (auto sliceIterator = slice.begin(); sliceIterator != slice.end(); sliceIterator++ ) {
-			cout << "\n\t\tS: " << to_string ( sliceIterator->startpoint ) ;
-			cout << "\n\t\tE: " << to_string(sliceIterator->endpoint)<<"\n" ;
+	
+			cout<<"\nLineSegment: "<<sliceIterator->startpoint<<"\t"<<sliceIterator->endpoint;
 		}
 		cout<<"\n\n";
 	}
@@ -177,7 +177,7 @@ int stlMesh::readStlFile ( const char *filename ) {
 		return 1;
 }
 
-void stlMesh::set_min_max_var_z () {
+void stlMesh::set_min_max_var_z (float &min, float &max) {
 	
 	for ( auto meshIterator = mesh.begin(); meshIterator != mesh.end(); meshIterator++ ) 
 		for ( int i = 0; i < 3; i++ ) {
@@ -186,32 +186,18 @@ void stlMesh::set_min_max_var_z () {
 			max_z = ( max_z < meshIterator -> vertex[i].z ) ? meshIterator -> vertex[i].z : max_z;
 
 	}
-
+	min=min_z;
+	max=max_z;
 	cout<<"\n(Diagnostic Msg) Minimum and maximum z values are : "<<min_z<<", "<<max_z;
 }
 
-void stlMesh::slice_mesh ( ) {
+void stlMesh::slice_mesh ( plane *p, slice *s) {
 
-		cout<<"\n(Diagnostic Msg) Min and max Z are : "<<min_z<<" "<<max_z;
-	
-		float sliceSize = 0.1f;
-
-
-		plane *p = new plane[(int)(((max_z-min_z)/sliceSize))];
-		slice *s = new slice[(int)(((max_z-min_z)/sliceSize))];
-
-		cout<<"\n(Diagnostic Msg) Successfully created plane and slice arrays ";
-		
-		for( float i = min_z; i <= max_z; i+=sliceSize ) {
-		
-			p->create_plane( vec3(0,0,1), i ) ;
-			
 			for(auto meshIterator = mesh.begin(); meshIterator != mesh.end(); meshIterator++) {
 
 				vector<vec3> intersections;
 
 				for (int i=0; i < 3; i++) {
-				
 
 				float dp1 = p->distanceFromPoint(meshIterator->vertex[i]);
 				float dp2 = p->distanceFromPoint(meshIterator->vertex[(i+1)%3]);
@@ -228,12 +214,4 @@ void stlMesh::slice_mesh ( ) {
 					  s->slice.push_back( linesegment(intersections[1], intersections[0]));		
 				}
 			}
-		
-			s->display_slice();
-
-			p++;
-			s++;
-
-	}	
-
 }

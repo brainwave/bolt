@@ -1,3 +1,6 @@
+#ifndef MESHDEF_H
+#define MESHDEF_H
+
 #include <iostream>
 #include <string.h>
 
@@ -7,6 +10,11 @@
 
 using namespace std;
 using namespace glm;
+
+ostream &operator<<(ostream & output, const vec3 &vector ) {
+	output<<"{ "<<vector.x<<", "<<vector.y<<", "<<vector.z<<" }";
+	return output;
+}
 
 struct triangle {
 	
@@ -59,25 +67,27 @@ struct slice {
 	
 	void display_slice ( void );
 
-	void write_slice ( void);
+	void store_slice ();
 };
 
 class stlMesh {
 	
 	vector <triangle> mesh;
 
-	float min_z = 0.0f, max_z = 0.0f;
+	float min_z = 9999999.0f, max_z = -9999999.0f;
 
 	
 public:
-	void slice_mesh ();
+	void slice_mesh (plane *p, slice *s);
 
 	void displayMesh ( triangle &t );
 
 	void display_all_elements ();
 
-	void set_min_max_var_z ( void ) ;
+	void set_min_max_var_z ( float &min_z, float &max_z ) ;
 	
 	int readStlFile ( const char *filename );
 };
 
+		
+#endif

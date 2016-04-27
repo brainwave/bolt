@@ -1,4 +1,5 @@
 #include "meshDef.hpp"
+#include <fstream>
 
 float plane::distanceFromPoint (vec3 point) {
 	normal = glm::normalize (normal);
@@ -14,6 +15,19 @@ void slice::display_slice () {
 		}
 		cout<<"\n\n";
 	}
+
+void slice::store_slice(string &filename, const int sliceNo) {
+
+		filename = filename + to_string(sliceNo) + ".dat";
+		cout<<"\n(Diagnostic Msg) Writing to file: "<<filename;
+		ofstream file;
+		file.open (filename);
+			
+		for ( auto sliceIterator = slice.begin(); sliceIterator != slice.end(); sliceIterator++ ) 								
+				file<<sliceIterator->startpoint<<" "<<sliceIterator->endpoint<<"\n";
+		
+		file.close();
+}
 
 void stlMesh::display_all_elements () {
 

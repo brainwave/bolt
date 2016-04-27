@@ -12,7 +12,7 @@ using namespace std;
 using namespace glm;
 
 ostream &operator<<(ostream & output, const vec3 &vector ) {
-	output<<"{ "<<vector.x<<", "<<vector.y<<", "<<vector.z<<" }";
+	output<<vector.x<<" "<<vector.y<<" "<<vector.z;
 	return output;
 }
 
@@ -67,7 +67,7 @@ struct slice {
 	
 	void display_slice ( void );
 
-	void store_slice ();
+	void store_slice (string &filename,const int sliceNo);
 };
 
 class stlMesh {

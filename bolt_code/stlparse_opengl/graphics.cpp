@@ -31,14 +31,24 @@ const GLchar* fshader =
     "}";
 
 
-static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
-{
+int showSlice(string filename, string extension, int counter);
+int max_slice_no=0,cur_slice_no=0;
+
+static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
 			glfwSetWindowShouldClose(window,GL_TRUE);
+	
+	if (key == GLFW_KEY_SPACE && action == GLFW_PRESS && cur_slice_no<max_slice_no)
+		showSlice("slice_",".dat",cur_slice_no++);	
+
 }
 
-GLFWwindow* glInit(void)
-{
+GLFWwindow* glInit(int slicecounter) {
+	//store the number of slices
+	max_slice_no=slicecounter;
+
+	GLuint vao, vbo, shaderProgram;
+
 	GLFWwindow* window;
 	if (!glfwInit())
 	    exit(EXIT_FAILURE);
@@ -48,7 +58,6 @@ GLFWwindow* glInit(void)
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
-
 	window = glfwCreateWindow(640, 480, "Slice Viewer", NULL, NULL);
 if (!window) {
 	    glfwTerminate();
@@ -56,61 +65,26 @@ if (!window) {
 	}
 
 	glfwMakeContextCurrent(window);
+   
+	glfwSetKeyCallback(window, key_callback);
 
-    glfwSetKeyCallback(window, key_callback);
-	
 	glewExperimental = GL_TRUE;
 	if(glewInit()!=GLEW_OK) {
 		cout<<"\n(Diagnostic Msg) Error: Couldn't initiazlie glew.";
 		exit(EXIT_FAILURE);
 	}
 
-	return window;
-}
-
-int showSlice(GLFWwindow* window, string filename, string extension, int counter)
-{
-
-	vector<glm::vec3> vertices ;
-	filename = filename+to_string(counter)+extension;
-
 	glGetError();
-
-	FILE* file = fopen(filename.c_str(),"r");
-
-	if(!file) {
-			cout<<"\n(Diagnostic Msg) Couldn't Open File";
-			return 1;
-	}
-
-	else
-			cout<<"\n(Diagnostic Msg) "<<filename.c_str()<<" opened";
-	while(!feof(file)) {
-	glm::vec3 temp_vertex;
-
-	fscanf(file, "%f %f %f", &temp_vertex.x, &temp_vertex.y, &temp_vertex.z);
 	
-	vertices.push_back(temp_vertex);
-	}
-
-	cout<<"\n(Diagnostic Msg)Printing Vertices:\n";	
-	for ( auto it = vertices.begin(); it != vertices.end(); it++) 
-			cout<<(*it).x<<" "<<(*it).y<<" "<<(*it).z<<"\n";
-
-	GLuint vbo=0;
 	glGenBuffers(1, &vbo);
-
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBufferData(GL_ARRAY_BUFFER, 3*sizeof(GLfloat)*vertices.size(), &vertices[0].x, GL_STATIC_DRAW);
-
-	GLuint vao=0;
+	
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
 	glEnableVertexAttribArray(0);
-	glBindBuffer (GL_ARRAY_BUFFER, vbo);
+	
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
 
-	//vertex shader
 	GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
 	glShaderSource (vertexShader, 1, &vshader, NULL);
 	glCompileShader(vertexShader);
@@ -143,9 +117,8 @@ int showSlice(GLFWwindow* window, string filename, string extension, int counter
 		cout<<"\nFragment Shader Error "<<logStr;
 	}
 	
-	
 	//shader program
-	GLuint shaderProgram = glCreateProgram();
+	shaderProgram = glCreateProgram();
 	
 	glAttachShader(shaderProgram, fragmentShader);
 	glAttachShader( shaderProgram, vertexShader);
@@ -167,24 +140,46 @@ int showSlice(GLFWwindow* window, string filename, string extension, int counter
 		cout<<"\nProgram Linking Error "<<logStr;
 	}
 	
-
-	while(!glfwWindowShouldClose(window)) {
-
-	
-
-	glBufferData(GL_ARRAY_BUFFER, 3*sizeof(GLfloat)*vertices.size(), &vertices[0].x, GL_STATIC_DRAW);
-    
-	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 	glUseProgram(shaderProgram);
-	glBindVertexArray(vao);
-
-	glLineWidth(10);
-	glDrawArrays(GL_LINES, 0, 6);
 	
-	glfwPollEvents();
-	glfwSwapBuffers(window);
+	return window;
+}
+
+int showSlice(string filename, string extension, int counter)
+{
+
+	vector<glm::vec3> vertices ;
+
+	filename = filename+to_string(counter)+extension;
+	FILE* file = fopen(filename.c_str(),"r");
+	if(!file) {
+			cout<<"\n(Diagnostic Msg) Couldn't Open File";
+			return 1;
 	}
-  
+	
+	while(!feof(file)) {
+	glm::vec3 temp_vertex;
+
+	fscanf(file, "%f %f %f", &temp_vertex.x, &temp_vertex.y, &temp_vertex.z);
+	
+	vertices.push_back(temp_vertex);
+	}
+
+	cout<<"\n(Diagnostic Msg)Printing Vertices:\n";	
+	for ( auto it = vertices.begin(); it != vertices.end(); it++) 
+			cout<<(*it).x<<" "<<(*it).y<<" "<<(*it).z<<"\n";
+
+	glBufferData(GL_ARRAY_BUFFER, 3*sizeof(GLfloat)*vertices.size(), &vertices[0].x, GL_DYNAMIC_DRAW);
 	return 1;
 }
 
+int showWindow(GLFWwindow* window) {
+		//vertex shader
+	while(!glfwWindowShouldClose(window)) {
+	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+	glDrawArrays(GL_LINES, 0, 6);
+	glfwPollEvents();
+	glfwSwapBuffers(window);
+	}
+	return 0;
+}

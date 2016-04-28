@@ -74,7 +74,8 @@ class stlMesh {
 	
 	vector <triangle> mesh;
 
-	float min_z = 9999999.0f, max_z = -9999999.0f;
+	float min_z = 999999.0f, min_x = 999999.0f, min_y = 999999.0f;
+	float max_z = -999999.f,max_x = -999999.f, max_y = -9999999.0f;
 
 	
 public:
@@ -84,8 +85,10 @@ public:
 
 	void display_all_elements ();
 
-	void set_min_max_var_z ( float &min_z, float &max_z ) ;
-	
+	void set_min_max_var_z ( float &min_z, float &max_z, float &min_x, float &max_x, float &min_y, float &max_y) ;
+
+	void recenter ( const float xshift, const float yshift, const float zshift );
+
 	int readStlFile ( const char *filename );
 };
 

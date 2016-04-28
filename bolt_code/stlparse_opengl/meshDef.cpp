@@ -19,7 +19,7 @@ void slice::display_slice () {
 void slice::store_slice(string &filename, const int sliceNo) {
 
 		filename = filename + to_string(sliceNo) + ".dat";
-		cout<<"\n(Diagnostic Msg) Writing to file: "<<filename;
+		cout<<"\n "<<filename;
 		ofstream file;
 		file.open (filename);
 			
@@ -84,8 +84,6 @@ int stlMesh::readStlFile ( const char *filename ) {
 				fread((void *)&facetNo, 4, 1, file);
 				
 				cout<<"\nNo. Of Facets is : "<<facetNo;
-				cin.get();
-
 
 				while(!feof(file)){
 					for(int i=0;i<4;i++){
@@ -191,18 +189,37 @@ int stlMesh::readStlFile ( const char *filename ) {
 		return 1;
 }
 
-void stlMesh::set_min_max_var_z (float &min, float &max) {
+void stlMesh::set_min_max_var_z (float &minz, float &maxz, float &minx, float &maxx, float &miny, float &maxy) {
 	
 	for ( auto meshIterator = mesh.begin(); meshIterator != mesh.end(); meshIterator++ ) 
 		for ( int i = 0; i < 3; i++ ) {
 			
 			min_z = ( min_z > meshIterator -> vertex[i].z ) ? meshIterator -> vertex[i].z : min_z;
 			max_z = ( max_z < meshIterator -> vertex[i].z ) ? meshIterator -> vertex[i].z : max_z;
+			min_x = ( min_x > meshIterator -> vertex[i].x ) ? meshIterator -> vertex[i].x : min_x;
+			max_x = ( max_x < meshIterator -> vertex[i].x ) ? meshIterator -> vertex[i].x : max_x;
+			min_y = ( min_y > meshIterator -> vertex[i].y ) ? meshIterator -> vertex[i].y : min_y;
+			max_y = ( max_y < meshIterator -> vertex[i].y ) ? meshIterator -> vertex[i].y : max_y;
 
 	}
-	min=min_z;
-	max=max_z;
-	cout<<"\n(Diagnostic Msg) Minimum and maximum z values are : "<<min_z<<", "<<max_z;
+
+	minz=min_z;
+	maxz=max_z;
+	minx=min_x;
+	maxx=max_x;
+	miny=min_y;
+	maxy=max_y;
+	
+}
+
+void stlMesh::recenter(const float xshift, const float yshift, const float zshift ) {
+		for ( auto meshIterator = mesh.begin(); meshIterator != mesh.end(); meshIterator++) {
+			for( int i =0; i <3; i++ ) {
+				meshIterator->vertex[i].x -= xshift;
+				meshIterator->vertex[i].y -= yshift;
+				meshIterator->vertex[i].z -= zshift;
+			}
+		}
 }
 
 void stlMesh::slice_mesh ( plane *p, slice *s) {

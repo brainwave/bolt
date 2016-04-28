@@ -390,8 +390,8 @@ int main(int argc, char *argv[]){
 		mesh.find_min_max_var_z(min_z, max_z);
 		cout<<"\nMin and max Z are : "<<min_z<<" "<<max_z;
 		
-		plane *p = new plane[(int)(((max_z-min_z)/sliceSize))];
-		slice *s = new slice[(int)(((max_z-min_z)/sliceSize))];
+		plane *p = new plane[(int)(((max_z-min_z)/sliceSize))+1];
+		slice *s = new slice[(int)(((max_z-min_z)/sliceSize))+1];
 
 		cout<<"\nSuccessfully created plane and slice arrays ";
 		

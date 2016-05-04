@@ -6,5 +6,4 @@
 *.ycm_extra_conf*
 *snippet
 *.dat
-libs
 *.stl

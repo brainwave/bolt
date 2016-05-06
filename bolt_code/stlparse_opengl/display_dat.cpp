@@ -245,17 +245,22 @@ int showWindow(GLFWwindow* window, const GLfloat xscale = 1.0f, const GLfloat ys
 }
 
 int main() {
+
 	GLfloat xscale, yscale, zscale;
 
 	string discard;
 	ifstream file;
+
 	file.open("last_run_parameters.txt");
+
+	//discarding unused spaces/words in file
 	file>>discard>>max_slice_no;	
 	file>>discard>>xscale;
 	file>>discard>>yscale;
 	file>>discard>>zscale;
 
 	file.close();
+
 	cout<<"\nReading files upto .slice_"<<max_slice_no-1<<".dat ";
 		
 			GLFWwindow* window = glInit();

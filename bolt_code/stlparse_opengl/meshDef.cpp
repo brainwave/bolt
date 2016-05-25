@@ -1,4 +1,58 @@
+#include "meshDef.hpp"
+#include <fstream>
+
+float plane::distanceFromPoint (vec3 point) {
+	normal = glm::normalize (normal);
+	return dot(point, normal) - distance;
+}	
+
+void slice::display_slice () {
+		cout<<"\n(Diagnostic Msg)\n";
+
+		for (auto sliceIterator = slice.begin(); sliceIterator != slice.end(); sliceIterator++ ) {
 	
+			cout<<"\nLineSegment: "<<sliceIterator->startpoint<<"\t"<<sliceIterator->endpoint;
+		}
+		cout<<"\n\n";
+	}
+
+void slice::store_slice(string &filename, const int sliceNo) {
+
+		filename = filename + to_string(sliceNo) + ".dat";
+		cout<<"\n "<<filename;
+		ofstream file;
+		file.open (filename);
+			
+		for ( auto sliceIterator = slice.begin(); sliceIterator != slice.end(); sliceIterator++ ) 								
+				file<<sliceIterator->startpoint<<" "<<sliceIterator->endpoint<<"\n";
+		
+		file.close();
+}
+
+void stlMesh::display_all_elements () {
+
+	int counter=0;
+
+	cout<<"\n(Diagnostic Msg)Data in Mesh : ";
+	for( auto meshIterator=mesh.begin();meshIterator!=mesh.end();meshIterator++ )				
+		cout<<"\nTriangle No. "<<++counter<<" "<<*meshIterator;
+
+}
+
+int stlMesh::readStlFile ( const char *filename ) {
+			
+	bool isASCII=false; //false -binary, true -ASCII
+
+		triangle t;
+		vec3 vertex[4];
+
+		//detect if the file is ASCII or not
+		int parser;
+		
+		FILE *file = fopen(filename, "r");
+			//Using C style file IO over C++ style streams, as streams cause data corruption.
+			//May be fixable, need to check advantages of both approaches
+			
 		do{
 			parser=fgetc(file);
 		}while((parser!=EOF) && parser<=127 );

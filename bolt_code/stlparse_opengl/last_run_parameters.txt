@@ -1,8 +1,8 @@
 SliceCount
-41
+9
 xScale
-0.239789
+1
 yScale
-0.383663
+1.6
 zScale
-0.239789
+1

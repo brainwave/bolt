@@ -52,16 +52,16 @@ int stlMesh::readStlFile ( const char *filename ) {
 		FILE *file = fopen(filename, "r");
 			//Using C style file IO over C++ style streams, as streams cause data corruption.
 			//May be fixable, need to check advantages of both approaches
-			
+	        		
 		do{
 			parser=fgetc(file);
-		}while((parser!=EOF) && parser<=127 );
+		}while((parser!=EOF) && parser<=127 && ftell(file)<=2048);
 			//Check if file is ASCII. If true, every character read from file should be <=127
 			//Need to check for robustness of this approach.
 			
 		fclose(file);
 
-		if(parser==EOF)
+		if(parser==EOF || ftell(file)==2048)
 			isASCII=true;
 
 		if(!isASCII) {

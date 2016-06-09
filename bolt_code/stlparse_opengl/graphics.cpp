@@ -38,7 +38,6 @@ const GLchar* fshader =
 //Global Variables
 GLuint vao, vbo,shaderProgram ;
 GLfloat  xscale, yscale, zscale;
-
 int showSlice(string filename, string extension, int counter);
 int max_slice_no=0,cur_slice_no=0, vertexCount=0;
 int width=0, height=0;
@@ -73,8 +72,8 @@ GLFWwindow* glInit(int slicecounter, const GLfloat xshift, const GLfloat yshift,
 	if (!glfwInit())
 	    exit(EXIT_FAILURE);
 
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);

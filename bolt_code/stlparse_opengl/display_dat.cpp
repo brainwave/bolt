@@ -37,27 +37,21 @@ const GLchar* fshader =
 
 //Global Variables
 GLuint vao, vbo,shaderProgram ;
-
 int showSlice(string filename, string extension, int counter, const GLfloat, const GLfloat, const GLfloat );
-
 int max_slice_no=0,cur_slice_no=0, vertexCount=0;
-
 int width=0, height=0;
 
 float minimum (GLfloat x, GLfloat y, GLfloat z) {
+	float min = x; /* assume x is the largest */
+	if (y < min) 
+		min = y;
+	if (z < min ) 
+		min = z;
 
-		float min = x; /* assume x is the largest */
-
-		if (y < min) 
-			min = y;
-		if (z < min ) 
-			min = z;
-
-		return min ; /* max is the largest value */
+	return min ; /* max is the largest value */
 } 
 
 static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
-
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
 			glfwSetWindowShouldClose(window,GL_TRUE);
 	
@@ -113,9 +107,7 @@ if (!window) {
 	//check vertex shader compilation
 	GLint status=0;
 	glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &status);
-
 	if(status==GL_FALSE) {
-
 		GLint logLen=0;
 		glGetShaderiv(vertexShader, GL_INFO_LOG_LENGTH, &logLen);
 		GLchar* logStr = new GLchar[logLen];
@@ -126,25 +118,18 @@ if (!window) {
 	
 	//frag shader
 	GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);	
-
 	glShaderSource (fragmentShader, 1, &fshader, NULL);	
-
 	glCompileShader(fragmentShader);
-
 	status=0;
 	//check fragshader compilation
-
 	glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &status);
-
 	if(status==GL_FALSE) {
-
 		GLint logLen=0;
 		glGetShaderiv(fragmentShader, GL_INFO_LOG_LENGTH, &logLen);
 		GLchar* logStr = new GLchar[logLen];
 		glGetShaderInfoLog(fragmentShader, logLen, 0, logStr);
 
 		cout<<"\nFragment Shader Error "<<logStr;
-
 	}
 	
 	//shader program
@@ -160,9 +145,7 @@ if (!window) {
 	
 	//check linking
 	if(status==GL_FALSE) {
-
 		GLint logLen=0;
-
 		glGetProgramiv(shaderProgram, GL_INFO_LOG_LENGTH, &logLen);
 		cout<<"\nLog Length: "<<logLen<<"\n";
 
@@ -184,25 +167,21 @@ int showSlice(string filename, string extension, int counter, const GLfloat x_sc
 
 	filename = filename+to_string(counter)+extension;
 	FILE* file = fopen(filename.c_str(),"r");
-
 	if(!file) {
 			cout<<"\n(Diagnostic Msg) Couldn't Open File";
 			return 1;
 	}
 	
 	while(!feof(file)) {
-
 	glm::vec3 temp_vertex;
 
 	fscanf(file, "%f %f %f", &temp_vertex.x, &temp_vertex.y, &temp_vertex.z);
 	
 	vertices.push_back(temp_vertex);
-
 	}
 	vertexCount=0;
 
 	cout<<"\n(Diagnostic Msg)Printing Vertices:\n";	
-
 	for ( auto it = vertices.begin(); it != vertices.end(); it++) 
 	{		
 			cout<<(*it).x<<" "<<(*it).y<<" "<<(*it).z<<"\n";
@@ -214,7 +193,6 @@ int showSlice(string filename, string extension, int counter, const GLfloat x_sc
 //	glm::mat4 glm_tm = glm::scale(glm::mat4(1.0),glm::vec3(1,aspectratio,1));
 	//get transformation matrix location
 	GLint tm = glGetUniformLocation(shaderProgram, "transform");
-
 	if(tm ==-1 ) {
 			cout<<"\nError, couldn't bind transform ";
 			return 1; 
@@ -229,9 +207,7 @@ int showSlice(string filename, string extension, int counter, const GLfloat x_sc
 
 int showWindow(GLFWwindow* window, const GLfloat xscale = 1.0f, const GLfloat yscale = 1.0f, const GLfloat zscale = 1.0f) {
 		//vertex shader
-		//
 	while(!glfwWindowShouldClose(window)) {
-
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 	glDrawArrays(GL_LINES, 0, vertexCount);
 
@@ -245,22 +221,17 @@ int showWindow(GLFWwindow* window, const GLfloat xscale = 1.0f, const GLfloat ys
 }
 
 int main() {
-
 	GLfloat xscale, yscale, zscale;
 
 	string discard;
 	ifstream file;
-
 	file.open("last_run_parameters.txt");
-
-	//discarding unused spaces/words in file
 	file>>discard>>max_slice_no;	
 	file>>discard>>xscale;
 	file>>discard>>yscale;
 	file>>discard>>zscale;
 
 	file.close();
-
 	cout<<"\nReading files upto .slice_"<<max_slice_no-1<<".dat ";
 		
 			GLFWwindow* window = glInit();

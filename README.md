@@ -1,2 +1,2 @@
 # bolt
-Master Repository for Bolt printer
+Development branch of bolt printer

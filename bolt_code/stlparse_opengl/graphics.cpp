@@ -38,6 +38,7 @@ const GLchar* fshader =
 //Global Variables
 GLuint vao, vbo,shaderProgram ;
 GLfloat  xscale, yscale, zscale;
+
 int showSlice(string filename, string extension, int counter);
 int max_slice_no=0,cur_slice_no=0, vertexCount=0;
 int width=0, height=0;

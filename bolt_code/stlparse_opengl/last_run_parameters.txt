@@ -1,0 +1,8 @@
+SliceCount
+41
+xScale
+0.239789
+yScale
+0.383663
+zScale
+0.239789

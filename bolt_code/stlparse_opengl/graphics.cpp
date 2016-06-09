@@ -19,7 +19,7 @@ using namespace std;
 // Shader sources
 
 const GLchar* vshader =
-    "#version 120 \n"
+    "#version 150 \n"
     "in vec3 position;"
     "uniform mat4 transform;"
 	"void main()"
@@ -28,11 +28,11 @@ const GLchar* vshader =
     "}";
 
 const GLchar* fshader =
-    "#version 120 \n"
-    //"out vec4 fragColor;"
+    "#version 150 \n"
+    "out vec4 fragColor;"
     "void main()"
     "{"
-    "    gl_fragColor = vec4(0.0, 0.0, 1.0, 1.0);" //added gl_ prefix
+    "    fragColor = vec4(0.0, 0.0, 1.0, 1.0);"
     "}";
 
 //Global Variables
@@ -42,7 +42,7 @@ GLfloat  xscale, yscale, zscale;
 int showSlice(string filename, string extension, int counter);
 int max_slice_no=0,cur_slice_no=0, vertexCount=0;
 int width=0, height=0;
-int window_width,window_height;
+
 float minimum (GLfloat x, GLfloat y, GLfloat z) {
 	float min = x; /* assume x is the largest */
 	if (y < min) 
@@ -60,13 +60,6 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 //	if (key == GLFW_KEY_SPACE && action == GLFW_PRESS && cur_slice_no<max_slice_no)
 
 }
-//Function obtains monitor resolution
-void get_resolution() {
-    const GLFWvidmode * mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-
-    window_width = mode->width;
-    window_height = mode->height;
-}
 
 GLFWwindow* glInit(int slicecounter, const GLfloat xshift, const GLfloat yshift, const GLfloat zshift) {
 	//store globally relevant info
@@ -80,21 +73,18 @@ GLFWwindow* glInit(int slicecounter, const GLfloat xshift, const GLfloat yshift,
 	if (!glfwInit())
 	    exit(EXIT_FAILURE);
 
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-        get_resolution();
 
-	window = glfwCreateWindow(window_width, window_height, "Slice Viewer", NULL, NULL); //Window size passed
-        
-        if( window == NULL ){
-                fprintf( stderr, "Failed to open GLFW window. If you have an Intel GPU, some are not 3.3 compatible.\n" );
-                getchar();
-                glfwTerminate();
-                exit(1);
-        }
+
+	window = glfwCreateWindow(1440, 900, "Slice Viewer", NULL, NULL);
+if (!window) {
+	    glfwTerminate();
+	    exit(EXIT_FAILURE);
+	}
 
 	glfwMakeContextCurrent(window);
 	glfwSetKeyCallback(window, key_callback);

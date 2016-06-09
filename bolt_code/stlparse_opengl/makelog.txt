@@ -1,0 +1,2 @@
+g++	main.cpp  -g  -oslicer.o -I/workspace/bolt_akshay/bolt_code/stlparse_opengl/libs   -lglfw -lGL -lGLEW  --std=c++11
+Makefile:13: recipe for target 'main' failed

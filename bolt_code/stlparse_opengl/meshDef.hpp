@@ -4,8 +4,8 @@
 #include <iostream>
 #include <string.h>
 
-#include "libs/glm/glm.hpp"
-#include "libs/glm/gtx/string_cast.hpp"
+#include "glm/glm.hpp"
+#include "glm/gtx/string_cast.hpp"
 #include <vector>
 
 using namespace std;

@@ -4,7 +4,7 @@ CXX=g++
 PROG=main.cpp
 PROG2=display_dat.cpp
 CXXFLAGS=--std=c++11
-INCLUDE_DIRS =-I/home/brainwave/glStl/libs/ 
+INCLUDE_DIRS =-I/home/brainwave/glstl/libs/ 
 LDFLAGS=-g 
 LDLIBS =-lglfw -lGL -lGLEW 
 OP1=-oslicer.o

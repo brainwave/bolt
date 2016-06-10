@@ -49,7 +49,6 @@ int main ( int argc, char *argv[] ) {
 		xcenter = min_x + xrange;
 		ycenter = min_y + yrange;
 		zcenter = min_z + zrange;
-		zcenter = 1.0;
 
 		//update new coordinates
 		min_z = min_z - zcenter; max_z -= zcenter;
@@ -70,7 +69,7 @@ int main ( int argc, char *argv[] ) {
 
 				cout << "\n(Diagnostic Msg) Successfully created plane and slice arrays ";
 		
-		for( float i = min_z; i <= max_z-sliceSize; i+=sliceSize )	{
+		/*for( float i = min_z; i <= max_z-sliceSize; i+=sliceSize )	{
 		
 			string filename = ".slice_";
 
@@ -82,7 +81,35 @@ int main ( int argc, char *argv[] ) {
 			p++; s++; slice_counter++;
 			}
 
-		}	
+		}*/
+
+		// Akshay's addition - slice by triangles
+		plane *pstart = p;
+		int j=0;
+		printf("\n Min Z: %f Max Z: %f", min_z, max_z);
+		for(float i = min_z; i<=max_z-sliceSize; i+=sliceSize)
+		{
+			p->create_plane( vec3(0,0,1), i ) ;
+			//printf("\n Distance: %f",i);
+			if(j<=arr_len)
+			{
+				p++;j++;
+			}
+		}
+		p=pstart;
+		//printf("\n Exited plane loop");
+		mesh.sliceByTriangle(p,s,sliceSize);
+		printf("\n Done Slicing");
+		string filename = ".slice_";	
+		for( float i = min_z; i <= max_z-sliceSize; i+=sliceSize )	{
+
+			printf("\nStoring slices");
+			s->store_slice(filename, slice_counter); 
+			if(slice_counter<=arr_len) {
+			 s++; slice_counter++;
+			}
+		}
+		// end of Akshay's code 
 
 			ofstream file;
 			file.open("last_run_parameters.txt");

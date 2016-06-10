@@ -90,6 +90,10 @@ public:
 	void recenter ( const float xshift, const float yshift, const float zshift );
 
 	int readStlFile ( const char *filename );
+
+	// Akshay's addition - reversal of iteration order
+	void sliceByTriangle(plane*p, slice*s,  float sliceSize);
+
 };
 
 		

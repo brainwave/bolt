@@ -83,7 +83,7 @@ int stlMesh::readStlFile ( const char *filename ) {
 				fread(modelName, 80, 1, file);
 				fread((void *)&facetNo, 4, 1, file);
 				
-				cout<<"\nNo. Of Facets is : "<<facetNo;
+				cout<<"\nNo. Of Triangles is : "<<facetNo;
 
 				while(!feof(file)){
 					for(int i=0;i<4;i++){

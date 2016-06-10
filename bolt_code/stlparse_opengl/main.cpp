@@ -100,9 +100,10 @@ int main ( int argc, char *argv[] ) {
 		//printf("\n Exited plane loop");
 		mesh.sliceByTriangle(p,s,sliceSize);
 		printf("\n Done Slicing");
-		string filename = ".slice_";	
+
 		for( float i = min_z; i <= max_z-sliceSize; i+=sliceSize )	{
 
+			string filename = ".slice_";	
 			printf("\nStoring slices");
 			s->store_slice(filename, slice_counter); 
 			if(slice_counter<=arr_len) {

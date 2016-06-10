@@ -258,44 +258,40 @@ void stlMesh::sliceByTriangle(plane *pstart, slice *sstart, float sliceSize)
 	// iterate through all triangles
 	for(auto t = mesh.begin(); t!=mesh.end(); t++)
 	{
-		printf("\n(Mesh Loop) ");
-		p=pstart;s=sstart;sliceCounter=0;
-		triangle_min_z=t->vertex[0].z, triangle_max_z=t->vertex[0].z;
+		
+		p=pstart;
+		s=sstart;
+		sliceCounter=0;
+		
+		triangle_min_z=t->vertex[0].z;
+		triangle_max_z=t->vertex[0].z;
 	
 		// store the bottom-most and top-most z-coordinates of the triangle
 		for (int j=1; j<3; j++)
 		{
-		//	triangle_min_z = (triangle_min_z>t->vertex[j].z)?t->vertex[j].z:triangle_min_z;
-		//	triangle_max_z = (triangle_max_z<t->vertex[j].z)?t->vertex[j].z:triangle_max_z;
-			if(t->vertex[j].z<triangle_min_z)
-				triangle_min_z=t->vertex[j].z;
+			if(t->vertex[j].z<triangle_min_z) triangle_min_z=t->vertex[j].z;
 			if(t->vertex[j].z>triangle_max_z)
 				triangle_max_z=t->vertex[j].z;
 		}
-		printf("\n Triangle Min Z: %f",triangle_min_z);
-		printf("\n Triangle Max Z: %f",triangle_max_z);
 
 		// move to the bottom-most plane that cuts the triangle
 		while(p->distance<=triangle_min_z)	
 		{
-		//	printf("\n Distance of plane: %f",p->distance);
-			if(sliceCounter<arr_len){
-				p++;
+			if(sliceCounter<arr_len)
+			{	p++;
 				s++;
 			sliceCounter++;
-			}
+ 			}
 			else
 				break;
-		}
-		printf("(Found Min Plane)");
+ 		}
 		if(p!=pstart)
 		{
 			p--;s--;sliceCounter--;
-		}
+ 		}
 		// move through planes till the plane is above the triangle
-		while(p->distance<=triangle_max_z && sliceCounter<=arr_len)
+		while(p->distance<=triangle_max_z && sliceCounter<arr_len)
 		{
-			//printf("\n(PlaneLoop)");
 			vector<vec3> intersections;
 			for (int i=0; i < 3; i++) {
 				float dp1 = p->distanceFromPoint(t->vertex[i]);
@@ -307,15 +303,11 @@ void stlMesh::sliceByTriangle(plane *pstart, slice *sstart, float sliceSize)
 				}	
 
 				if(intersections.size()==2) {
-					printf("\n HI");
 					 s->slice.push_back( linesegment(intersections[1], intersections[0]));		
 				}
 			}
 			p++;s++;sliceCounter++;
-		}
-		printf("(TriangleDone)");
+ 		}
 	}
-	printf("\n(SlicingDone)");
-}
 
 

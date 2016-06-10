@@ -67,50 +67,37 @@ int main ( int argc, char *argv[] ) {
 		plane *p = new plane[arr_len];
 		slice *s = new slice[arr_len];
 
-				cout << "\n(Diagnostic Msg) Successfully created plane and slice arrays ";
+		cout << "\n(Diagnostic Msg) Successfully created plane and slice arrays ";
 		
-		/*for( float i = min_z; i <= max_z-sliceSize; i+=sliceSize )	{
 		
-			string filename = ".slice_";
-
-			p->create_plane( vec3(0,0,1), i ) ;
-			mesh.slice_mesh(p, s);
-			s->store_slice(filename, slice_counter); 
-		
-			if(slice_counter<=arr_len) {
-			p++; s++; slice_counter++;
-			}
-
-		}*/
-
-		// Akshay's addition - slice by triangles
+		// save the address of the first place
 		plane *pstart = p;
-		int j=0;
-		printf("\n Min Z: %f Max Z: %f", min_z, max_z);
-		for(float i = min_z; i<=max_z-sliceSize; i+=sliceSize)
-		{
-			p->create_plane( vec3(0,0,1), i ) ;
-			//printf("\n Distance: %f",i);
-			if(j<=arr_len)
-			{
-				p++;j++;
-			}
-		}
-		p=pstart;
-		//printf("\n Exited plane loop");
-		mesh.sliceByTriangle(p,s,sliceSize);
-		printf("\n Done Slicing");
 
-		for( float i = min_z; i <= max_z-sliceSize; i+=sliceSize )	{
+		int j=0;
+
+		// initialize the planes - from min-z to one below max_z		
+		for(float i = min_z; i<=max_z-sliceSize && j<arr_len; i+=sliceSize,j++,p++){
+
+			p->create_plane( vec3(0,0,1), i ) ;
+		}
+	
+		// restore first place to p
+		p=pstart;
+		
+		mesh.sliceByTriangle(p,s,sliceSize);
+		
+		// store the slices 
+		for( float i = min_z; i <= max_z-sliceSize; i+=sliceSize ){
 
 			string filename = ".slice_";	
-			printf("\nStoring slices");
 			s->store_slice(filename, slice_counter); 
 			if(slice_counter<=arr_len) {
 			 s++; slice_counter++;
 			}
 		}
-		// end of Akshay's code 
+
+		printf("\n Number of slices: %d",slice_counter);
+
 
 			ofstream file;
 			file.open("last_run_parameters.txt");

@@ -1,8 +1,0 @@
-SliceCount
-1350
-xScale
-0.00740502
-yScale
-0.0129488
-zScale
-0.00740502

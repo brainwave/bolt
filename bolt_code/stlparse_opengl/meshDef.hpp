@@ -91,7 +91,6 @@ public:
 
 	int readStlFile ( const char *filename );
 
-	// Akshay's addition - reversal of iteration order
 	void sliceByTriangle(plane*p, slice*s,  float sliceSize);
 
 };

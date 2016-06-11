@@ -96,6 +96,7 @@ int main ( int argc, char *argv[] ) {
 			file<<"zScale"<<"\n"<<zscale<<"\n";
 			file.close();
 
+			cin.get();
 
 			showWindow(window,xscale, yscale, zscale);
 

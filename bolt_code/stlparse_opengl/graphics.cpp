@@ -79,7 +79,7 @@ GLFWwindow* glInit(int slicecounter, const GLfloat xshift, const GLfloat yshift,
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
 
-	window = glfwCreateWindow(1440, 900, "Slice Viewer", NULL, NULL);
+	window = glfwCreateWindow(800, 600, "Slice Viewer", NULL, NULL);
 if (!window) {
 	    glfwTerminate();
 	    exit(EXIT_FAILURE);

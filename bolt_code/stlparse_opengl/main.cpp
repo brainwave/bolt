@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <array>
 #include <unistd.h>
+#include <time.h>
 
 int main ( int argc, char *argv[] ) {
 
@@ -85,8 +86,10 @@ int main ( int argc, char *argv[] ) {
 		p=pstart;
 		
 		mesh.sliceByTriangle(p,s,sliceSize);
-		
+	
+		clock_t startTime = clock();
 		// store the slices 
+			
 		for( float i = min_z; i <= max_z-sliceSize; i+=sliceSize ){
 
 			string filename = ".slice_";	
@@ -95,6 +98,8 @@ int main ( int argc, char *argv[] ) {
 			 s++; slice_counter++;
 			}
 		}
+		
+		cout<<"\nTime taken by store_slice : "<<((double)(clock() - startTime)/CLOCKS_PER_SEC);
 
 		printf("\n Number of slices: %d",slice_counter);
 

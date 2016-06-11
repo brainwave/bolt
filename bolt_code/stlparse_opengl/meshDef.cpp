@@ -67,7 +67,7 @@ int stlMesh::readStlFile ( const char *filename ) {
 			//block to read binary stl file
 			
 				char modelName[80], discarder[2];
-				size_t facetNo;
+				long long facetNo;
 
 				cout<<"\nFile is not ASCII, using binary format";
 
@@ -82,7 +82,7 @@ int stlMesh::readStlFile ( const char *filename ) {
 				fread(modelName, 80, 1, file);
 				fread((void *)&facetNo, 4, 1, file);
 				
-				cout<<"\nNo. Of Triangles is : "<<facetNo;
+				//cout<<"\nNo. Of Triangles is : "<<facetNo;
 
 				while(!feof(file)){
 					for(int i=0;i<4;i++){

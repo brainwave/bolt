@@ -4,8 +4,8 @@
 #include <iostream>
 #include <string.h>
 
-#include "libs/glm/glm.hpp"
-#include "libs/glm/gtx/string_cast.hpp"
+#include "glm/glm.hpp"
+#include "glm/gtx/string_cast.hpp"
 #include <vector>
 
 using namespace std;
@@ -90,6 +90,9 @@ public:
 	void recenter ( const float xshift, const float yshift, const float zshift );
 
 	int readStlFile ( const char *filename );
+
+	void sliceByTriangle(plane*p, slice*s,  float sliceSize);
+
 };
 
 		

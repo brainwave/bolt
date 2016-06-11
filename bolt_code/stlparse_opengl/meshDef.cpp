@@ -19,7 +19,6 @@ void slice::display_slice () {
 void slice::store_slice(string &filename, const int sliceNo) {
 
 		filename = filename + to_string(sliceNo) + ".dat";
-		cout<<"\n "<<filename;
 		ofstream file;
 		file.open (filename);
 			
@@ -83,7 +82,7 @@ int stlMesh::readStlFile ( const char *filename ) {
 				fread(modelName, 80, 1, file);
 				fread((void *)&facetNo, 4, 1, file);
 				
-				cout<<"\nNo. Of Facets is : "<<facetNo;
+				cout<<"\nNo. Of Triangles is : "<<facetNo;
 
 				while(!feof(file)){
 					for(int i=0;i<4;i++){
@@ -246,3 +245,76 @@ void stlMesh::slice_mesh ( plane *p, slice *s) {
 				}
 			}
 }
+
+void stlMesh::sliceByTriangle(plane *pstart, slice *sstart, float sliceSize){
+
+	plane *p;
+	slice *s;
+
+	int arr_len= (int)(((max_z-min_z)/sliceSize))+1;
+	int sliceCounter;
+
+	float triangle_min_z, triangle_max_z;
+
+	// iterate through all triangles
+	for(auto t = mesh.begin(); t!=mesh.end(); t++){
+		
+		p=pstart;
+		s=sstart;
+		sliceCounter=0;
+		
+		triangle_min_z=t->vertex[0].z;
+		triangle_max_z=t->vertex[0].z;
+	
+		// store the bottom-most and top-most z-coordinates of the triangle
+		for (int j=1; j<3; j++)	{
+
+			if(t->vertex[j].z<triangle_min_z) triangle_min_z=t->vertex[j].z;
+			if(t->vertex[j].z>triangle_max_z) triangle_max_z=t->vertex[j].z;
+		}
+
+		// move to the bottom-most plane that cuts the triangle
+		while(p->distance<=triangle_min_z && sliceCounter<arr_len){
+
+			if(sliceCounter<arr_len){
+				p++;
+				s++;
+				sliceCounter++;
+ 			}
+			else
+				break;
+ 		}
+
+		// possibly overshot the min-z value, so move back one plane
+		if(p!=pstart){
+
+			p--;
+			s--;
+			sliceCounter--;
+ 		}
+
+		// move through planes till the plane is above the triangle
+		while(p->distance<=triangle_max_z && sliceCounter<arr_len){
+
+			vector<vec3> intersections;
+
+			for (int i=0; i < 3; i++) {
+				float dp1 = p->distanceFromPoint(t->vertex[i]);
+				float dp2 = p->distanceFromPoint(t->vertex[(i+1)%3]);
+				if( dp1*dp2 < 0){ 
+					intersections.push_back (t->vertex[i] + ((t->vertex[(i+1)%3] - t->vertex[i]) * 
+							 (dp1/(dp1-dp2))) );
+
+				}	
+
+				if(intersections.size()==2) {
+					 s->slice.push_back( linesegment(intersections[1], intersections[0]));		
+				}
+			}
+			p++;
+			s++;
+			sliceCounter++;
+ 		}
+	}
+}
+

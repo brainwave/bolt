@@ -49,7 +49,6 @@ int main ( int argc, char *argv[] ) {
 		xcenter = min_x + xrange;
 		ycenter = min_y + yrange;
 		zcenter = min_z + zrange;
-		zcenter = 1.0;
 
 		//update new coordinates
 		min_z = min_z - zcenter; max_z -= zcenter;
@@ -68,21 +67,37 @@ int main ( int argc, char *argv[] ) {
 		plane *p = new plane[arr_len];
 		slice *s = new slice[arr_len];
 
-				cout << "\n(Diagnostic Msg) Successfully created plane and slice arrays ";
+		cout << "\n(Diagnostic Msg) Successfully created plane and slice arrays ";
 		
-		for( float i = min_z; i <= max_z-sliceSize; i+=sliceSize )	{
 		
-			string filename = ".slice_";
+		// save the address of the first place
+		plane *pstart = p;
+
+		int j=0;
+
+		// initialize the planes - from min-z to one below max_z		
+		for(float i = min_z; i<=max_z-sliceSize && j<arr_len; i+=sliceSize,j++,p++){
 
 			p->create_plane( vec3(0,0,1), i ) ;
-			mesh.slice_mesh(p, s);
-			s->store_slice(filename, slice_counter); 
+		}
+	
+		// restore first place to p
+		p=pstart;
 		
-			if(slice_counter<=arr_len) {
-			p++; s++; slice_counter++;
-			}
+		mesh.sliceByTriangle(p,s,sliceSize);
+		
+		// store the slices 
+		for( float i = min_z; i <= max_z-sliceSize; i+=sliceSize ){
 
-		}	
+			string filename = ".slice_";	
+			s->store_slice(filename, slice_counter); 
+			if(slice_counter<=arr_len) {
+			 s++; slice_counter++;
+			}
+		}
+
+		printf("\n Number of slices: %d",slice_counter);
+
 
 			ofstream file;
 			file.open("last_run_parameters.txt");

@@ -3,11 +3,19 @@
 #include <stdlib.h>
 #include <array>
 #include <unistd.h>
+#include <time.h>
 
 int main ( int argc, char *argv[] ) {
 
 	float sliceSize = 0.1;
-		//replace with switch case
+	
+	// time calculation
+	clock_t begin = clock();
+	clock_t end;
+	double time_spent;
+	
+
+	//replace with switch case
 	if(argc ==1 ) {
 			cout<<"\nParameter missing : filename\nExiting ";
 			return 1;
@@ -83,9 +91,22 @@ int main ( int argc, char *argv[] ) {
 	
 		// restore first place to p
 		p=pstart;
-		
+	
+		// slicing 
+		clock_t beginSliceTime, endSliceTime;	
+
+		beginSliceTime = clock();
+
 		mesh.sliceByTriangle(p,s,sliceSize);
+
+		endSliceTime = clock();
+
+		time_spent = (double) (endSliceTime - beginSliceTime) / CLOCKS_PER_SEC;
+
+		printf("\n Total slicing time: %lf", time_spent);	
 		
+		clock_t beginStore, endStore;
+		beginStore = clock();
 		// store the slices 
 		for( float i = min_z; i <= max_z-sliceSize; i+=sliceSize ){
 
@@ -95,6 +116,9 @@ int main ( int argc, char *argv[] ) {
 			 s++; slice_counter++;
 			}
 		}
+		endStore = clock();
+		time_spent = (double)(endStore - beginStore) / CLOCKS_PER_SEC;
+		printf("\n Time spent storing: %lf", time_spent);
 
 		printf("\n Number of slices: %d",slice_counter);
 
@@ -110,7 +134,11 @@ int main ( int argc, char *argv[] ) {
 			file<<"yScale"<<"\n"<<yscale<<"\n";
 			file<<"zScale"<<"\n"<<zscale<<"\n";
 			file.close();
-
+			
+			end = clock();
+			time_spent = (double) (end - begin) / CLOCKS_PER_SEC;
+			printf("\n Total Time Spent: %lf ", time_spent);
+			
 			cin.get();
 
 			showWindow(window,xscale, yscale, zscale);

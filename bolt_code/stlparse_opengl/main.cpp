@@ -80,6 +80,7 @@ int main ( int argc, char *argv[] ) {
 		for(float i = min_z; i<=max_z-sliceSize && j<arr_len; i+=sliceSize,j++,p++){
 
 			p->create_plane( vec3(0,0,1), i ) ;
+//			cout<<"\nCreated Plane "<<p->distance;
 		}
 	
 		// restore first place to p
@@ -94,7 +95,7 @@ int main ( int argc, char *argv[] ) {
 
 			string filename = ".slice_";	
 			s->store_slice(filename, slice_counter); 
-			if(slice_counter<=arr_len) {
+			if(slice_counter<arr_len) {
 			 s++; slice_counter++;
 			}
 		}

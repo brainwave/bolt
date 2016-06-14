@@ -168,6 +168,67 @@ if (!window) {
 	return window;
 }
 
+
+vector <glm::vec3>  lineFill(vector <glm::vec3> vertices){
+
+	vector <glm::vec3> addedVertices;
+
+	float ymin = vertices[0].y;
+	float ymax = vertices[0].y;
+	float step = 0.000010f;	
+
+	bool first = true;
+	bool odd = true;
+
+
+	// find ymax and ymin
+	for(auto it = vertices.begin(); it!=vertices.end(); it++){
+
+	//	printf("\n %f %f %f",it->x,it->y,it->z);
+		ymin = (it->y<ymin)?it->y:ymin;
+		ymax = (it->y>ymax)?it->y:ymax;
+	}
+
+	//printf("\n ymax = %f ymin = %f yrange = %f step = %f",ymax,ymin,yrange,step);
+	
+	for (float i=ymin; i<=ymax; i+=step){
+
+		glm::vec3 vertex1, vertex2;
+		float dp1, dp2;
+
+		for(auto it = vertices.begin();it != vertices.end(); it++){
+	
+			if(first){
+
+				vertex1 = *it;
+				dp1 = vertex1.y - i;
+				first = false;
+			}
+						
+			else{
+
+				first = true;
+				vertex2 = *it;
+				dp2 = vertex2.y - i;
+			
+				if( dp1*dp2 < 0){
+				
+					glm::vec3 vertex = vertex1 + (vertex2 - vertex1)*(dp1/(dp1-dp2));
+					addedVertices.push_back(vertex); 
+				}
+			}
+		}
+	}
+
+	for(auto it = addedVertices.begin(); it!=addedVertices.end(); it ++)
+	{
+		vertices.push_back(*it);
+	}
+	
+	return vertices;
+}
+
+
 int showSlice(string filename, string extension, int counter, GLfloat &x_scale, GLfloat &y_scale, GLfloat &z_scale) {
 
 	vector<glm::vec3> vertices ;
@@ -180,21 +241,18 @@ int showSlice(string filename, string extension, int counter, GLfloat &x_scale, 
 	}
 	
 	while(!feof(file)) {
-	glm::vec3 temp_vertex;
+		glm::vec3 temp_vertex;
 
-	fscanf(file, "%f %f %f", &temp_vertex.x, &temp_vertex.y, &temp_vertex.z);
+		fscanf(file, "%f %f %f", &temp_vertex.x, &temp_vertex.y, &temp_vertex.z);
 	
-	vertices.push_back(temp_vertex);
+		vertices.push_back(temp_vertex);
 	}
+
+	fclose(file);
 	vertexCount=0;
 
-	cout<<"\n(Diagnostic Msg)Printing Vertices:\n";	
-	for ( auto it = vertices.begin(); it != vertices.end(); it++) 
-	{		
-			cout<<(*it).x<<" "<<(*it).y<<" "<<(*it).z<<"\n";
-			vertexCount++;
-	}
-	
+//	cout<<"\n(Diagnostic Msg)Printing Vertices:\n";	
+
 	GLfloat aspectratio = width/(float)height;
 	
 	yscale = minimum(xscale,yscale,zscale);
@@ -217,9 +275,19 @@ int showSlice(string filename, string extension, int counter, GLfloat &x_scale, 
 			return 1; 
 	}
 
+	vertices = lineFill(vertices);
+
+	for ( auto it = vertices.begin(); it != vertices.end(); it++) 
+	{		
+//			cout<<(*it).x<<" "<<(*it).y<<" "<<(*it).z<<"\n";
+			vertexCount++;
+	}
+	
 	glUniformMatrix4fv(tm, 1, GL_FALSE, glm::value_ptr(glm_tm));
 
 	glBufferData(GL_ARRAY_BUFFER, 3*sizeof(GLfloat)*vertices.size(), &vertices[0].x, GL_STATIC_DRAW);
+
+//	cin.get();
 
 	return 0;
 }

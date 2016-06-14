@@ -97,7 +97,7 @@ int main ( int argc, char *argv[] ) {
 
 		beginSliceTime = clock();
 
-		mesh.sliceByTriangle(p,s,sliceSize);
+		mesh.sliceByTriangle(p,s,sliceSize,arr_len);
 
 		endSliceTime = clock();
 
@@ -122,7 +122,7 @@ int main ( int argc, char *argv[] ) {
 
 		printf("\n Number of slices: %d",slice_counter);
 
-
+		
 			ofstream file;
 			file.open("last_run_parameters.txt");
 			file<<"SliceCount"<<"\n"<<slice_counter<<"\n";

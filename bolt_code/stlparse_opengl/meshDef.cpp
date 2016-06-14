@@ -70,7 +70,7 @@ int stlMesh::readStlFile ( const char *filename ) {
 			//block to read binary stl file
 			
 				char modelName[80], discarder[2];
-				size_t facetNo;
+				long long facetNo;
 
 				cout<<"\nFile is not ASCII, using binary format";
 
@@ -249,12 +249,11 @@ void stlMesh::slice_mesh ( plane *p, slice *s) {
 			}
 }
 
-void stlMesh::sliceByTriangle(plane *pstart, slice *sstart, float sliceSize){
+void stlMesh::sliceByTriangle(plane *pstart, slice *sstart, float sliceSize, int arr_len){
 
 	plane *p;
 	slice *s;
 
-	int arr_len= (int)(((max_z-min_z)/sliceSize))+1;
 	int sliceCounter;
 
 	float triangle_min_z, triangle_max_z;
@@ -294,13 +293,14 @@ void stlMesh::sliceByTriangle(plane *pstart, slice *sstart, float sliceSize){
 			p--;
 			s--;
 			sliceCounter--;
- 		}
+		}
 
 		// move through planes till the plane is above the triangle
 		while(p->distance<=triangle_max_z && sliceCounter<arr_len){
 
 			vector<vec3> intersections;
 
+			cout<<"\n Slice "<<sliceCounter;
 			for (int i=0; i < 3; i++) {
 				float dp1 = p->distanceFromPoint(t->vertex[i]);
 				float dp2 = p->distanceFromPoint(t->vertex[(i+1)%3]);
@@ -308,12 +308,16 @@ void stlMesh::sliceByTriangle(plane *pstart, slice *sstart, float sliceSize){
 					intersections.push_back (t->vertex[i] + ((t->vertex[(i+1)%3] - t->vertex[i]) * 
 							 (dp1/(dp1-dp2))) );
 
-				}	
-
-				if(intersections.size()==2) {
-					 s->slice.push_back( linesegment(intersections[1], intersections[0]));		
 				}
+
 			}
+
+			if(intersections.size()==2) {
+
+				s->slice.push_back( linesegment(intersections[1], intersections[0]));	
+				cout<<"\n Pushing line seg "<<intersections[1]<<" --- "<<intersections[0];	
+			}
+
 			p++;
 			s++;
 			sliceCounter++;

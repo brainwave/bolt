@@ -300,7 +300,7 @@ void stlMesh::sliceByTriangle(plane *pstart, slice *sstart, float sliceSize, int
 
 			vector<vec3> intersections;
 
-			cout<<"\n Slice "<<sliceCounter;
+//			cout<<"\n Slice "<<sliceCounter;
 			for (int i=0; i < 3; i++) {
 				float dp1 = p->distanceFromPoint(t->vertex[i]);
 				float dp2 = p->distanceFromPoint(t->vertex[(i+1)%3]);
@@ -315,7 +315,7 @@ void stlMesh::sliceByTriangle(plane *pstart, slice *sstart, float sliceSize, int
 			if(intersections.size()==2) {
 
 				s->slice.push_back( linesegment(intersections[1], intersections[0]));	
-				cout<<"\n Pushing line seg "<<intersections[1]<<" --- "<<intersections[0];	
+//				cout<<"\n Pushing line seg "<<intersections[1]<<" --- "<<intersections[0];	
 			}
 
 			p++;

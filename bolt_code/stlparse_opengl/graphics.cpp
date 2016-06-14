@@ -194,7 +194,13 @@ vector <glm::vec3>  lineFill(vector <glm::vec3> vertices){
 	for (float i=ymin; i<=ymax; i+=step){
 
 		glm::vec3 vertex1, vertex2;
+		glm::vec3 oddVertex, evenVertex;
+
 		float dp1, dp2;
+		
+		odd = true;
+		first = true;
+
 
 		for(auto it = vertices.begin();it != vertices.end(); it++){
 	
@@ -211,10 +217,23 @@ vector <glm::vec3>  lineFill(vector <glm::vec3> vertices){
 				vertex2 = *it;
 				dp2 = vertex2.y - i;
 			
-				if( dp1*dp2 < 0){
+			//	cout<<"\n Between "<<vertex1<<" and "<<vertex2;
 				
-					glm::vec3 vertex = vertex1 + (vertex2 - vertex1)*(dp1/(dp1-dp2));
-					addedVertices.push_back(vertex); 
+				if( dp1*dp2 < 0){
+					
+					if(odd){
+
+						odd=false;
+						oddVertex = vertex1 + (vertex2 - vertex1)*(dp1/(dp1-dp2));
+					}
+					else{	
+								
+						odd=true;
+						evenVertex = vertex1 + (vertex2 - vertex1)*(dp1/(dp1-dp2));
+			//			cout<<"\n Adding "<<oddVertex<<"---"<<evenVertex;	
+						addedVertices.push_back(oddVertex); 
+						addedVertices.push_back(evenVertex);
+					}
 				}
 			}
 		}

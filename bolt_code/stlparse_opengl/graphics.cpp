@@ -207,7 +207,7 @@ vector <glm::vec3>  lineFill(vector <glm::vec3> vertices){
 	for (float i=ymin; i<=ymax; i+=step){
 
 		glm::vec3 vertex1, vertex2;
-		glm::vec3 vertex, oddVertex, evenVertex;
+		glm::vec3 intersectionPoint;
 			
 
 		float dp1, dp2;
@@ -233,29 +233,66 @@ vector <glm::vec3>  lineFill(vector <glm::vec3> vertices){
 				dp2 = vertex2.y - i;
 			
 				
-				if( dp1*dp2 < 0.000f){
+				if( dp1*dp2 < 0){
 					
-				/*
-					if(odd){
+					intersectionPoint = vertex1 + (vertex2 - vertex1)*(dp1/(dp1-dp2));
+					intersections.push_back(intersectionPoint);
+				}
 
-						odd=false;
-						oddVertex = vertex1 + (vertex2 - vertex1)*(dp1/(dp1-dp2));
-					}
-					else{	
-								
-						odd=true;
-						evenVertex = vertex1 + (vertex2 - vertex1)*(dp1/(dp1-dp2));
-						addedVertices.push_back(oddVertex); 
-						addedVertices.push_back(evenVertex);
-						cout<<"\n Pushing "<<oddVertex;
-						cout<<"\n Pushing "<<evenVertex;
-						
-					}
-			
-				*/
+				else if (dp1 == 0){
 					
-					vertex = vertex1 + (vertex2 - vertex1)*(dp1/(dp1-dp2));
-					intersections.push_back(vertex);
+					printf("\n DP1 is 0");
+					
+					vector<glm::vec3> endPoints;
+
+					int counter = 0;
+
+					for (auto iter = vertices.begin(); iter!=vertices.end(); iter++, counter++){
+						
+						if(iter->x==vertex1.x && iter->y==vertex1.y){
+						
+							if(counter%2==0)								
+								endPoints.push_back(*(iter+1));
+							else
+								endPoints.push_back(*(iter-1));
+						}
+					}
+						
+					if(endPoints.size() == 2){ // 2 point case
+					
+						if((endPoints[0].y - vertex1.y > 0 && endPoints[1].y - vertex1.y > 0) 
+							|| (endPoints[0].y - vertex1.y < 0 && endPoints[1].y - vertex1.y < 0) )
+							intersections.push_back(vertex1);
+							
+					} 			
+	
+				}
+				else if (dp2 == 0){
+
+					printf("\n DP2 is 0");
+
+					vector<glm::vec3> endPoints;
+
+					int counter = 0;
+
+					for (auto iter = vertices.begin(); iter!=vertices.end(); iter++, counter++){
+						
+						if(iter->x==vertex2.x && iter->y==vertex2.y){
+						
+							if(counter%2==0)								
+								endPoints.push_back(*(iter+1));
+							else
+								endPoints.push_back(*(iter-1));
+						}
+					}
+						
+					if(endPoints.size() == 2){ // 2 point case
+					
+						if((endPoints[0].y - vertex2.y > 0 && endPoints[1].y - vertex2.y > 0) 
+							|| (endPoints[0].y - vertex2.y < 0 && endPoints[1].y - vertex2.y < 0) )
+							intersections.push_back(vertex2);
+							
+					} 
 				}
 			}
 

@@ -171,25 +171,29 @@ if (!window) {
 
 vector <glm::vec3>  lineFill(vector <glm::vec3> vertices){
 
+	if(vertexCount == 0)
+		return vertices;
+
 	vector <glm::vec3> addedVertices;
 
 	float ymin = vertices[0].y;
 	float ymax = vertices[0].y;
-	float step = 0.000010f;	
+//	float step = 0.0010f;		
+	float step = 0.01f;
+//	float step = 0.1f;	
 
 	bool first = true;
 	bool odd = true;
 
-
+	
 	// find ymax and ymin
 	for(auto it = vertices.begin(); it!=vertices.end(); it++){
 
-	//	printf("\n %f %f %f",it->x,it->y,it->z);
 		ymin = (it->y<ymin)?it->y:ymin;
 		ymax = (it->y>ymax)?it->y:ymax;
 	}
 
-	//printf("\n ymax = %f ymin = %f yrange = %f step = %f",ymax,ymin,yrange,step);
+
 	
 	for (float i=ymin; i<=ymax; i+=step){
 
@@ -217,7 +221,6 @@ vector <glm::vec3>  lineFill(vector <glm::vec3> vertices){
 				vertex2 = *it;
 				dp2 = vertex2.y - i;
 			
-			//	cout<<"\n Between "<<vertex1<<" and "<<vertex2;
 				
 				if( dp1*dp2 < 0){
 					
@@ -230,7 +233,6 @@ vector <glm::vec3>  lineFill(vector <glm::vec3> vertices){
 								
 						odd=true;
 						evenVertex = vertex1 + (vertex2 - vertex1)*(dp1/(dp1-dp2));
-			//			cout<<"\n Adding "<<oddVertex<<"---"<<evenVertex;	
 						addedVertices.push_back(oddVertex); 
 						addedVertices.push_back(evenVertex);
 					}
@@ -258,17 +260,20 @@ int showSlice(string filename, string extension, int counter, GLfloat &x_scale, 
 			cout<<"\n(Diagnostic Msg) Couldn't Open File";
 			return 1;
 	}
-	
-	while(!feof(file)) {
-		glm::vec3 temp_vertex;
 
-		fscanf(file, "%f %f %f", &temp_vertex.x, &temp_vertex.y, &temp_vertex.z);
+	vertexCount = 0;	
+	glm::vec3 temp_vertex;
+	
+	while(fscanf(file,"%f %f %f", &temp_vertex.x, &temp_vertex.y, &temp_vertex.z)!=EOF) {
 	
 		vertices.push_back(temp_vertex);
+		
+		vertexCount++;
 	}
 
+	printf("\n Initial read count = %d",vertexCount);
+
 	fclose(file);
-	vertexCount=0;
 
 //	cout<<"\n(Diagnostic Msg)Printing Vertices:\n";	
 
@@ -296,6 +301,7 @@ int showSlice(string filename, string extension, int counter, GLfloat &x_scale, 
 
 	vertices = lineFill(vertices);
 
+	vertexCount = 0;
 	for ( auto it = vertices.begin(); it != vertices.end(); it++) 
 	{		
 //			cout<<(*it).x<<" "<<(*it).y<<" "<<(*it).z<<"\n";

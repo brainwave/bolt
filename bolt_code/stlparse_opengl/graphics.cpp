@@ -2,6 +2,7 @@
 #include <cassert>
 #include <vector>
 #include <fstream>
+#include <algorithm>
 using namespace std;
 
 #include <stdio.h>
@@ -168,19 +169,27 @@ if (!window) {
 	return window;
 }
 
+int boundaryVertexCount=0;
+
+bool xCoordinateComparision(const glm::vec3 &a, const glm::vec3 &b){
+
+	return a.x<b.x;
+}
+
+
 
 vector <glm::vec3>  lineFill(vector <glm::vec3> vertices){
 
-	if(vertexCount == 0)
+	if(boundaryVertexCount == 0)
 		return vertices;
 
-	vector <glm::vec3> addedVertices;
+	vector <glm::vec3> addedVertices,intersections;
 
 	float ymin = vertices[0].y;
 	float ymax = vertices[0].y;
 //	float step = 0.0010f;		
 	float step = 0.01f;
-//	float step = 0.1f;	
+//	float step = 0.0225f;	
 
 	bool first = true;
 	bool odd = true;
@@ -198,14 +207,16 @@ vector <glm::vec3>  lineFill(vector <glm::vec3> vertices){
 	for (float i=ymin; i<=ymax; i+=step){
 
 		glm::vec3 vertex1, vertex2;
-		glm::vec3 oddVertex, evenVertex;
+		glm::vec3 vertex, oddVertex, evenVertex;
+			
 
 		float dp1, dp2;
-		
+
 		odd = true;
 		first = true;
 
-
+		intersections.clear();
+		
 		for(auto it = vertices.begin();it != vertices.end(); it++){
 	
 			if(first){
@@ -222,8 +233,9 @@ vector <glm::vec3>  lineFill(vector <glm::vec3> vertices){
 				dp2 = vertex2.y - i;
 			
 				
-				if( dp1*dp2 < 0){
+				if( dp1*dp2 < 0.000f){
 					
+				/*
 					if(odd){
 
 						odd=false;
@@ -235,14 +247,32 @@ vector <glm::vec3>  lineFill(vector <glm::vec3> vertices){
 						evenVertex = vertex1 + (vertex2 - vertex1)*(dp1/(dp1-dp2));
 						addedVertices.push_back(oddVertex); 
 						addedVertices.push_back(evenVertex);
+						cout<<"\n Pushing "<<oddVertex;
+						cout<<"\n Pushing "<<evenVertex;
+						
 					}
+			
+				*/
+					
+					vertex = vertex1 + (vertex2 - vertex1)*(dp1/(dp1-dp2));
+					intersections.push_back(vertex);
 				}
 			}
+
 		}
+
+		// sort intersection points  and push them into addedVertices
+                sort(intersections.begin(), intersections.end(),xCoordinateComparision);
+
+                for(auto x = intersections.begin(); x!=intersections.end(); x++){
+
+			addedVertices.push_back(*x);
+                }
 	}
 
-	for(auto it = addedVertices.begin(); it!=addedVertices.end(); it ++)
-	{
+	// push all added vertices into vertices
+	for(auto it = addedVertices.begin(); it!=addedVertices.end(); it++){
+
 		vertices.push_back(*it);
 	}
 	
@@ -261,6 +291,7 @@ int showSlice(string filename, string extension, int counter, GLfloat &x_scale, 
 			return 1;
 	}
 
+	boundaryVertexCount = 0;
 	vertexCount = 0;	
 	glm::vec3 temp_vertex;
 	
@@ -268,12 +299,15 @@ int showSlice(string filename, string extension, int counter, GLfloat &x_scale, 
 	
 		vertices.push_back(temp_vertex);
 		
-		vertexCount++;
+		boundaryVertexCount++;
 	}
 
-	printf("\n Initial read count = %d",vertexCount);
+	printf("\n Initial read count = %d",boundaryVertexCount);
+
 
 	fclose(file);
+
+	vertices = lineFill(vertices);
 
 //	cout<<"\n(Diagnostic Msg)Printing Vertices:\n";	
 
@@ -299,7 +333,7 @@ int showSlice(string filename, string extension, int counter, GLfloat &x_scale, 
 			return 1; 
 	}
 
-	vertices = lineFill(vertices);
+
 
 	vertexCount = 0;
 	for ( auto it = vertices.begin(); it != vertices.end(); it++) 

@@ -91,7 +91,7 @@ public:
 
 	int readStlFile ( const char *filename );
 
-	void sliceByTriangle(plane*p, slice*s,  float sliceSize);
+	void sliceByTriangle(plane*p, slice*s,  float sliceSize, int arr_len);
 
 };
 

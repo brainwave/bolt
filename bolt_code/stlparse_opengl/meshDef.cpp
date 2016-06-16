@@ -1,5 +1,6 @@
 #include "meshDef.hpp"
 #include <fstream>
+#include <time.h>
 
 float plane::distanceFromPoint (vec3 point) {
 	normal = glm::normalize (normal);
@@ -19,6 +20,8 @@ void slice::display_slice () {
 void slice::store_slice(string &filename, const int sliceNo) {
 
 		filename = filename + to_string(sliceNo) + ".dat";
+		cout<<"\n Storing "<<filename;		
+
 		ofstream file;
 		file.open (filename);
 
@@ -250,12 +253,11 @@ void stlMesh::slice_mesh ( plane *p, slice *s) {
 			}
 }
 
-void stlMesh::sliceByTriangle(plane *pstart, slice *sstart, float sliceSize){
+void stlMesh::sliceByTriangle(plane *pstart, slice *sstart, float sliceSize, int arr_len){
 
 	plane *p;
 	slice *s;
 
-	int arr_len= (int)(((max_z-min_z)/sliceSize))+1;
 	int sliceCounter;
 
 	float triangle_min_z, triangle_max_z;
@@ -292,7 +294,7 @@ void stlMesh::sliceByTriangle(plane *pstart, slice *sstart, float sliceSize){
 			s--;
 			sliceCounter--;
 
- 		}
+		}
 
 		// move through planes till the plane is above the triangle
 		while(p->distance<=triangle_max_z && sliceCounter<arr_len && sliceCounter >=0){
@@ -301,6 +303,7 @@ void stlMesh::sliceByTriangle(plane *pstart, slice *sstart, float sliceSize){
 		
 			vector<vec3> intersections;
 
+//			cout<<"\n Slice "<<sliceCounter;
 			for (int i=0; i < 3; i++) {
 
 				float dp1 = p->distanceFromPoint(t->vertex[i]);
@@ -317,16 +320,14 @@ void stlMesh::sliceByTriangle(plane *pstart, slice *sstart, float sliceSize){
 				}	
 
 			}
-			if(intersections.size()==2) {
+			
+			if(intersections.size()==2) 
 					 s->slice.push_back( linesegment(intersections[1], intersections[0]));		
-			//		 cout<<"\nPushed back - Startpoint: "<<intersections[1]<<" -> Endpoint: "<<intersections[0];
-				}
-	
+				
 			p++;
 			s++;
 			sliceCounter++;
 			
-
  		}
 	}
 }

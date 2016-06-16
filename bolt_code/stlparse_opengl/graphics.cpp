@@ -2,6 +2,7 @@
 #include <cassert>
 #include <vector>
 #include <fstream>
+#include <algorithm>
 using namespace std;
 
 #include <stdio.h>
@@ -168,6 +169,154 @@ if (!window) {
 	return window;
 }
 
+int boundaryVertexCount=0;
+
+bool xCoordinateComparision(const glm::vec3 &a, const glm::vec3 &b){
+
+	return a.x<b.x;
+}
+
+
+
+vector <glm::vec3>  lineFill(vector <glm::vec3> vertices){
+
+	if(boundaryVertexCount == 0)
+		return vertices;
+
+	vector <glm::vec3> addedVertices,intersections;
+
+	float ymin = vertices[0].y;
+	float ymax = vertices[0].y;
+//	float step = 0.0010f;		
+	float step = 0.01f;
+//	float step = 0.0225f;	
+
+	bool first = true;
+	bool odd = true;
+
+	
+	// find ymax and ymin
+	for(auto it = vertices.begin(); it!=vertices.end(); it++){
+
+		ymin = (it->y<ymin)?it->y:ymin;
+		ymax = (it->y>ymax)?it->y:ymax;
+	}
+
+
+	
+	for (float i=ymin; i<=ymax; i+=step){
+
+		glm::vec3 vertex1, vertex2;
+		glm::vec3 intersectionPoint;
+			
+
+		float dp1, dp2;
+
+		odd = true;
+		first = true;
+
+		intersections.clear();
+		
+		for(auto it = vertices.begin();it != vertices.end(); it++){
+	
+			if(first){
+
+				vertex1 = *it;
+				dp1 = vertex1.y - i;
+				first = false;
+			}
+						
+			else{
+
+				first = true;
+				vertex2 = *it;
+				dp2 = vertex2.y - i;
+			
+				
+				if( dp1*dp2 < 0){
+					
+					intersectionPoint = vertex1 + (vertex2 - vertex1)*(dp1/(dp1-dp2));
+					intersections.push_back(intersectionPoint);
+				}
+
+				else if (dp1 == 0){
+					
+					printf("\n DP1 is 0");
+					
+					vector<glm::vec3> endPoints;
+
+					int counter = 0;
+
+					for (auto iter = vertices.begin(); iter!=vertices.end(); iter++, counter++){
+						
+						if(iter->x==vertex1.x && iter->y==vertex1.y){
+						
+							if(counter%2==0)								
+								endPoints.push_back(*(iter+1));
+							else
+								endPoints.push_back(*(iter-1));
+						}
+					}
+						
+					if(endPoints.size() == 2){ // 2 point case
+					
+						if((endPoints[0].y - vertex1.y > 0 && endPoints[1].y - vertex1.y > 0) 
+							|| (endPoints[0].y - vertex1.y < 0 && endPoints[1].y - vertex1.y < 0) )
+							intersections.push_back(vertex1);
+							
+					} 			
+	
+				}
+				else if (dp2 == 0){
+
+					printf("\n DP2 is 0");
+
+					vector<glm::vec3> endPoints;
+
+					int counter = 0;
+
+					for (auto iter = vertices.begin(); iter!=vertices.end(); iter++, counter++){
+						
+						if(iter->x==vertex2.x && iter->y==vertex2.y){
+						
+							if(counter%2==0)								
+								endPoints.push_back(*(iter+1));
+							else
+								endPoints.push_back(*(iter-1));
+						}
+					}
+						
+					if(endPoints.size() == 2){ // 2 point case
+					
+						if((endPoints[0].y - vertex2.y > 0 && endPoints[1].y - vertex2.y > 0) 
+							|| (endPoints[0].y - vertex2.y < 0 && endPoints[1].y - vertex2.y < 0) )
+							intersections.push_back(vertex2);
+							
+					} 
+				}
+			}
+
+		}
+
+		// sort intersection points  and push them into addedVertices
+                sort(intersections.begin(), intersections.end(),xCoordinateComparision);
+
+                for(auto x = intersections.begin(); x!=intersections.end(); x++){
+
+			addedVertices.push_back(*x);
+                }
+	}
+
+	// push all added vertices into vertices
+	for(auto it = addedVertices.begin(); it!=addedVertices.end(); it++){
+
+		vertices.push_back(*it);
+	}
+	
+	return vertices;
+}
+
+
 int showSlice(string filename, string extension, int counter, GLfloat &x_scale, GLfloat &y_scale, GLfloat &z_scale) {
 
 	vector<glm::vec3> vertices ;
@@ -180,30 +329,26 @@ int showSlice(string filename, string extension, int counter, GLfloat &x_scale, 
 			cout<<"\n(Diagnostic Msg) Couldn't Open File "<<filename.c_str()<<"\n";
 			return 1;
 	}
-	
-	while(!feof(file)) {
-	glm::vec3 temp_vertex;
 
-	fscanf(file, "%f %f %f", &temp_vertex.x, &temp_vertex.y, &temp_vertex.z);
+	boundaryVertexCount = 0;
+	vertexCount = 0;	
+	glm::vec3 temp_vertex;
 	
-	vertices.push_back(temp_vertex);
+	while(fscanf(file,"%f %f %f", &temp_vertex.x, &temp_vertex.y, &temp_vertex.z)!=EOF) {
+	
+		vertices.push_back(temp_vertex);
+		
+		boundaryVertexCount++;
 	}
 
-	vertexCount=0;
 
 	fclose(file);
 
-//		cout<<"\n(Diagnostic Msg)Printing Vertices:\n";	
-		for ( auto it = vertices.begin(); it != vertices.end(); it++) 
-		{		
-//				cout<<(*it).x<<" "<<(*it).y<<" "<<(*it).z<<"\n";
-				vertexCount++;
-		}
-	
+	vertices = lineFill(vertices);
+
 	GLfloat aspectratio = width/(float)height;
 	
 	yscale = minimum(xscale,yscale,zscale);
-//	cout<<"\nY scale currently is: "<<yscale;
 	xscale = yscale;
 	zscale = yscale;
 	yscale*= aspectratio;	
@@ -222,6 +367,13 @@ int showSlice(string filename, string extension, int counter, GLfloat &x_scale, 
 			return 1; 
 	}
 
+
+
+	vertexCount = 0;
+
+	for ( auto it = vertices.begin(); it != vertices.end(); it++) 
+			vertexCount++;
+	
 	glUniformMatrix4fv(tm, 1, GL_FALSE, glm::value_ptr(glm_tm));
 
 	glBufferData(GL_ARRAY_BUFFER, 3*sizeof(GLfloat)*vertices.size(), &vertices[0].x, GL_STATIC_DRAW);

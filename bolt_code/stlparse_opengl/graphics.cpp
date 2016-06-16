@@ -44,7 +44,7 @@ int showSlice(string filename, string extension, int counter);
 int max_slice_no=0,cur_slice_no=0, vertexCount=0;
 int width=0, height=0;
 
-
+int endPointCount=0;
 //functions
 float minimum (GLfloat x, GLfloat y, GLfloat z) {
 	float min = x; /* assume x is the largest */
@@ -244,23 +244,29 @@ vector <glm::vec3>  lineFill(vector <glm::vec3> vertices) {
 
 					for (auto iter = vertices.begin(); iter!=vertices.end(); iter++, counter++){
 						
-						if(iter->x==vertex1.x && iter->y==vertex1.y){
-						
-							if(counter%2==0)								
-								endPoints.push_back(*(iter+1));
-							else
-								endPoints.push_back(*(iter-1));
-						}
-					}
-						
-					if(endPoints.size() == 2){ // 2 point case
-					
-						if((endPoints[0].y - vertex1.y > 0 && endPoints[1].y - vertex1.y > 0) 
-							|| (endPoints[0].y - vertex1.y < 0 && endPoints[1].y - vertex1.y < 0) )
-							intersections.push_back(vertex1);
+							if(iter->x == vertex1.x && iter->y == vertex1.y) {
 							
-					} 			
+								if(counter%2==0)	
+									endPoints.push_back(*(iter+1));
+								else
+									endPoints.push_back(*(iter-1));
+							
+							 }
+						
+							if(endPoints.size() == 2){ // 2 point case
+							
+								if( (endPoints[0].y - vertex1.y) * (endPoints[1].y - vertex1.y > 0) < 0 )
+									intersections.push_back(vertex1);
+							} 			
+							
+							else if (endPoints.size()>2) {
+									
+									cout<<"\nJunction no "<<endPointCount<<" detected, has "<<endPoints.size()<<" Convergence";
+									endPointCount++;
+							}
+
 	
+					}
 				}
 				else if (dp2 == 0){
 
@@ -270,7 +276,7 @@ vector <glm::vec3>  lineFill(vector <glm::vec3> vertices) {
 
 					for (auto iter = vertices.begin(); iter!=vertices.end(); iter++, counter++){
 						
-						if(iter->x==vertex2.x && iter->y==vertex2.y){
+						if(iter->x == vertex2.x && iter->y == vertex2.y){
 						
 							if(counter%2==0)								
 								endPoints.push_back(*(iter+1));
@@ -281,11 +287,16 @@ vector <glm::vec3>  lineFill(vector <glm::vec3> vertices) {
 						
 					if(endPoints.size() == 2){ // 2 point case
 					
-						if((endPoints[0].y - vertex2.y > 0 && endPoints[1].y - vertex2.y > 0) 
-							|| (endPoints[0].y - vertex2.y < 0 && endPoints[1].y - vertex2.y < 0) )
+						if(((endPoints[0].y - vertex2.y ) * ( endPoints[1].y - vertex2.y )) < 0)
 							intersections.push_back(vertex2);
 							
 					} 
+	
+					else if (endPoints.size()>2) {
+							
+							cout<<"\nJunction no "<<endPointCount<<" detected, has "<<endPoints.size()<<" Convergence";
+							endPointCount++;
+					}
 				}
 			}
 
@@ -336,8 +347,6 @@ int showSlice(string filename, string extension, int counter, GLfloat &x_scale, 
 
 	vertices = lineFill(vertices);
 
-//	cout<<"\n(Diagnostic Msg)Printing Vertices:\n";	
-
 	GLfloat aspectratio = width/(float)height;
 	
 	yscale = minimum(xscale,yscale,zscale);
@@ -351,8 +360,6 @@ int showSlice(string filename, string extension, int counter, GLfloat &x_scale, 
 
 	glm::mat4 glm_tm = glm::scale(glm::mat4(1.0),glm::vec3(xscale,yscale,zscale));
 
-//	glm::mat4 glm_tm = glm::scale(glm::mat4(1.0),glm::vec3(1,aspectratio,1));
-	//get transformation matrix location
 	GLint tm = glGetUniformLocation(shaderProgram, "transform");
 	if(tm ==-1 ) {
 			cout<<"\nError, couldn't bind transform ";
@@ -364,15 +371,12 @@ int showSlice(string filename, string extension, int counter, GLfloat &x_scale, 
 	vertexCount = 0;
 	for ( auto it = vertices.begin(); it != vertices.end(); it++) 
 	{		
-//			cout<<(*it).x<<" "<<(*it).y<<" "<<(*it).z<<"\n";
 			vertexCount++;
 	}
 	
 	glUniformMatrix4fv(tm, 1, GL_FALSE, glm::value_ptr(glm_tm));
 
 	glBufferData(GL_ARRAY_BUFFER, 3*sizeof(GLfloat)*vertices.size(), &vertices[0].x, GL_STATIC_DRAW);
-
-//	cin.get();
 
 	return 0;
 }

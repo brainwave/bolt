@@ -39,10 +39,13 @@ const GLchar* fshader =
 //Global Variables
 GLuint vao, vbo,shaderProgram ;
 GLfloat  xscale, yscale, zscale;
+
 int showSlice(string filename, string extension, int counter);
 int max_slice_no=0,cur_slice_no=0, vertexCount=0;
 int width=0, height=0;
 
+
+//functions
 float minimum (GLfloat x, GLfloat y, GLfloat z) {
 	float min = x; /* assume x is the largest */
 	if (y < min) 
@@ -176,20 +179,15 @@ bool xCoordinateComparision(const glm::vec3 &a, const glm::vec3 &b){
 	return a.x<b.x;
 }
 
+vector <glm::vec3>  lineFill(vector <glm::vec3> vertices) {
 
-
-vector <glm::vec3>  lineFill(vector <glm::vec3> vertices){
 
 	if(boundaryVertexCount == 0)
 		return vertices;
 
 	vector <glm::vec3> addedVertices,intersections;
 
-	float ymin = vertices[0].y;
-	float ymax = vertices[0].y;
-//	float step = 0.0010f;		
-	float step = 0.01f;
-//	float step = 0.0225f;	
+	float yMin = vertices[0].y, yMax = vertices[0].y, xMin = vertices[0].x, xMax = vertices[0].x, step;
 
 	bool first = true;
 	bool odd = true;
@@ -198,18 +196,17 @@ vector <glm::vec3>  lineFill(vector <glm::vec3> vertices){
 	// find ymax and ymin
 	for(auto it = vertices.begin(); it!=vertices.end(); it++){
 
-		ymin = (it->y<ymin)?it->y:ymin;
-		ymax = (it->y>ymax)?it->y:ymax;
+		yMin = (it->y < yMin) ? it->y : yMin; yMax = (it->y > yMax) ? it->y : yMax;
+		xMin = (it->x < xMin) ? it->x : xMin; xMax = (it->x > xMax) ? it->x : xMax;
 	}
 
+	step =(yMax - yMin)/600;
 
-	
-	for (float i=ymin; i<=ymax; i+=step){
+	for (float i=yMin; i<=yMax; i+=step){
 
 		glm::vec3 vertex1, vertex2;
 		glm::vec3 intersectionPoint;
 			
-
 		float dp1, dp2;
 
 		odd = true;
@@ -241,8 +238,6 @@ vector <glm::vec3>  lineFill(vector <glm::vec3> vertices){
 
 				else if (dp1 == 0){
 					
-					printf("\n DP1 is 0");
-					
 					vector<glm::vec3> endPoints;
 
 					int counter = 0;
@@ -268,8 +263,6 @@ vector <glm::vec3>  lineFill(vector <glm::vec3> vertices){
 	
 				}
 				else if (dp2 == 0){
-
-					printf("\n DP2 is 0");
 
 					vector<glm::vec3> endPoints;
 
@@ -339,9 +332,6 @@ int showSlice(string filename, string extension, int counter, GLfloat &x_scale, 
 		boundaryVertexCount++;
 	}
 
-	printf("\n Initial read count = %d",boundaryVertexCount);
-
-
 	fclose(file);
 
 	vertices = lineFill(vertices);
@@ -351,7 +341,6 @@ int showSlice(string filename, string extension, int counter, GLfloat &x_scale, 
 	GLfloat aspectratio = width/(float)height;
 	
 	yscale = minimum(xscale,yscale,zscale);
-	cout<<"\nY scale currently is: "<<yscale;
 	xscale = yscale;
 	zscale = yscale;
 	yscale*= aspectratio;	

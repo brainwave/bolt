@@ -20,7 +20,6 @@ void slice::display_slice () {
 void slice::store_slice(string &filename, const int sliceNo) {
 
 		filename = filename + to_string(sliceNo) + ".dat";
-		cout<<"\n Storing "<<filename;		
 
 		ofstream file;
 		file.open (filename);

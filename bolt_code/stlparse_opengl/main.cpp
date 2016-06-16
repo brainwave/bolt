@@ -1,9 +1,4 @@
-#include "meshDef.cpp"
-#include "graphics.cpp"
-#include <stdlib.h>
-#include <array>
-#include <unistd.h>
-#include <time.h>
+#include "main.hpp"
 
 int main ( int argc, char *argv[] ) {
 
@@ -104,8 +99,9 @@ int main ( int argc, char *argv[] ) {
 
 		time_spent = (double) (endSliceTime - beginSliceTime) / CLOCKS_PER_SEC;
 
-		printf("\n Total slicing time: %lf", time_spent);	
-		
+		printf("\nTotal slicing time: %lf", time_spent);	
+		printf("\nStoring Slices");
+
 		clock_t startTime = clock();
 		
 		// store the slices 
@@ -139,8 +135,6 @@ int main ( int argc, char *argv[] ) {
 			time_spent = (double) (end - begin) / CLOCKS_PER_SEC;
 			printf("\n Total Time Spent: %lf ", time_spent);
 			
-			cin.get();
-
 			showWindow(window,xscale, yscale, zscale);
 
 			glfwDestroyWindow(window);	

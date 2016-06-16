@@ -4,7 +4,7 @@ CXX=g++
 PROG=main.cpp
 PROG2=display_dat.cpp
 CXXFLAGS=--std=c++11
-INCLUDE_DIRS =-I/home/akshay/workspace/bolt_akshay/bolt_code/stlparse_opengl/libs
+INCLUDE_DIRS =-I/home/brainwave/workspace/bolt/bolt_code/stlparse_opengl/libs
 LDFLAGS=-g 
 LDLIBS =-lglfw -lGL -lGLEW 
 OP1=-oslicer.o

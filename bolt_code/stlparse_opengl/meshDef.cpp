@@ -21,10 +21,14 @@ void slice::store_slice(string &filename, const int sliceNo) {
 		filename = filename + to_string(sliceNo) + ".dat";
 		ofstream file;
 		file.open (filename);
-			
-		for ( auto sliceIterator = slice.begin(); sliceIterator != slice.end(); sliceIterator++ ) 								
+
+//		cout<<"\n"<<filename;		
+
+		for ( auto sliceIterator = slice.begin(); sliceIterator != slice.end(); sliceIterator++ ) {				
 				file<<sliceIterator->startpoint<<" "<<sliceIterator->endpoint<<"\n";
-		
+//				cout<<"\nStartpoint "<<sliceIterator->startpoint<<" "<<"Endpoint "<<sliceIterator->endpoint;
+		}	
+
 		file.close();
 }
 
@@ -67,7 +71,7 @@ int stlMesh::readStlFile ( const char *filename ) {
 			//block to read binary stl file
 			
 				char modelName[80], discarder[2];
-				size_t facetNo;
+				long long facetNo;
 
 				cout<<"\nFile is not ASCII, using binary format";
 
@@ -82,7 +86,7 @@ int stlMesh::readStlFile ( const char *filename ) {
 				fread(modelName, 80, 1, file);
 				fread((void *)&facetNo, 4, 1, file);
 				
-				cout<<"\nNo. Of Triangles is : "<<facetNo;
+				//cout<<"\nNo. Of Triangles is : "<<facetNo;
 
 				while(!feof(file)){
 					for(int i=0;i<4;i++){
@@ -276,44 +280,53 @@ void stlMesh::sliceByTriangle(plane *pstart, slice *sstart, float sliceSize){
 		// move to the bottom-most plane that cuts the triangle
 		while(p->distance<=triangle_min_z && sliceCounter<arr_len){
 
-			if(sliceCounter<arr_len){
 				p++;
 				s++;
 				sliceCounter++;
- 			}
-			else
-				break;
+
  		}
 
 		// possibly overshot the min-z value, so move back one plane
-		if(p!=pstart){
-
+		if(p!=pstart && sliceCounter>0){
 			p--;
 			s--;
 			sliceCounter--;
+
  		}
 
 		// move through planes till the plane is above the triangle
-		while(p->distance<=triangle_max_z && sliceCounter<arr_len){
+		while(p->distance<=triangle_max_z && sliceCounter<arr_len && sliceCounter >=0){
 
+//			cout<<"\nSlice No "<<sliceCounter;
+		
 			vector<vec3> intersections;
 
 			for (int i=0; i < 3; i++) {
+
 				float dp1 = p->distanceFromPoint(t->vertex[i]);
 				float dp2 = p->distanceFromPoint(t->vertex[(i+1)%3]);
+
+
+			//	cout<<"\nVertex 1 x: "<<t->vertex[i].x<<" Vertex 1 y: "<<t->vertex[i].y
+			//		<<	" Vertex 2 x: "<<t->vertex[(i+1)%3].x<<" Vertex 2 y: "<<t->vertex[(i+1)%3].y
+			//		<<	"\nPlane Distnace: "<<p->distance<<" d1: "<<dp1<<" d2: "<<dp2;
+
 				if( dp1*dp2 < 0){ 
 					intersections.push_back (t->vertex[i] + ((t->vertex[(i+1)%3] - t->vertex[i]) * 
 							 (dp1/(dp1-dp2))) );
-
 				}	
 
-				if(intersections.size()==2) {
-					 s->slice.push_back( linesegment(intersections[1], intersections[0]));		
-				}
 			}
+			if(intersections.size()==2) {
+					 s->slice.push_back( linesegment(intersections[1], intersections[0]));		
+			//		 cout<<"\nPushed back - Startpoint: "<<intersections[1]<<" -> Endpoint: "<<intersections[0];
+				}
+	
 			p++;
 			s++;
 			sliceCounter++;
+			
+
  		}
 	}
 }

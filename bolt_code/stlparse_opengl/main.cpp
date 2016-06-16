@@ -106,8 +106,6 @@ int main ( int argc, char *argv[] ) {
 
 		printf("\n Total slicing time: %lf", time_spent);	
 		
-		mesh.sliceByTriangle(p,s,sliceSize);
-	
 		clock_t startTime = clock();
 		
 		// store the slices 

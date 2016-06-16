@@ -24,14 +24,10 @@ void slice::store_slice(string &filename, const int sliceNo) {
 
 		ofstream file;
 		file.open (filename);
-
-//		cout<<"\n"<<filename;		
-
-		for ( auto sliceIterator = slice.begin(); sliceIterator != slice.end(); sliceIterator++ ) {				
+			
+		for ( auto sliceIterator = slice.begin(); sliceIterator != slice.end(); sliceIterator++ ) 			
 				file<<sliceIterator->startpoint<<" "<<sliceIterator->endpoint<<"\n";
-//				cout<<"\nStartpoint "<<sliceIterator->startpoint<<" "<<"Endpoint "<<sliceIterator->endpoint;
-		}	
-
+			
 		file.close();
 }
 
@@ -89,7 +85,7 @@ int stlMesh::readStlFile ( const char *filename ) {
 				fread(modelName, 80, 1, file);
 				fread((void *)&facetNo, 4, 1, file);
 				
-				//cout<<"\nNo. Of Triangles is : "<<facetNo;
+				cout<<"\nNo. Of Triangles is : "<<facetNo;
 
 				while(!feof(file)){
 					for(int i=0;i<4;i++){

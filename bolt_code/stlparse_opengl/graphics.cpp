@@ -80,7 +80,7 @@ GLFWwindow* glInit(int slicecounter, const GLfloat xshift, const GLfloat yshift,
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
 
-	window = glfwCreateWindow(1440, 900, "Slice Viewer", NULL, NULL);
+	window = glfwCreateWindow(800, 600, "Slice Viewer", NULL, NULL);
 if (!window) {
 	    glfwTerminate();
 	    exit(EXIT_FAILURE);
@@ -322,11 +322,9 @@ int showSlice(string filename, string extension, int counter, GLfloat &x_scale, 
 	vector<glm::vec3> vertices ;
 
 	filename = filename+to_string(counter)+extension;
-
 	FILE* file = fopen(filename.c_str(),"r");
-
 	if(!file) {
-			cout<<"\n(Diagnostic Msg) Couldn't Open File "<<filename.c_str()<<"\n";
+			cout<<"\n(Diagnostic Msg) Couldn't Open File";
 			return 1;
 	}
 
@@ -341,14 +339,19 @@ int showSlice(string filename, string extension, int counter, GLfloat &x_scale, 
 		boundaryVertexCount++;
 	}
 
+	printf("\n Initial read count = %d",boundaryVertexCount);
+
 
 	fclose(file);
 
 	vertices = lineFill(vertices);
 
+//	cout<<"\n(Diagnostic Msg)Printing Vertices:\n";	
+
 	GLfloat aspectratio = width/(float)height;
 	
 	yscale = minimum(xscale,yscale,zscale);
+	cout<<"\nY scale currently is: "<<yscale;
 	xscale = yscale;
 	zscale = yscale;
 	yscale*= aspectratio;	
@@ -370,13 +373,17 @@ int showSlice(string filename, string extension, int counter, GLfloat &x_scale, 
 
 
 	vertexCount = 0;
-
 	for ( auto it = vertices.begin(); it != vertices.end(); it++) 
+	{		
+//			cout<<(*it).x<<" "<<(*it).y<<" "<<(*it).z<<"\n";
 			vertexCount++;
+	}
 	
 	glUniformMatrix4fv(tm, 1, GL_FALSE, glm::value_ptr(glm_tm));
 
 	glBufferData(GL_ARRAY_BUFFER, 3*sizeof(GLfloat)*vertices.size(), &vertices[0].x, GL_STATIC_DRAW);
+
+//	cin.get();
 
 	return 0;
 }

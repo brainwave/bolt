@@ -16,6 +16,7 @@ using namespace std;
 #include "glm/gtc/type_ptr.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 
+#include <png++/png.hpp>
 
 // Shader sources
 
@@ -39,6 +40,7 @@ const GLchar* fshader =
 //Global Variables
 GLuint vao, vbo,shaderProgram ;
 GLfloat  xscale, yscale, zscale;
+uint8_t *pixels = new uint8_t[800 * 600 * 3];
 
 int showSlice(string filename, string extension, int counter);
 int max_slice_no=0,cur_slice_no=0, vertexCount=0;
@@ -387,8 +389,24 @@ int showWindow(GLFWwindow* window,GLfloat x_scale, GLfloat y_scale, GLfloat z_sc
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 	glDrawArrays(GL_LINES, 0, vertexCount);
 
-	if(cur_slice_no<max_slice_no)
+	if(cur_slice_no<max_slice_no) {
 	showSlice(".slice_",".dat",cur_slice_no++,x_scale, y_scale, z_scale);	
+
+	glReadPixels (0, 0, 800, 600, GL_BLUE, GL_UNSIGNED_BYTE, (GLvoid*)pixels);
+
+	png::image< png::rgb_pixel > image(800,600);
+
+	int color=0;
+
+	for (size_t y = image.get_height()-1; y >0; --y )
+		for (size_t x=0; x < image.get_width(); ++x) {
+			image[y][x] = png::rgb_pixel(0,0,*(pixels + color++));
+		}
+	string pngFileName=".slice_"+(to_string(cur_slice_no-1))+".png";
+	cout<<"\n"<<pngFileName;
+	image.write(pngFileName);
+
+	}
 
 	glfwPollEvents();
 	glfwSwapBuffers(window);

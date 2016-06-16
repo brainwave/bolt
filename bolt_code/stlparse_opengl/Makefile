@@ -3,10 +3,10 @@ CXX=g++
 
 PROG=main.cpp
 PROG2=display_dat.cpp
-CXXFLAGS=--std=c++11
+CXXFLAGS=--std=c++11 `libpng-config --cflags`
 INCLUDE_DIRS =-I/home/brainwave/workspace/bolt/bolt_code/stlparse_opengl/libs
 LDFLAGS=-g 
-LDLIBS =-lglfw -lGL -lGLEW 
+LDLIBS =-lglfw -lGL -lGLEW `libpng-config --ldflags`
 OP1=-oslicer.o
 OP2=-oviewer.o
 main:

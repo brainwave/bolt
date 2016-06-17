@@ -40,21 +40,15 @@ No fancy 3D graphics are shown, it only shows the image statically. The sample
 shows LodePNG can be used to load PNG images as textures in OpenGL.
 */
 
-#include "lodepng.h"
+#include <lodepng/lodepng.cpp>
 
 #include <iostream>
 #include <SDL/SDL.h>
 #include <GL/gl.h>
 
-int main(int argc, char *argv[])
+int main (int argc, char* argv[])
 {
-  if(argc < 2)
-  {
-    std::cout << "Please provide a filename." << std::endl;
-    return 1;
-  }
-  const char* filename = argv[1];
-
+  char *filename = argv[1];
   // Load file and decode image.
   std::vector<unsigned char> image;
   unsigned width, height;

@@ -8,3 +8,5 @@
 *.dat
 Makefile
 last_run_parameters.txt
+png/*.*
+dat/*.*

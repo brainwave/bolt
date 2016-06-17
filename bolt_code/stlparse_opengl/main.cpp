@@ -107,7 +107,7 @@ int main ( int argc, char *argv[] ) {
 		// store the slices 
 		for( float i = min_z; i <= max_z-sliceSize; i+=sliceSize ){
 
-			string filename = ".slice_";	
+			string filename = "dat/slice_";	
 			s->store_slice(filename, slice_counter); 
 			if(slice_counter<arr_len) {
 			 s++; slice_counter++;

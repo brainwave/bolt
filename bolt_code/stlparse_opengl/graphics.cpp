@@ -390,7 +390,7 @@ int showWindow(GLFWwindow* window,GLfloat x_scale, GLfloat y_scale, GLfloat z_sc
 	glDrawArrays(GL_LINES, 0, vertexCount);
 
 	if(cur_slice_no<max_slice_no) {
-	showSlice(".slice_",".dat",cur_slice_no++,x_scale, y_scale, z_scale);	
+	showSlice("dat/slice_",".dat",cur_slice_no++,x_scale, y_scale, z_scale);	
 
 	glReadPixels (0, 0, 800, 600, GL_BLUE, GL_UNSIGNED_BYTE, (GLvoid*)pixels);
 
@@ -402,7 +402,7 @@ int showWindow(GLFWwindow* window,GLfloat x_scale, GLfloat y_scale, GLfloat z_sc
 		for (size_t x=0; x < image.get_width(); ++x) {
 			image[y][x] = png::rgb_pixel(0,0,*(pixels + color++));
 		}
-	string pngFileName=".slice_"+(to_string(cur_slice_no-1))+".png";
+	string pngFileName="png/slice_"+(to_string(cur_slice_no-1))+".png";
 	cout<<"\n"<<pngFileName;
 	image.write(pngFileName);
 

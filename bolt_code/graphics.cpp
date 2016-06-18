@@ -66,12 +66,12 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 
 }
 
-GLFWwindow* glInit(int slicecounter, const GLfloat xshift, const GLfloat yshift, const GLfloat zshift) {
+GLFWwindow* glInit(int slicecounter, const GLfloat xshift, const GLfloat yshift, const GLfloat zshift, const GLfloat pixels_per_mm = 0.5) {
 	//store globally relevant info
 	max_slice_no=slicecounter;
 
-	xscale = 1/(2*xshift);
-	yscale = 1/(2*yshift);
+	xscale = (pixels_per_mm*1)/(2*xshift);
+	yscale = (pixels_per_mm*1)/(2*yshift);
 	zscale = 1/(2*zshift);
 
 	GLFWwindow* window;
@@ -238,7 +238,7 @@ vector <glm::vec3>  lineFill(vector <glm::vec3> vertices) {
 					intersections.push_back(intersectionPoint);
 				}
 
-				else if (dp1 == 0){
+				else if (dp1 == 0 && dp2 != 0){
 					
 					vector<glm::vec3> endPoints;
 
@@ -257,7 +257,7 @@ vector <glm::vec3>  lineFill(vector <glm::vec3> vertices) {
 						
 							if(endPoints.size() == 2){ // 2 point case
 							
-								if( (endPoints[0].y - vertex1.y) * (endPoints[1].y - vertex1.y > 0) < 0 )
+								if( (endPoints[0].y - vertex1.y) * (endPoints[1].y - vertex1.y ) < 0 )
 									intersections.push_back(vertex1);
 							} 			
 							
@@ -270,7 +270,7 @@ vector <glm::vec3>  lineFill(vector <glm::vec3> vertices) {
 	
 					}
 				}
-				else if (dp2 == 0){
+				else if (dp2 == 0 && dp1 != 0){
 
 					vector<glm::vec3> endPoints;
 

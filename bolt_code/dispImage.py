@@ -24,11 +24,11 @@ def stop(event):
     	
 main = Tk()
 main.attributes("-fullscreen", True)
-c = Canvas(main, width=1200, height=800)
+c = Canvas(main, width=800, height=600)
 c.pack()
 
 picture = PhotoImage(file=file_part+str(counter)+extension)
-picture2 = c.create_image(600,400,anchor=CENTER, image=picture)
+picture2 = c.create_image(400,300,anchor=CENTER, image=picture)
 
 Button(main, text='Quit', command=main.destroy).pack()
 main.bind("<Return>",stuff)

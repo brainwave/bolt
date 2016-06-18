@@ -3,7 +3,8 @@
 int main ( int argc, char *argv[] ) {
 
 	float sliceSize = 0.1;
-	
+	float pixels_per_mm = 0.5;	
+
 	// time calculation
 	clock_t begin = clock();
 	clock_t end;
@@ -17,15 +18,21 @@ int main ( int argc, char *argv[] ) {
 	}
 
     else if(argc == 2) {
-			cout<<"\nSlicing "<<argv[1]<<" with default slice size of "<<sliceSize;
+			cout<<"\nSlicing "<<argv[1]<<" with default slice size of "<<sliceSize<<" and default pixels/mm as "<<pixels_per_mm;
 	}
 
 	else if(argc ==3) {
 			sliceSize = atof(argv[2]);
-		cout<<"\nSlicing "<<argv[1]<<" with supplied slice size of "<<sliceSize;
+		cout<<"\nSlicing "<<argv[1]<<" with supplied slice size of "<<sliceSize<<" and default pixels/mm as "<<pixels_per_mm;
 	}
 
-	else if(argc >3) {
+	else if (argc == 4) {
+		sliceSize = atof(argv[2]);
+		cout<<"\n Slicing "<<argv[1]<<" with supplied slice size of "<<sliceSize<<" and supplied pixels/mm as "<<pixels_per_mm;
+	}
+
+
+	else if(argc >4) {
 			cout << "\nExtraneous parameters supplied, exiting. ";
 			return 1;
 	}
@@ -43,9 +50,9 @@ int main ( int argc, char *argv[] ) {
 		mesh.set_min_max_var_z(min_z, max_z, min_x, max_x, min_y, max_y);
 	
 		//restructure using labmda later
-		xrange = (max_x - min_x)/2;
-		yrange = (max_y - min_y)/2;
-		zrange = (max_z - min_z)/2;
+		xrange = (max_x - min_x);
+		yrange = (max_y - min_y);
+		zrange = (max_z - min_z);
 
 		cout<<"\nRanges are: "<<xrange<<" "<<yrange<<" "<<zrange;
 
@@ -122,10 +129,11 @@ int main ( int argc, char *argv[] ) {
 			ofstream file;
 			file.open("last_run_parameters.txt");
 			file<<"SliceCount"<<"\n"<<slice_counter<<"\n";
-					GLFWwindow* window = glInit(slice_counter, xrange, yrange, zrange);
+			
+			GLFWwindow* window = glInit(slice_counter, xrange, yrange, zrange, pixels_per_mm);
 			//filename, extension, slice_counter);
 
-			showSlice(".slice_",".dat", 0, xscale, yscale, zscale);
+			showSlice("dat/slice_",".dat", 0, xscale, yscale, zscale);
 			file<<"xScale"<<"\n"<<xscale<<"\n";
 			file<<"yScale"<<"\n"<<yscale<<"\n";
 			file<<"zScale"<<"\n"<<zscale<<"\n";

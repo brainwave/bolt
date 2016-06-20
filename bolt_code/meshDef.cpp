@@ -1,3 +1,6 @@
+#ifndef MESHDEF_CPP
+#define MESHDEF_CPP
+
 #include "meshDef.hpp"
 #include <fstream>
 #include <time.h>
@@ -327,3 +330,4 @@ void stlMesh::sliceByTriangle(plane *pstart, slice *sstart, float sliceSize, int
 	}
 }
 
+#endif

@@ -18,6 +18,7 @@ using namespace std;
 
 #include <png++/png.hpp>
 
+#include "meshDef.cpp"
 // Shader sources
 
 const GLchar* vshader =
@@ -42,7 +43,7 @@ GLuint vao, vbo,shaderProgram ;
 GLfloat  xscale, yscale, zscale;
 uint8_t *pixels = new uint8_t[800 * 600 * 3];
 
-int showSlice(string filename, string extension, int counter);
+int showSlice(slice *s, float &, float &, float &);
 int max_slice_no=0,cur_slice_no=0, vertexCount=0;
 int width=0, height=0;
 
@@ -187,7 +188,7 @@ vector <glm::vec3>  lineFill(vector <glm::vec3> vertices) {
 	if(boundaryVertexCount == 0)
 		return vertices;
 
-	vector <glm::vec3> addedVertices,intersections;
+	vector <glm::vec3> addedVertices, intersections;
 
 	float yMin = vertices[0].y, yMax = vertices[0].y, xMin = vertices[0].x, xMax = vertices[0].x, step;
 
@@ -333,29 +334,23 @@ vector <glm::vec3>  lineFill(vector <glm::vec3> vertices) {
 }
 
 
-int showSlice(string filename, string extension, int counter, GLfloat &x_scale, GLfloat &y_scale, GLfloat &z_scale) {
+int showSlice(slice *s,  GLfloat &x_scale, GLfloat &y_scale, GLfloat &z_scale) {
 
 	vector<glm::vec3> vertices ;
-
-	filename = filename+to_string(counter)+extension;
-	FILE* file = fopen(filename.c_str(),"r");
-	if(!file) {
-			cout<<"\n(Diagnostic Msg) Couldn't Open File";
-			return 1;
-	}
 
 	boundaryVertexCount = 0;
 	vertexCount = 0;	
 	glm::vec3 temp_vertex;
 	
-	while(fscanf(file,"%f %f %f", &temp_vertex.x, &temp_vertex.y, &temp_vertex.z)!=EOF) {
+	for ( auto it = s->slice.begin(); it != s->slice.end(); it++ ) {
 	
-		vertices.push_back(temp_vertex);
+		vertices.push_back(it->startpoint);
+		vertices.push_back(it->endpoint);
 		
 		boundaryVertexCount++;
 	}
 
-	fclose(file);
+//	fclose(file);
 
 	vertices = lineFill(vertices);
 
@@ -382,9 +377,7 @@ int showSlice(string filename, string extension, int counter, GLfloat &x_scale, 
 
 	vertexCount = 0;
 	for ( auto it = vertices.begin(); it != vertices.end(); it++) 
-	{		
 			vertexCount++;
-	}
 	
 	glUniformMatrix4fv(tm, 1, GL_FALSE, glm::value_ptr(glm_tm));
 
@@ -393,14 +386,14 @@ int showSlice(string filename, string extension, int counter, GLfloat &x_scale, 
 	return 0;
 }
 
-int showWindow(GLFWwindow* window,GLfloat x_scale, GLfloat y_scale, GLfloat z_scale) {
-		//vertex shader
-	while(!glfwWindowShouldClose(window)) {
+int showWindow(slice *s, GLFWwindow* window,GLfloat x_scale, GLfloat y_scale, GLfloat z_scale) {
+	 //vertex shader
+	while(!glfwWindowShouldClose(window) && cur_slice_no < max_slice_no) {
+
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 	glDrawArrays(GL_LINES, 0, vertexCount);
 
-	if(cur_slice_no<max_slice_no) {
-	showSlice("dat/slice_",".dat",cur_slice_no++,x_scale, y_scale, z_scale);	
+	showSlice(s,x_scale, y_scale, z_scale);	
 
 	glReadPixels (0, 0, 800, 600, GL_BLUE, GL_UNSIGNED_BYTE, (GLvoid*)pixels);
 
@@ -412,13 +405,14 @@ int showWindow(GLFWwindow* window,GLfloat x_scale, GLfloat y_scale, GLfloat z_sc
 		for (size_t x=0; x < image.get_width(); ++x) {
 			image[y][x] = png::rgb_pixel(0,0,*(pixels + color++));
 		}
-	string pngFileName="png/slice_"+(to_string(cur_slice_no-1))+".png";
+	string pngFileName="png/slice_"+(to_string(cur_slice_no))+".png";
 	image.write(pngFileName);
 
-	}
-
+	cur_slice_no++; s++;
+	
 	glfwPollEvents();
 	glfwSwapBuffers(window);
+	
 	}
 	return 0;
 }

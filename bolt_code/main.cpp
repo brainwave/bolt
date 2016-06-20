@@ -38,7 +38,7 @@ int main ( int argc, char *argv[] ) {
 	}
 
 	//clean up all computations, very shabby right now
-	float min_z, max_z,min_x, max_x, min_y, max_y, xrange, yrange, zrange, xcenter, ycenter, zcenter, xscale=1.f, yscale=1.f, zscale=1.f;
+	float min_z, max_z,min_x, max_x, min_y, max_y, xrange, yrange, zrange, xcenter, ycenter, zcenter, xscale=1.0f, yscale=1.0f, zscale=1.0f;
 
 	stlMesh mesh;
 
@@ -107,33 +107,27 @@ int main ( int argc, char *argv[] ) {
 		time_spent = (double) (endSliceTime - beginSliceTime) / CLOCKS_PER_SEC;
 
 		printf("\nTotal slicing time: %lf", time_spent);	
-		printf("\nStoring Slices");
-
 		clock_t startTime = clock();
 		
 		// store the slices 
 		for( float i = min_z; i <= max_z-sliceSize; i+=sliceSize ){
-
-			string filename = "dat/slice_";	
-			s->store_slice(filename, slice_counter); 
 			if(slice_counter<arr_len) {
-			 s++; slice_counter++;
+			 slice_counter++;
 			}
 		}
 		
-		cout<<"\nTime taken by store_slice : "<<((double)(clock() - startTime)/CLOCKS_PER_SEC);
-
-		printf("\n Number of slices: %d",slice_counter);
-
 		
 			ofstream file;
 			file.open("last_run_parameters.txt");
 			file<<"SliceCount"<<"\n"<<slice_counter<<"\n";
 			
-			GLFWwindow* window = glInit(slice_counter, xrange, yrange, zrange, pixels_per_mm);
+			GLFWwindow* window = glInit(slice_counter, xrange/xscale, yrange/xscale, zrange/xscale, pixels_per_mm);
 			//filename, extension, slice_counter);
 
-			showSlice("dat/slice_",".dat", 0, xscale, yscale, zscale);
+//			showSlice("dat/slice_",".dat", 0, xscale, yscale, zscale);
+//
+			showSlice (s++, xscale, yscale, zscale);
+
 			file<<"xScale"<<"\n"<<xscale<<"\n";
 			file<<"yScale"<<"\n"<<yscale<<"\n";
 			file<<"zScale"<<"\n"<<zscale<<"\n";
@@ -143,7 +137,7 @@ int main ( int argc, char *argv[] ) {
 			time_spent = (double) (end - begin) / CLOCKS_PER_SEC;
 			printf("\n Total Time Spent: %lf ", time_spent);
 			
-			showWindow(window,xscale, yscale, zscale);
+			showWindow(s, window,xscale, yscale, zscale);
 
 			glfwDestroyWindow(window);	
 			glfwTerminate();

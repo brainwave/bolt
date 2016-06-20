@@ -70,8 +70,8 @@ GLFWwindow* glInit(int slicecounter, const GLfloat xshift, const GLfloat yshift,
 	//store globally relevant info
 	max_slice_no=slicecounter;
 
-	xscale = 1/(2*xshift);//(pixels_per_mm*1)/(2*xshift);
-	yscale = 1/(2*yshift);//(pixels_per_mm*1)/(2*yshift);
+	xscale = (pixels_per_mm)/(2*xshift);
+	yscale = (pixels_per_mm)/(2*yshift);
 	zscale = 1/(2*zshift);
 
 	GLFWwindow* window;

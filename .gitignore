@@ -6,7 +6,6 @@
 *.ycm_extra_conf*
 *snippet
 *.dat
-Makefile
 last_run_parameters.txt
 png/
 dat/

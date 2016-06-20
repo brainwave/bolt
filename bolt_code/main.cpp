@@ -50,9 +50,9 @@ int main ( int argc, char *argv[] ) {
 		mesh.set_min_max_var_z(min_z, max_z, min_x, max_x, min_y, max_y);
 	
 		//restructure using labmda later
-		xrange = (max_x - min_x);
-		yrange = (max_y - min_y);
-		zrange = (max_z - min_z);
+		xrange = (max_x - min_x)/2;
+		yrange = (max_y - min_y)/2;
+		zrange = (max_z - min_z)/2;
 
 		cout<<"\nRanges are: "<<xrange<<" "<<yrange<<" "<<zrange;
 

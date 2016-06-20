@@ -70,8 +70,8 @@ GLFWwindow* glInit(int slicecounter, const GLfloat xshift, const GLfloat yshift,
 	//store globally relevant info
 	max_slice_no=slicecounter;
 
-	xscale = (pixels_per_mm)/(2*xshift);
-	yscale = (pixels_per_mm)/(2*yshift);
+	xscale = 1/(2*xshift); //(pixels_per_mm)/(2*xshift);
+	yscale = 1/(2*yshift);//(pixels_per_mm)/(2*yshift);
 	zscale = 1/(2*zshift);
 
 	GLFWwindow* window;
@@ -218,6 +218,7 @@ vector <glm::vec3>  lineFill(vector <glm::vec3> vertices) {
 		
 		for(auto it = vertices.begin();it != vertices.end(); it++){
 	
+			// store start vertex of an edge
 			if(first){
 
 				vertex1 = *it;
@@ -225,19 +226,21 @@ vector <glm::vec3>  lineFill(vector <glm::vec3> vertices) {
 				first = false;
 			}
 						
+			// store the end vertex of an edge
 			else{
 
 				first = true;
 				vertex2 = *it;
 				dp2 = vertex2.y - i;
 			
-				
+				// start and end are on opposite sides of the scan line
 				if( dp1*dp2 < 0){
 					
 					intersectionPoint = vertex1 + (vertex2 - vertex1)*(dp1/(dp1-dp2));
 					intersections.push_back(intersectionPoint);
 				}
 
+				// scan line passes through start point
 				else if (dp1 == 0 && dp2 != 0){
 					
 					vector<glm::vec3> endPoints;
@@ -246,30 +249,34 @@ vector <glm::vec3>  lineFill(vector <glm::vec3> vertices) {
 
 					for (auto iter = vertices.begin(); iter!=vertices.end(); iter++, counter++){
 						
-							if(iter->x == vertex1.x && iter->y == vertex1.y) {
-							
-								if(counter%2==0)	
-									endPoints.push_back(*(iter+1));
-								else
-									endPoints.push_back(*(iter-1));
-							
-							 }
+						if(iter->x == vertex1.x && iter->y == vertex1.y) {
 						
-							if(endPoints.size() == 2){ // 2 point case
+							if(counter%2==0)	
+								endPoints.push_back(*(iter+1));
+							else
+								endPoints.push_back(*(iter-1));
+						
+						 }
+					
+						if(endPoints.size() == 2){ // 2 point case
 							
+							// if vertex has not already been added
+							if(! (find(intersections.begin(),intersections.end(),vertex1)!=intersections.end()) ){
+						//		intersections.push_back(vertex1);	
 								if( (endPoints[0].y - vertex1.y) * (endPoints[1].y - vertex1.y ) < 0 )
 									intersections.push_back(vertex1);
-							} 			
-							
-							else if (endPoints.size()>2) {
-									
-									cout<<"\nJunction no "<<endPointCount<<" detected, has "<<endPoints.size()<<" Convergence";
-									endPointCount++;
 							}
-
-	
+						} 			
+							
+						else if (endPoints.size()>2) {
+							
+							cout<<"\nJunction no "<<endPointCount<<" detected, has "<<endPoints.size()<<" Convergence";
+							endPointCount++;
+						}
 					}
 				}
+				
+				// scan line passes through end point
 				else if (dp2 == 0 && dp1 != 0){
 
 					vector<glm::vec3> endPoints;
@@ -288,10 +295,13 @@ vector <glm::vec3>  lineFill(vector <glm::vec3> vertices) {
 					}
 						
 					if(endPoints.size() == 2){ // 2 point case
-					
-						if(((endPoints[0].y - vertex2.y ) * ( endPoints[1].y - vertex2.y )) < 0)
-							intersections.push_back(vertex2);
-							
+						
+						// if vertex has not already been added	
+						if( !(find(intersections.begin(),intersections.end(),vertex2)!=intersections.end()) ){
+						//	intersections.push_back(vertex2);	
+							if( (endPoints[0].y - vertex2.y) * (endPoints[1].y - vertex2.y ) < 0 )
+								intersections.push_back(vertex2);
+						}
 					} 
 	
 					else if (endPoints.size()>2) {

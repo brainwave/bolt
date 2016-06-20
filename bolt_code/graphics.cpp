@@ -35,7 +35,7 @@ const GLchar* fshader =
     "out vec4 fragColor;"
     "void main()"
     "{"
-    "    fragColor = vec4(0.0, 0.0, 1.0, 1.0);"
+    "    fragColor = vec4(1.0, 1.0, 1.0, 1.0);"
     "}";
 
 //Global Variables
@@ -395,7 +395,7 @@ int showWindow(slice *s, GLFWwindow* window,GLfloat x_scale, GLfloat y_scale, GL
 
 	showSlice(s,x_scale, y_scale, z_scale);	
 
-	glReadPixels (0, 0, 800, 600, GL_BLUE, GL_UNSIGNED_BYTE, (GLvoid*)pixels);
+	glReadPixels (0, 0, 800, 600, GL_RGB, GL_UNSIGNED_BYTE, (GLvoid*)pixels);
 
 	png::image< png::rgb_pixel > image(800,600);
 
@@ -403,7 +403,7 @@ int showWindow(slice *s, GLFWwindow* window,GLfloat x_scale, GLfloat y_scale, GL
 
 	for (size_t y = image.get_height()-1; y >0; --y )
 		for (size_t x=0; x < image.get_width(); ++x) {
-			image[y][x] = png::rgb_pixel(0,0,*(pixels + color++));
+			image[y][x] = png::rgb_pixel(*(pixels + color++),*(pixels + color++),*(pixels + color++));
 		}
 	string pngFileName="png/slice_"+(to_string(cur_slice_no))+".png";
 	image.write(pngFileName);

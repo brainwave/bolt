@@ -32,10 +32,11 @@ const GLchar* vshader =
 
 const GLchar* fshader =
     "#version 150 \n"
+    "uniform vec4 lineColor;"
     "out vec4 fragColor;"
     "void main()"
     "{"
-    "    fragColor = vec4(0.0, 0.0, 1.0, 1.0);"
+    "    fragColor = lineColor;"
     "}";
 
 //Global Variables
@@ -177,20 +178,20 @@ if (!window) {
 
 int boundaryVertexCount=0;
 
+
 bool xCoordinateComparision(const glm::vec3 &a, const glm::vec3 &b){
 
 	return a.x<b.x;
 }
 
-vector <glm::vec3>  lineFill(vector <glm::vec3> vertices) {
-
+vector <glm::vec3>  lineFill(vector <glm::vec3> vertices) { 
 
 	if(boundaryVertexCount == 0)
 		return vertices;
 
 	vector <glm::vec3> addedVertices, intersections;
 
-	float yMin = vertices[0].y, yMax = vertices[0].y, xMin = vertices[0].x, xMax = vertices[0].x, step;
+	float yMin = vertices[0].y, yMax = vertices[0].y, xMin = vertices[0].x, xMax = vertices[0].x, step, xstep;
 
 	bool first = true;
 	bool odd = true;
@@ -204,6 +205,7 @@ vector <glm::vec3>  lineFill(vector <glm::vec3> vertices) {
 	}
 
 	step =(yMax - yMin)/600;
+	xstep = (xMax - xMin)/800;
 
 	for (float i=yMin; i<=yMax; i+=step){
 
@@ -318,8 +320,7 @@ vector <glm::vec3>  lineFill(vector <glm::vec3> vertices) {
 		// sort intersection points  and push them into addedVertices
                 sort(intersections.begin(), intersections.end(),xCoordinateComparision);
 
-                for(auto x = intersections.begin(); x!=intersections.end(); x++){
-
+		for(auto x = intersections.begin(); x!= intersections.end(); x++){
 			addedVertices.push_back(*x);
                 }
 	}
@@ -331,12 +332,13 @@ vector <glm::vec3>  lineFill(vector <glm::vec3> vertices) {
 	}
 	
 	return vertices;
+
 }
 
 
 int showSlice(slice *s,  GLfloat &x_scale, GLfloat &y_scale, GLfloat &z_scale) {
 
-	vector<glm::vec3> vertices ;
+	vector<glm::vec3> vertices, addedVertices ;
 
 	boundaryVertexCount = 0;
 	vertexCount = 0;	
@@ -347,7 +349,7 @@ int showSlice(slice *s,  GLfloat &x_scale, GLfloat &y_scale, GLfloat &z_scale) {
 		vertices.push_back(it->startpoint);
 		vertices.push_back(it->endpoint);
 		
-		boundaryVertexCount++;
+		boundaryVertexCount+=2;
 	}
 
 //	fclose(file);
@@ -369,7 +371,7 @@ int showSlice(slice *s,  GLfloat &x_scale, GLfloat &y_scale, GLfloat &z_scale) {
 
 	GLint tm = glGetUniformLocation(shaderProgram, "transform");
 	if(tm ==-1 ) {
-			cout<<"\nError, couldn't bind transform ";
+		cout<<"\nError, couldn't bind transform ";
 			return 1; 
 	}
 
@@ -381,7 +383,7 @@ int showSlice(slice *s,  GLfloat &x_scale, GLfloat &y_scale, GLfloat &z_scale) {
 	
 	glUniformMatrix4fv(tm, 1, GL_FALSE, glm::value_ptr(glm_tm));
 
-	glBufferData(GL_ARRAY_BUFFER, 3*sizeof(GLfloat)*vertices.size(), &vertices[0].x, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, 3*sizeof(GLfloat)*vertices.size(), &vertices[0].x, GL_DYNAMIC_DRAW);
 
 	return 0;
 }
@@ -391,8 +393,32 @@ int showWindow(slice *s, GLFWwindow* window,GLfloat x_scale, GLfloat y_scale, GL
 	while(!glfwWindowShouldClose(window) && cur_slice_no < max_slice_no) {
 
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-	glDrawArrays(GL_LINES, 0, vertexCount);
 
+//	glDrawArrays(GL_LINES, 0, vertexCount);
+
+
+	GLint loc = glGetUniformLocation(shaderProgram,"lineColor");
+
+
+	// fill color
+	if(loc!=-1){
+	
+		glUniform4f(loc,0.0f,0.0f,1.0f,1.0f);
+	}
+	
+	// draw fill
+	glDrawArrays(GL_LINES, boundaryVertexCount, vertexCount-boundaryVertexCount+1);	
+
+
+	// boundary color
+	if(loc!=-1){
+
+		glUniform4f(loc,1.0f,0.0f,0.0f,1.0f);
+	}
+	
+	// draw boundary
+	glDrawArrays(GL_LINES, 0, boundaryVertexCount);
+	
 	showSlice(s,x_scale, y_scale, z_scale);	
 
 	glReadPixels (0, 0, 800, 600, GL_BLUE, GL_UNSIGNED_BYTE, (GLvoid*)pixels);
@@ -405,6 +431,8 @@ int showWindow(slice *s, GLFWwindow* window,GLfloat x_scale, GLfloat y_scale, GL
 		for (size_t x=0; x < image.get_width(); ++x) {
 			image[y][x] = png::rgb_pixel(0,0,*(pixels + color++));
 		}
+
+
 	string pngFileName="png/slice_"+(to_string(cur_slice_no))+".png";
 	image.write(pngFileName);
 

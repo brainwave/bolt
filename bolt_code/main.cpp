@@ -1,43 +1,22 @@
 #include "main.hpp"
 
+
+
 int main ( int argc, char *argv[] ) {
 
-	float sliceSize = 0.1;
-	float pixels_per_mm = 0.5;	
+	float sliceSize;
+	float pixels_per_mm;	
 
 	// time calculation
 	clock_t begin = clock();
 	clock_t end;
 	double time_spent;
+
+
+	if(!checkArguments(argc, argv, sliceSize, pixels_per_mm))
+		return 0;
 	
-
-	//replace with switch case
-	if(argc ==1 ) {
-			cout<<"\nParameter missing : filename\nExiting ";
-			return 1;
-	}
-
-    else if(argc == 2) {
-			cout<<"\nSlicing "<<argv[1]<<" with default slice size of "<<sliceSize<<" and default pixels/mm as "<<pixels_per_mm;
-	}
-
-	else if(argc ==3) {
-			sliceSize = atof(argv[2]);
-		cout<<"\nSlicing "<<argv[1]<<" with supplied slice size of "<<sliceSize<<" and default pixels/mm as "<<pixels_per_mm;
-	}
-
-	else if (argc == 4) {
-		sliceSize = atof(argv[2]);
-		cout<<"\n Slicing "<<argv[1]<<" with supplied slice size of "<<sliceSize<<" and supplied pixels/mm as "<<pixels_per_mm;
-	}
-
-
-	else if(argc >4) {
-			cout << "\nExtraneous parameters supplied, exiting. ";
-			return 1;
-	}
-
-	//clean up all computations, very shabby right now
+	
 	float min_z, max_z,min_x, max_x, min_y, max_y, xrange, yrange, zrange, xcenter, ycenter, zcenter, xscale=1.0f, yscale=1.0f, zscale=1.0f;
 
 	stlMesh mesh;

@@ -6,10 +6,7 @@ int main ( int argc, char *argv[] ) {
 	float pixels_per_mm = 0.5;	
 
 	// time calculation
-	clock_t begin = clock();
-	clock_t end;
-	double time_spent;
-	
+	clock_t time, startTime = clock();
 
 	//replace with switch case
 	if(argc ==1 ) {
@@ -38,27 +35,26 @@ int main ( int argc, char *argv[] ) {
 	}
 
 	//clean up all computations, very shabby right now
-	float min_z, max_z,min_x, max_x, min_y, max_y, xrange, yrange, zrange, xcenter, ycenter, zcenter, xscale=1.0f, yscale=1.0f, zscale=1.0f;
+	float min_z, max_z,min_x, max_x, min_y, max_y, xrange, yrange, zrange, xcenter, ycenter, zcenter, xscale=2.0f, yscale=2.0f, zscale=2.0f;
 
 	stlMesh mesh;
 
+	time = clock();
 	if ( mesh.readStlFile(argv[1]) ) {
 		cout << "\nProgram Failed" ;
 		return 1;
 	}
 	else {
+		cout<<"\nreadStlFile : "<<(double)(clock() - time)/CLOCKS_PER_SEC;
+
 		mesh.set_min_max_var_z(min_z, max_z, min_x, max_x, min_y, max_y);
 	
 		//restructure using labmda later
-		xrange = (max_x - min_x)/2;
-		yrange = (max_y - min_y)/2;
-		zrange = (max_z - min_z)/2;
+		xrange = (max_x - min_x); 	yrange = (max_y - min_y);	zrange = (max_z - min_z);
 
 		cout<<"\nRanges are: "<<xrange<<" "<<yrange<<" "<<zrange;
 
-		xcenter = min_x + xrange;
-		ycenter = min_y + yrange;
-		zcenter = min_z + zrange;
+		xcenter = min_x + xrange; ycenter = min_y + yrange; zcenter = min_z + zrange;
 
 		//update new coordinates
 		min_z = min_z - zcenter; max_z -= zcenter;
@@ -89,59 +85,39 @@ int main ( int argc, char *argv[] ) {
 		for(float i = min_z; i<=max_z-sliceSize && j<arr_len; i+=sliceSize,j++,p++){
 
 			p->create_plane( vec3(0,0,1), i ) ;
-//			cout<<"\nCreated Plane "<<p->distance;
 		}
 	
 		// restore first place to p
 		p=pstart;
 	
 		// slicing 
-		clock_t beginSliceTime, endSliceTime;	
 
-		beginSliceTime = clock();
-
+		time = clock();
 		mesh.sliceByTriangle(p,s,sliceSize,arr_len);
 
-		endSliceTime = clock();
-
-		time_spent = (double) (endSliceTime - beginSliceTime) / CLOCKS_PER_SEC;
-
-		printf("\nTotal slicing time: %lf", time_spent);	
-		clock_t startTime = clock();
+		cout<<"Time spent in slicing "<<(double) (clock() - time) / CLOCKS_PER_SEC;
 		
-		// store the slices 
-		for( float i = min_z; i <= max_z-sliceSize; i+=sliceSize ){
-			if(slice_counter<arr_len) {
+		for( float i = min_z; i <= max_z-sliceSize; i+=sliceSize )
+			if(slice_counter<arr_len) 
 			 slice_counter++;
-			}
-		}
+			
+		ofstream file;
+		file.open("last_run_parameters.txt");
+		file<<"SliceCount"<<"\n"<<slice_counter<<"\n";
 		
+		GLFWwindow* window = glInit(slice_counter, xrange/xscale, yrange/xscale, zrange/xscale, pixels_per_mm);
+
+		showSlice (s++, xscale, yscale, zscale);
+
+		file<<"xScale\n"<<xscale<<"\nyScale"<<"\n"<<yscale<<"\nzScale"<<"\n"<<zscale<<"\n";
+		file.close();
 		
-			ofstream file;
-			file.open("last_run_parameters.txt");
-			file<<"SliceCount"<<"\n"<<slice_counter<<"\n";
-			
-			GLFWwindow* window = glInit(slice_counter, xrange/xscale, yrange/xscale, zrange/xscale, pixels_per_mm);
-			//filename, extension, slice_counter);
+		showWindow(s, window,xscale, yscale, zscale);
 
-//			showSlice("dat/slice_",".dat", 0, xscale, yscale, zscale);
-//
-			showSlice (s++, xscale, yscale, zscale);
+		glfwDestroyWindow(window);	
+		glfwTerminate();
 
-			file<<"xScale"<<"\n"<<xscale<<"\n";
-			file<<"yScale"<<"\n"<<yscale<<"\n";
-			file<<"zScale"<<"\n"<<zscale<<"\n";
-			file.close();
-			
-			end = clock();
-			time_spent = (double) (end - begin) / CLOCKS_PER_SEC;
-			printf("\n Total Time Spent: %lf ", time_spent);
-			
-			showWindow(s, window,xscale, yscale, zscale);
-
-			glfwDestroyWindow(window);	
-			glfwTerminate();
-
+		cout<<"\nTotal Program time : "<<(double)(clock() - startTime)/CLOCKS_PER_SEC;
 
 		}
 }

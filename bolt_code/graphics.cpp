@@ -259,24 +259,26 @@ vector <glm::vec3>  lineFill(vector <glm::vec3> vertices) {
 							else
 								endPoints.push_back(*(iter-1));
 						
-						 }
-					
-						if(endPoints.size() == 2){ // 2 point case
-							
-							// if vertex has not already been added
-							if(! (find(intersections.begin(),intersections.end(),vertex1)!=intersections.end()) ){
-						//		intersections.push_back(vertex1);	
-								if( (endPoints[0].y - vertex1.y) * (endPoints[1].y - vertex1.y ) < 0 )
-									intersections.push_back(vertex1);
-							}
-						} 			
-							
-						else if (endPoints.size()>2) {
-							
-							cout<<"\nJunction no "<<endPointCount<<" detected, has "<<endPoints.size()<<" Convergence";
-							endPointCount++;
-						}
+					 	}
 					}
+					
+					if(endPoints.size() == 2){ // 2 point case
+					
+						// if vertex has not already been added
+						if(! (find(intersections.begin(),intersections.end(),vertex1)!=intersections.end()) ){
+					
+							if( (endPoints[0].y - vertex1.y) * (endPoints[1].y - vertex1.y ) < 0 )
+								intersections.push_back(vertex1);
+						}
+					} 			
+						
+					else if (endPoints.size()>2) {
+							
+						cout<<"\nJunction no "<<endPointCount<<" detected, has "<<endPoints.size()<<" Convergence";
+					
+						endPointCount++;
+					}
+					
 				}
 				
 				// scan line passes through end point
@@ -301,7 +303,7 @@ vector <glm::vec3>  lineFill(vector <glm::vec3> vertices) {
 						
 						// if vertex has not already been added	
 						if( !(find(intersections.begin(),intersections.end(),vertex2)!=intersections.end()) ){
-						//	intersections.push_back(vertex2);	
+						
 							if( (endPoints[0].y - vertex2.y) * (endPoints[1].y - vertex2.y ) < 0 )
 								intersections.push_back(vertex2);
 						}
@@ -309,8 +311,9 @@ vector <glm::vec3>  lineFill(vector <glm::vec3> vertices) {
 	
 					else if (endPoints.size()>2) {
 							
-							cout<<"\nJunction no "<<endPointCount<<" detected, has "<<endPoints.size()<<" Convergence";
-							endPointCount++;
+						cout<<"\nJunction no "<<endPointCount<<" detected, has "<<endPoints.size()<<" Convergence";
+					
+						endPointCount++;
 					}
 				}
 			}
@@ -319,6 +322,10 @@ vector <glm::vec3>  lineFill(vector <glm::vec3> vertices) {
 
 		// sort intersection points  and push them into addedVertices
                 sort(intersections.begin(), intersections.end(),xCoordinateComparision);
+
+		// if the number of intersections is odd, the remove the last intersection
+		if(intersections.size() % 2 == 1)
+			intersections.erase(intersections.end() - 1);		
 
 		for(auto x = intersections.begin(); x!= intersections.end(); x++){
 			addedVertices.push_back(*x);

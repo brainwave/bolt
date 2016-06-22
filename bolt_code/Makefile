@@ -4,7 +4,7 @@ CXX=g++
 PROG=main.cpp
 PROG2=display_png.cpp
 CXXFLAGS=--std=c++11 `libpng-config --cflags`
-INCLUDE_DIRS =-I/home/brainwave/workspace/bolt/bolt_code/libs
+INCLUDE_DIRS =-I/home/akshay/workspace/bolt_akshay/bolt_code/libs
 LDFLAGS=-g 
 LDLIBS =-lglfw -lGL -lGLEW `libpng-config --ldflags`
 OP1=-oslicer.o

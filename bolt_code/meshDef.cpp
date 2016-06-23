@@ -211,7 +211,6 @@ for ( auto meshIterator = mesh.begin(); meshIterator != mesh.end(); meshIterator
 
 xrange = max_x - min_x; yrange = max_y - min_y; zrange = max_z - min_z;
 
-z_max = max_z; z_min = min_z;
 
 float xcenter = min_x + xrange/2, ycenter = min_y + yrange/2, zcenter = min_z + zrange/2;
 
@@ -223,6 +222,8 @@ float xcenter = min_x + xrange/2, ycenter = min_y + yrange/2, zcenter = min_z + 
 				meshIterator->vertex[i].z -= zcenter;
 			}
 		}
+
+	z_max = max_z - zcenter; z_min = min_z - zcenter;
 }
 
 void stlMesh::slice_mesh ( plane *p, slice *s) {

@@ -29,6 +29,8 @@ int main ( int argc, char *argv[] ) {
 
 		mesh.recenter(xrange, yrange, zrange, max_z, min_z);
 
+		cout<<"\nRanges are "<<" "<<xrange<<" "<<yrange<<" "<<zrange<<" , Z max is at "<<max_z;
+
 		int arr_len= (int)(zrange/sliceSize)+1;
 
 		static int slice_counter=0; 

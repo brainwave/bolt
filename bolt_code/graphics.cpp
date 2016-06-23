@@ -423,7 +423,7 @@ void lineDraw(int xa, int ya, int xb, int yb){
 
 }
 
-int showSlice(slice *s,  GLfloat &x_scale, GLfloat &y_scale, GLfloat &z_scale) {
+int showSlice(slice *s,  GLfloat &x_scale, GLfloat &y_scale, GLfloat &z_scale, float max_x, float min_x, float max_y, float min_y) {
 
 	vector<glm::vec3> vertices, addedVertices ;
 
@@ -495,8 +495,8 @@ int showSlice(slice *s,  GLfloat &x_scale, GLfloat &y_scale, GLfloat &z_scale) {
 			
 			first = false;
 			
-			_x = (it->x - -2)/(4) * 800;
-			_y = (it->y - -2)/(4) * 600;
+			_x = (it->x - min_x)/(max_x - min_x) * 800;
+			_y = (it->y - min_y)/(max_y - min_y) * 600;
 		
 			x1 = (int)_x;
 			y1 = (int)_y;
@@ -505,8 +505,8 @@ int showSlice(slice *s,  GLfloat &x_scale, GLfloat &y_scale, GLfloat &z_scale) {
 		else{
 			first = true;
 			
-			_x = (it->x - -2)/(4) * 800;
-			_y = (it->y - -2)/(4) * 600;
+			_x = (it->x - min_x)/(max_x - min_x) * 800;
+			_y = (it->y - min_y)/(max_y - min_y) * 600;
 	
 			x2 = (int)_x;
 			y2 = (int)_y;
@@ -519,7 +519,7 @@ int showSlice(slice *s,  GLfloat &x_scale, GLfloat &y_scale, GLfloat &z_scale) {
 	return 0;
 }
 
-int showWindow(slice *s, GLFWwindow* window,GLfloat x_scale, GLfloat y_scale, GLfloat z_scale) {
+int showWindow(slice *s, GLFWwindow* window,GLfloat x_scale, GLfloat y_scale, GLfloat z_scale, float max_x, float min_x, float max_y, float min_y) {
 	 //vertex shader
 	while(!glfwWindowShouldClose(window) && cur_slice_no < max_slice_no) {
 
@@ -550,7 +550,7 @@ int showWindow(slice *s, GLFWwindow* window,GLfloat x_scale, GLfloat y_scale, GL
 	// draw boundary
 	glDrawArrays(GL_LINES, 0, boundaryVertexCount);
 	
-	showSlice(s,x_scale, y_scale, z_scale);	
+	showSlice(s,x_scale, y_scale, z_scale, max_x, min_x, max_y, min_y);	
 
 	glReadPixels (0, 0, 800, 600, GL_RGB, GL_UNSIGNED_BYTE, (GLvoid*)pixels);
 

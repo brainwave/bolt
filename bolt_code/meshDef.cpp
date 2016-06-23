@@ -193,7 +193,7 @@ int stlMesh::readStlFile ( const char *filename ) {
 		return 1;
 }
 
-void stlMesh::recenter(float &xrange, float&yrange, float&zrange, float& z_max, float& z_min) {
+void stlMesh::recenter(float &xrange, float&yrange, float&zrange, float& x_max, float& x_min, float& y_max, float& y_min, float& z_max, float& z_min) {
 
 for ( auto meshIterator = mesh.begin(); meshIterator != mesh.end(); meshIterator++ ) 
 		for ( int i = 0; i < 3; i++ ) {
@@ -224,6 +224,8 @@ float xcenter = min_x + xrange/2, ycenter = min_y + yrange/2, zcenter = min_z + 
 		}
 
 	z_max = max_z - zcenter; z_min = min_z - zcenter;
+	x_max = max_x - xcenter; x_min = min_x - xcenter;
+	y_max = max_y - ycenter; y_min = min_y - ycenter;
 }
 
 void stlMesh::slice_mesh ( plane *p, slice *s) {

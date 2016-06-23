@@ -70,7 +70,7 @@ int main ( int argc, char *argv[] ) {
 		file.open("last_run_parameters.txt");
 		file<<"SliceCount"<<"\n"<<slice_counter<<"\n";
 		
-		GLFWwindow* window = glInit(slice_counter, xrange*Oscale_x, yrange*Oscale_y, zrange*Oscale_z, pixels_per_mm);
+		int window = glInit(slice_counter, xrange*Oscale_x, yrange*Oscale_y, zrange*Oscale_z, pixels_per_mm);
 
 		showSlice (s++, xrange, yrange, zrange, max_x, min_x, max_y, min_y);
 
@@ -78,9 +78,6 @@ int main ( int argc, char *argv[] ) {
 		file.close();
 		
 		showWindow(s, window, Oscale_x, Oscale_y, Oscale_z, max_x, min_x, max_y, min_y);
-
-		glfwDestroyWindow(window);	
-		glfwTerminate();
 
 		cout<<"\nTotal Program time : "<<(double)(clock() - startTime)/CLOCKS_PER_SEC;
 

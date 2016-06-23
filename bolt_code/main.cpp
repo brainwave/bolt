@@ -13,8 +13,8 @@ int main ( int argc, char *argv[] ) {
 	if(!checkArguments(argc, argv, sliceSize, pixels_per_mm))
 		return 0;
 	
-	
-	float min_z, max_z,min_x, max_x, min_y, max_y, xrange, yrange, zrange, xcenter, ycenter, zcenter, xscale=1.0f, yscale=1.0f, zscale=1.0f;
+	//ranges, min and max z values, and O(verall)scale_x, y and z
+	float xrange, yrange, zrange, min_z, max_z, Oscale_x=0.2f, Oscale_y=0.2f, Oscale_z=0.2f;
 
 	stlMesh mesh;
 
@@ -26,27 +26,11 @@ int main ( int argc, char *argv[] ) {
 	else {
 		cout<<"\nreadStlFile : "<<(double)(clock() - time)/CLOCKS_PER_SEC;
 
-		mesh.set_min_max_var_z(min_z, max_z, min_x, max_x, min_y, max_y);
-	
-		//restructure using labmda later
-		xrange = (max_x - min_x); 	yrange = (max_y - min_y);	zrange = (max_z - min_z);
 
-		cout<<"\nRanges are: "<<xrange<<" "<<yrange<<" "<<zrange;
+		mesh.recenter(xrange, yrange, zrange, max_z, min_z);
 
-		xcenter = min_x + xrange; ycenter = min_y + yrange; zcenter = min_z + zrange;
+		int arr_len= (int)(zrange/sliceSize)+1;
 
-		//update new coordinates
-		min_z = min_z - zcenter; max_z -= zcenter;
-		min_y = min_y - ycenter; max_y -= ycenter;
-		min_x = min_x - xcenter; max_x -= xcenter;
-
-		//Center Mesh, using extremums
-		mesh.recenter(xcenter, ycenter, zcenter);
-
-		//Add one extra length for the last element, if it falls on max_z
-//		cout<<"\n(Diagnostic Msg) Model centered around point "<<xcenter<<" "<<ycenter<<" "<<zcenter<<" Units";
-
-		int arr_len= (int)(((max_z-min_z)/sliceSize))+1;
 		static int slice_counter=0; 
 
 		plane *p = new plane[arr_len];
@@ -84,14 +68,14 @@ int main ( int argc, char *argv[] ) {
 		file.open("last_run_parameters.txt");
 		file<<"SliceCount"<<"\n"<<slice_counter<<"\n";
 		
-		GLFWwindow* window = glInit(slice_counter, xrange/xscale, yrange/xscale, zrange/xscale, pixels_per_mm);
+		GLFWwindow* window = glInit(slice_counter, xrange*Oscale_x, yrange*Oscale_y, zrange*Oscale_z, pixels_per_mm);
 
-		showSlice (s++, xscale, yscale, zscale);
+		showSlice (s++, xrange, yrange, zrange);
 
 		file<<"xScale\n"<<xscale<<"\nyScale"<<"\n"<<yscale<<"\nzScale"<<"\n"<<zscale<<"\n";
 		file.close();
 		
-		showWindow(s, window,xscale, yscale, zscale);
+		showWindow(s, window, Oscale_x, Oscale_y, Oscale_z);
 
 		glfwDestroyWindow(window);	
 		glfwTerminate();

@@ -68,13 +68,15 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 
 }
 
-GLFWwindow* glInit(int slicecounter, const GLfloat xshift, const GLfloat yshift, const GLfloat zshift, const GLfloat pixels_per_mm = 0.5) {
+
+//R(ange)scale_x, y and z
+GLFWwindow* glInit(int slicecounter, const GLfloat Rscale_x, const GLfloat Rscale_y, const GLfloat Rscale_z, const GLfloat pixels_per_mm = 0.5) {
 	//store globally relevant info
 	max_slice_no=slicecounter;
 
-	xscale = (pixels_per_mm)/(2*xshift);
-	yscale = (pixels_per_mm)/(2*yshift);
-	zscale = 1/(2*zshift);
+	xscale = (pixels_per_mm)/(2*Rscale_x);
+	yscale = (pixels_per_mm)/(2*Rscale_y);
+	zscale = 1/(2*Rscale_z);
 
 	GLFWwindow* window;
 	if (!glfwInit())

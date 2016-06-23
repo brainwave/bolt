@@ -85,9 +85,7 @@ public:
 
 	void display_all_elements ();
 
-	void set_min_max_var_z ( float &min_z, float &max_z, float &min_x, float &max_x, float &min_y, float &max_y) ;
-
-	void recenter ( const float xshift, const float yshift, const float zshift );
+	void recenter (float &, float&, float &, float &, float&);
 
 	int readStlFile ( const char *filename );
 

@@ -193,35 +193,34 @@ int stlMesh::readStlFile ( const char *filename ) {
 		return 1;
 }
 
-void stlMesh::set_min_max_var_z (float &minz, float &maxz, float &minx, float &maxx, float &miny, float &maxy) {
-	
-	for ( auto meshIterator = mesh.begin(); meshIterator != mesh.end(); meshIterator++ ) 
+void stlMesh::recenter(float &xrange, float&yrange, float&zrange, float& z_max, float& z_min) {
+
+for ( auto meshIterator = mesh.begin(); meshIterator != mesh.end(); meshIterator++ ) 
 		for ( int i = 0; i < 3; i++ ) {
 			
 			min_z = ( min_z > meshIterator -> vertex[i].z ) ? meshIterator -> vertex[i].z : min_z;
 			max_z = ( max_z < meshIterator -> vertex[i].z ) ? meshIterator -> vertex[i].z : max_z;
+
 			min_x = ( min_x > meshIterator -> vertex[i].x ) ? meshIterator -> vertex[i].x : min_x;
 			max_x = ( max_x < meshIterator -> vertex[i].x ) ? meshIterator -> vertex[i].x : max_x;
+
 			min_y = ( min_y > meshIterator -> vertex[i].y ) ? meshIterator -> vertex[i].y : min_y;
 			max_y = ( max_y < meshIterator -> vertex[i].y ) ? meshIterator -> vertex[i].y : max_y;
 
 	}
 
-	minz=min_z;
-	maxz=max_z;
-	minx=min_x;
-	maxx=max_x;
-	miny=min_y;
-	maxy=max_y;
-	
-}
+xrange = max_x - min_x; yrange = max_y - min_y; zrange = max_z - min_z;
 
-void stlMesh::recenter(const float xshift, const float yshift, const float zshift ) {
+z_max = max_z; z_min = min_z;
+
+float xcenter = min_x + xrange/2, ycenter = min_y + yrange/2, zcenter = min_z + zrange/2;
+
+
 		for ( auto meshIterator = mesh.begin(); meshIterator != mesh.end(); meshIterator++) {
 			for( int i =0; i <3; i++ ) {
-				meshIterator->vertex[i].x -= xshift;
-				meshIterator->vertex[i].y -= yshift;
-				meshIterator->vertex[i].z -= zshift;
+				meshIterator->vertex[i].x -= xcenter;
+				meshIterator->vertex[i].y -= ycenter;
+				meshIterator->vertex[i].z -= zcenter;
 			}
 		}
 }

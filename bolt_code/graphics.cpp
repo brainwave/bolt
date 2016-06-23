@@ -15,6 +15,7 @@ using namespace std;
 #include <png++/png.hpp>
 
 #include "meshDef.cpp"
+#include <time.h>
 // Shader sources
 //
 //Global Variables
@@ -378,7 +379,9 @@ int showSlice(slice *s,  float &x_scale, float &y_scale, float &z_scale, float m
 int showWindow(slice *s, int window,float x_scale, float y_scale, float z_scale, float max_x, float min_x, float max_y, float min_y) {
 	 //vertex shader
 
-	
+
+	clock_t startTime = clock();
+
 	while ( cur_slice_no < max_slice_no) {
 	showSlice(s,x_scale, y_scale, z_scale, max_x, min_x, max_y, min_y);	
 
@@ -389,6 +392,8 @@ int showWindow(slice *s, int window,float x_scale, float y_scale, float z_scale,
 
 	cur_slice_no++; s++;
 	}
+
+	cout<<"\nTotal time taken by slicer is "<<(double)(clock() - startTime)/CLOCKS_PER_SEC;
 	
 	return 0;
 }

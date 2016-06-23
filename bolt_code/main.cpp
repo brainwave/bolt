@@ -14,7 +14,7 @@ int main ( int argc, char *argv[] ) {
 		return 0;
 	
 	//ranges, min and max z values, and O(verall)scale_x, y and z
-	float xrange, yrange, zrange, min_z, max_z, Oscale_x=1.0f, Oscale_y=1.0f, Oscale_z=1.0f;
+	float xrange, yrange, zrange, min_z, max_z, Oscale_x=0.5f, Oscale_y=0.5f, Oscale_z=0.5f;
 
 	stlMesh mesh;
 

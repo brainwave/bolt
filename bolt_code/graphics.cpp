@@ -49,6 +49,8 @@ int max_slice_no=0,cur_slice_no=0, vertexCount=0;
 int width=0, height=0;
 
 int endPointCount=0;
+png::image< png::rgb_pixel > image(800,600);
+
 //functions
 float minimum (GLfloat x, GLfloat y, GLfloat z) {
 	float min = x; /* assume x is the largest */
@@ -345,6 +347,82 @@ vector <glm::vec3>  lineFill(vector <glm::vec3> vertices) {
 }
 
 
+void lineDraw(int xa, int ya, int xb, int yb){
+	
+	int dx,dy,p,x,y,xStart,yStart,xEnd,yEnd;
+	x = xa;
+	y = ya;
+	dx = abs(xb - xa);
+	dy = abs(yb - ya);
+	if(dx>=dy)
+	{
+		p = 2*dy -dx; //p0
+		if(xa>xb)
+		{
+			x = xb;
+			y = yb;
+			yStart = yb;
+			yEnd = ya;
+			xEnd = xa;
+		}
+		else
+		{
+			x = xa;
+			y = ya;
+			yStart = ya;
+			yEnd = yb;
+			xEnd = xb;
+		}
+		image[y][x] = png::rgb_pixel(0,0,255);
+		while(x<xEnd)
+		{
+			x = x + 1;
+			if (p<0)
+				p = p+2*dy;
+			else
+			{
+				y = y+1*(yEnd - yStart)/dy;
+				p = p + 2*(dy-dx);
+			}
+			image[y][x] = png::rgb_pixel(0,0,255);
+		}
+	}
+	else
+	{
+		p = 2*dx -dy; //p0
+		if(ya>yb)
+		{
+			y = yb;
+			x = xb;
+			xStart = xb;
+			xEnd = xa;
+			yEnd = ya;
+		}
+		else
+		{
+			y = ya;
+			x = xa;
+			xStart = xa;
+			xEnd = xb;
+			yEnd = yb;
+		}
+		image[y][x] = png::rgb_pixel(0,0,255);
+		while(y<yEnd)
+		{
+			y = y + 1;
+			if (p<0)
+				p = p+2*dx;
+			else
+			{
+				x = x+1*(xEnd-xStart)/dx;
+				p = p + 2*(dx-dy);
+			}
+			image[y][x] = png::rgb_pixel(0,0,255);
+		}
+	}
+
+}
+
 int showSlice(slice *s,  GLfloat &x_scale, GLfloat &y_scale, GLfloat &z_scale) {
 
 	vector<glm::vec3> vertices, addedVertices ;
@@ -385,14 +463,58 @@ int showSlice(slice *s,  GLfloat &x_scale, GLfloat &y_scale, GLfloat &z_scale) {
 	}
 
 
+	bool first = true;	
+
 
 	vertexCount = 0;
-	for ( auto it = vertices.begin(); it != vertices.end(); it++) 
+	for ( auto it = vertices.begin(); it != vertices.end(); it++){ 
+				
+//			cout<<"\n "<<*it;
 			vertexCount++;
+	}
 	
 	glUniformMatrix4fv(tm, 1, GL_FALSE, glm::value_ptr(glm_tm));
 
 	glBufferData(GL_ARRAY_BUFFER, 3*sizeof(GLfloat)*vertices.size(), &vertices[0].x, GL_DYNAMIC_DRAW);
+
+	for (size_t y = image.get_height()-1; y >0; --y )
+		for (size_t x=0; x < image.get_width(); ++x) {
+
+			
+			image[y][x] = png::rgb_pixel(0,0,0);
+		}
+
+
+	float _x,_y;
+	int x1,x2,y1,y2;
+
+
+	for( auto it = vertices.begin(); it!= vertices.end(); it++){
+	
+		if(first){
+			
+			first = false;
+			
+			_x = (it->x - -2)/(4) * 800;
+			_y = (it->y - -2)/(4) * 600;
+		
+			x1 = (int)_x;
+			y1 = (int)_y;
+	
+		}
+		else{
+			first = true;
+			
+			_x = (it->x - -2)/(4) * 800;
+			_y = (it->y - -2)/(4) * 600;
+	
+			x2 = (int)_x;
+			y2 = (int)_y;
+			
+			lineDraw(x1,y1,x2,y2);
+		}
+	}
+
 
 	return 0;
 }
@@ -432,14 +554,14 @@ int showWindow(slice *s, GLFWwindow* window,GLfloat x_scale, GLfloat y_scale, GL
 
 	glReadPixels (0, 0, 800, 600, GL_RGB, GL_UNSIGNED_BYTE, (GLvoid*)pixels);
 
-	png::image< png::rgb_pixel > image(800,600);
+//	png::image< png::rgb_pixel > image(800,600);
 
 	int color=0;
 
-	for (size_t y = image.get_height()-1; y >0; --y )
-		for (size_t x=0; x < image.get_width(); ++x) {
-			image[y][x] = png::rgb_pixel(*(pixels + color++),*(pixels + color++),*(pixels + color++));
-		}
+//	for (size_t y = image.get_height()-1; y >0; --y )
+//		for (size_t x=0; x < image.get_width(); ++x) {
+//			image[y][x] = png::rgb_pixel(*(pixels + color++),*(pixels + color++),*(pixels + color++));
+//		}
 
 
 	string pngFileName="png/slice_"+(to_string(cur_slice_no))+".png";

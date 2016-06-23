@@ -85,7 +85,7 @@ public:
 
 	void display_all_elements ();
 
-	void recenter (float &, float&, float &, float &, float&);
+	void recenter (float &, float&, float &, float &, float&, float&, float&, float&, float&);
 
 	int readStlFile ( const char *filename );
 

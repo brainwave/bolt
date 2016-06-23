@@ -14,7 +14,7 @@ int main ( int argc, char *argv[] ) {
 		return 0;
 	
 	//ranges, min and max z values, and O(verall)scale_x, y and z
-	float xrange, yrange, zrange, min_z, max_z, Oscale_x=1.0f, Oscale_y=1.0f, Oscale_z=1.0f;
+	float xrange, yrange, zrange, min_z, max_z, max_x, min_x, max_y, min_y, Oscale_x=0.5f, Oscale_y=0.5f, Oscale_z=0.5f;
 
 	stlMesh mesh;
 
@@ -27,7 +27,7 @@ int main ( int argc, char *argv[] ) {
 		cout<<"\nreadStlFile : "<<(double)(clock() - time)/CLOCKS_PER_SEC;
 
 
-		mesh.recenter(xrange, yrange, zrange, max_z, min_z);
+		mesh.recenter(xrange, yrange, zrange, max_x, min_x, max_y, min_y, max_z, min_z);
 
 		cout<<"\nRanges are "<<" "<<xrange<<" "<<yrange<<" "<<zrange<<" , Z max is at "<<max_z;
 
@@ -72,18 +72,18 @@ int main ( int argc, char *argv[] ) {
 		
 		GLFWwindow* window = glInit(slice_counter, xrange*Oscale_x, yrange*Oscale_y, zrange*Oscale_z, pixels_per_mm);
 
-		showSlice (s++, xrange, yrange, zrange);
+		showSlice (s++, xrange, yrange, zrange, max_x, min_x, max_y, min_y);
 
 		file<<"xScale\n"<<xscale<<"\nyScale"<<"\n"<<yscale<<"\nzScale"<<"\n"<<zscale<<"\n";
 		file.close();
 		
-		showWindow(s, window, Oscale_x, Oscale_y, Oscale_z);
+		showWindow(s, window, Oscale_x, Oscale_y, Oscale_z, max_x, min_x, max_y, min_y);
 
 		glfwDestroyWindow(window);	
 		glfwTerminate();
 
 		cout<<"\nTotal Program time : "<<(double)(clock() - startTime)/CLOCKS_PER_SEC;
 
-		}
+	}
 }
 

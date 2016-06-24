@@ -363,37 +363,49 @@ return true;
 }
 
 //if contact area between 2 adjacent slices is small, generate support
-void stlMesh::supportGenerator( slice *s, int arr_len )
+void stlMesh::supportGenerator( slice *sstart, int arr_len, int skipAmnt )
 {
-
+//  cout<<"\nBEFORE: "<<s->slice.size()<<endl;
+  slice *s, *next;
+  s = sstart;
   vector<linesegment> points;
   int z;
   //iterate through all slices
-  for(int i=0; i < arr_len; i++) {	cout<<"\nLOOP STARTED\n";
-	if(enclosed(&s[i], &s[i+1])) {			//if bottom layer is smaller than top layer
+  //for(int i=arr_len; i >=0; i--) {	cout<<"\nLOOP STARTED\n";
+  for(int i=0; i<arr_len-1; i++, s++) {
+	next = s+1;
+	if(enclosed(s, next)) {			//if bottom layer is smaller than top layer
 		//iterate through each edge in the top slice
-		cout<<"true\n";
-	        for(int i=0; i < s[i+1].slice.size(); i++) {         
+	        for(int j=0; j < next->slice.size(); j++) {         
 		        //get the endpoints of each edge as a linesegment with same start and end	
-			//for visuals, offsetting the points a little farther
 			int x,y;
-			x = 200 + s[i+1].slice[i].startpoint.x; y = 200 + s[i+1].slice[i].startpoint.y;	
-			vec3 point; point.x = x; point.y = y;
-			//points.push_back( linesegment(s[i+1].slice[i].startpoint, s[i+1].slice[i].startpoint));	
-			points.push_back( linesegment(point, point));
+			x = next->slice[j].startpoint.x; y = next->slice[j].startpoint.y;	
+			vec3 point[5]; 
+			point[0].x = x-5; point[0].y = y-5; point[1].x = x+5; point[1].y = y-5;
+			point[2].x = x-5; point[2].y = y+5; point[3].x = x+5; point[3].y = y+5;
+			point[4] = point[0];
+			
+			//tiny square of length 10 mm centred at x, y
+			for(int k=0; k<4; k++)
+				points.push_back(linesegment(point[k], point[k+1]));
 		}
+
 		//add the linesegments in point to the array of slices for all z till 0
-		z = s[i+1].slice[0].startpoint.z;	//current z value
+		z = next->slice[0].startpoint.z;	//current z value
 		while(z>=0)
 	        {
-			cout<<"Added support point at z = "<<z<<endl;
+		        //cout<<"Added support point at z = "<<z<<endl;
 		 	for(int p = 0; p < points.size(); p++)
-				s->slice.push_back(points[i]);
+				s->slice.push_back(points[i]); 
 			z--;
  		}
 	}
-  	break; //only generate one support
+	i += skipAmnt;
+	if( i >= arr_len) break;
+  	//break; //only generate one support
   }
+
+//  cout<<"\nAFTER: "<<s->slice.size()<<endl;
 
 }
 #endif

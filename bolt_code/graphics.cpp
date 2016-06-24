@@ -363,7 +363,7 @@ int showSlice(slice *s,  GLfloat &x_scale, GLfloat &y_scale, GLfloat &z_scale) {
 
 //	fclose(file);
 
-	vertices = lineFill(vertices);
+//	vertices = lineFill(vertices);
 
 	GLfloat aspectratio = width/(float)height;
 	

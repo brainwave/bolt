@@ -328,6 +328,72 @@ void stlMesh::sliceByTriangle(plane *pstart, slice *sstart, float sliceSize, int
 			
  		}
 	}
+
 }
 
+
+//return true if slice a is enclosed within slice b 
+bool enclosed(slice *a, slice *b)
+{ 
+return true;
+	//find min and max x of b  
+	int x_min_b, x_max_b, y_min_b, y_max_b;
+	int x_min_a, x_max_a, y_min_a, y_max_a;
+	x_min_b = b[0].slice[0].startpoint.x; x_max_b = x_min_b;
+        
+	for(int i=0; i< b->slice.size(); i++) {
+		x_min_b = ( b->slice[i].startpoint.x < x_min_b ) ? b->slice[i].startpoint.x : x_min_b;		
+		x_max_b = ( b->slice[i].startpoint.x > x_max_b ) ? b->slice[i].startpoint.x : x_max_b;		
+		y_min_b = ( b->slice[i].startpoint.y < y_min_b ) ? b->slice[i].startpoint.y : y_min_b;		
+		y_max_b = ( b->slice[i].startpoint.y > y_max_b ) ? b->slice[i].startpoint.y : y_max_b;		
+	}
+	
+	//find min and max x,y of a
+	for(int i=0; i< a->slice.size(); i++) {
+		x_min_a = ( a->slice[i].startpoint.x < x_min_a ) ? a->slice[i].startpoint.x : x_min_a;		
+		x_max_b = ( a->slice[i].startpoint.x > x_max_a ) ? a->slice[i].startpoint.x : x_max_a;		
+		y_min_b = ( a->slice[i].startpoint.y < y_min_a ) ? a->slice[i].startpoint.y : y_min_a;		
+		y_max_b = ( a->slice[i].startpoint.y > y_max_a ) ? a->slice[i].startpoint.y : y_max_a;		
+	}
+	
+	//check if b completey overlaps a	
+	if(x_min_b < x_min_a && x_max_b > x_max_a && y_min_b < y_min_a && y_max_b > y_max_b)
+		return true;
+	return false; 
+}
+
+//if contact area between 2 adjacent slices is small, generate support
+void stlMesh::supportGenerator( slice *s, int arr_len )
+{
+
+  vector<linesegment> points;
+  int z;
+  //iterate through all slices
+  for(int i=0; i < arr_len; i++) {	cout<<"\nLOOP STARTED\n";
+	if(enclosed(&s[i], &s[i+1])) {			//if bottom layer is smaller than top layer
+		//iterate through each edge in the top slice
+		cout<<"true\n";
+	        for(int i=0; i < s[i+1].slice.size(); i++) {         
+		        //get the endpoints of each edge as a linesegment with same start and end	
+			//for visuals, offsetting the points a little farther
+			int x,y;
+			x = 200 + s[i+1].slice[i].startpoint.x; y = 200 + s[i+1].slice[i].startpoint.y;	
+			vec3 point; point.x = x; point.y = y;
+			//points.push_back( linesegment(s[i+1].slice[i].startpoint, s[i+1].slice[i].startpoint));	
+			points.push_back( linesegment(point, point));
+		}
+		//add the linesegments in point to the array of slices for all z till 0
+		z = s[i+1].slice[0].startpoint.z;	//current z value
+		while(z>=0)
+	        {
+			cout<<"Added support point at z = "<<z<<endl;
+		 	for(int p = 0; p < points.size(); p++)
+				s->slice.push_back(points[i]);
+			z--;
+ 		}
+	}
+  	break; //only generate one support
+  }
+
+}
 #endif

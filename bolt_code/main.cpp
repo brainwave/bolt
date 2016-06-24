@@ -61,7 +61,10 @@ int main ( int argc, char *argv[] ) {
 		mesh.sliceByTriangle(p,s,sliceSize,arr_len);
 
 		cout<<"Time spent in slicing "<<(double) (clock() - time) / CLOCKS_PER_SEC;
-		
+	
+		//SUPPORT GENERATION
+		mesh.supportGenerator(s, arr_len);	
+
 		for( float i = min_z; i <= max_z-sliceSize; i+=sliceSize )
 			if(slice_counter<arr_len) 
 			 slice_counter++;
@@ -86,4 +89,3 @@ int main ( int argc, char *argv[] ) {
 
 		}
 }
-

@@ -216,124 +216,87 @@ vector <glm::vec3>  lineFill(vector <glm::vec3> vertices) {
 
 }
 
-
+// Bresenham's Line Drawing Algorithm
 void lineDraw(int xa, int ya, int xb, int yb){
 	
 	int dx,dy,p,x,y,xStart,yStart,xEnd,yEnd;
-	x = xa;
-	y = ya;
+
 	dx = abs(xb - xa);
 	dy = abs(yb - ya);
-/*	if(dx == 0 && dy == 0)
-//		cout<<"\n 0-0 Case";
-		;
-	else if(dx == 0){
 	
-//		cout<<"\n dx 0 case";
-		if(ya < yb){
-		
-			y = ya;
-			while(y<=yb){
-		
-				image[y][x] = png::rgb_pixel(0,0,255);
-				y++;
-			}
-		}	
-		else{
-	
-			y = yb;
-			while(y<=ya){
-			
-				image[y][x] = png::rgb_pixel(0,0,255);
-				y++;
-			}
-		}
-	}
-	else if(dy == 0){
-	
-//		cout<<"\n dy 0 case";
-		if(xa<xb){
-		
-			x = xa;
-			while(x<=xb){
-		
-				image[y][x] = png::rgb_pixel(0,0,255);
-				x++;
-			}
-		}
-		else{
-	
-			x = xb;
-			while(x<=xa){
-	
-				image[y][x] = png::rgb_pixel(0,0,255);
-				x++;
-			}
-		}
-	}*/
-	if(dx>=dy)
-	{
+	if(dx>=dy){
+
 		p = 2*dy -dx; //p0
-		if(xa>xb)
-		{
+
+		// draw from left to right
+		if(xa>xb){
+
 			x = xb;
 			y = yb;
 			yStart = yb;
 			yEnd = ya;
 			xEnd = xa;
 		}
-		else
-		{
+		else{
+
 			x = xa;
 			y = ya;
 			yStart = ya;
 			yEnd = yb;
 			xEnd = xb;
 		}
+
 		image[y][x] = png::rgb_pixel(0,0,255);
-		while(x<xEnd)
-		{
+
+		while(x<xEnd){
+
 			x = x + 1;
 			if (p<0)
 				p = p+2*dy;
-			else
-			{
+			else{
+
 				y = y+1*(yEnd - yStart)/dy;
 				p = p + 2*(dy-dx);
 			}
+
 			image[y][x] = png::rgb_pixel(0,0,255);
 		}
 	}
-	else
-	{
+	else{
+
 		p = 2*dx -dy; //p0
-		if(ya>yb)
-		{
+
+		// draw from bottom to top
+		if(ya>yb){
+
 			y = yb;
 			x = xb;
 			xStart = xb;
 			xEnd = xa;
 			yEnd = ya;
 		}
-		else
-		{
+		else{
+
 			y = ya;
 			x = xa;
 			xStart = xa;
 			xEnd = xb;
 			yEnd = yb;
 		}
+
 		image[y][x] = png::rgb_pixel(0,0,255);
-		while(y<yEnd)
-		{
+
+		while(y<yEnd){
+
 			y = y + 1;
 			if (p<0)
 				p = p+2*dx;
-			else
-			{
+			else{
+
 				x = x+1*(xEnd-xStart)/dx;
 				p = p + 2*(dx-dy);
 			}
+
 			image[y][x] = png::rgb_pixel(0,0,255);
 		}
 	}
@@ -381,8 +344,8 @@ int showSlice(slice *s,  float &x_scale, float &y_scale, float &z_scale, float m
 			vertexCount++;
 	}
 	
-	for (size_t y = image.get_height()-1; y >0; --y )
-		for (size_t x=0; x < image.get_width(); ++x) {
+	for (size_t y = 0; y < image.get_height(); y++ )
+		for (size_t x=0; x < image.get_width(); x++) {
 
 			
 			image[y][x] = png::rgb_pixel(0,0,0);

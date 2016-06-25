@@ -224,6 +224,53 @@ void lineDraw(int xa, int ya, int xb, int yb){
 	y = ya;
 	dx = abs(xb - xa);
 	dy = abs(yb - ya);
+/*	if(dx == 0 && dy == 0)
+//		cout<<"\n 0-0 Case";
+		;
+	else if(dx == 0){
+	
+//		cout<<"\n dx 0 case";
+		if(ya < yb){
+		
+			y = ya;
+			while(y<=yb){
+		
+				image[y][x] = png::rgb_pixel(0,0,255);
+				y++;
+			}
+		}	
+		else{
+	
+			y = yb;
+			while(y<=ya){
+			
+				image[y][x] = png::rgb_pixel(0,0,255);
+				y++;
+			}
+		}
+	}
+	else if(dy == 0){
+	
+//		cout<<"\n dy 0 case";
+		if(xa<xb){
+		
+			x = xa;
+			while(x<=xb){
+		
+				image[y][x] = png::rgb_pixel(0,0,255);
+				x++;
+			}
+		}
+		else{
+	
+			x = xb;
+			while(x<=xa){
+	
+				image[y][x] = png::rgb_pixel(0,0,255);
+				x++;
+			}
+		}
+	}*/
 	if(dx>=dy)
 	{
 		p = 2*dy -dx; //p0
@@ -352,8 +399,8 @@ int showSlice(slice *s,  float &x_scale, float &y_scale, float &z_scale, float m
 			
 			first = false;
 			
-			_x = (it->x - min_x)/(max_x - min_x) * 600 ;
-			_y = (it->y - min_y)/(max_y - min_y) * 600 ;
+			_x = (it->x - min_x)/(max_x - min_x) * 599 ;
+			_y = (it->y - min_y)/(max_y - min_y) * 599 ;
 		
 			x1 = (int)_x;
 			y1 = (int)_y;
@@ -362,13 +409,16 @@ int showSlice(slice *s,  float &x_scale, float &y_scale, float &z_scale, float m
 		else{
 			first = true;
 			
-			_x = (it->x - min_x)/(max_x - min_x) * 600;
-			_y = (it->y - min_y)/(max_y - min_y) * 600;
+			_x = (it->x - min_x)/(max_x - min_x) * 599;
+			_y = (it->y - min_y)/(max_y - min_y) * 599;
 	
 			x2 = (int)_x;
 			y2 = (int)_y;
-			
-			lineDraw(x1,y1,x2,y2);
+		
+		//	if( x1>=0 && x1<600 && x2>=0 && x2<600 && y1>=0 && y1<600 && y2>=0 && y2<600)
+				lineDraw(x1,y1,x2,y2);
+		//	else
+		//		 cout<<"\n Out of bounds";
 		}
 	}
 

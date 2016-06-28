@@ -128,33 +128,54 @@ struct linesegment {
 
 struct slice {
 
-	vector<linesegment> slice;	///< List of line segments that represent the slice. 
-	
-	/**
-	*/
-	void display_slice ( void );
+	vector<linesegment> slice;	///< Vector of line segments that constitute the slice. 
 	
 };
 
+/**
+ \brief Represents the input mesh. 
+	
+	Specified by a list of triangles.
+*/
 class stlMesh {
 	
-	vector <triangle> mesh;
-
-	float min_z = 999999.0f, min_x = 999999.0f, min_y = 999999.0f;
-	float max_z = -999999.f,max_x = -999999.f, max_y = -9999999.0f;
-
+	vector <triangle> mesh;	///< Vector of triangles that constitute the mesh.
+	
+	float min_x = 999999.0f; ///< Minimum x coordinate in the mesh
+	float min_y = 999999.0f; ///< Minimum y coordinate in the mesh
+	float min_z = 999999.0f; ///< Minimum z coordinate in the mesh
+	float max_x = -999999.0f; ///< Maximum x coordinate in the mesh
+	float max_y = -999999.0f; ///< Maximum y coordniate in the mesh
+	float max_z = -999999.0f; ///< Maximum z coordinate in the mesh
 	
 public:
-	void slice_mesh (plane *p, slice *s);
+	/**
+		Caculates xrange, yrange, zrange and minimum and maximum x, y, z coordinates and re-centers the model around
+		(xrange/2,yrange/2,zrange/2) 
 
-	void displayMesh ( triangle &t );
+		@todo Remove parameters
+	*/
+	void recenter (float &xrange, float&yrange, float &zrange, float &x_max, float&x_min, float&y_max, float&y_min, float&z_max, float);
 
-	void display_all_elements ();
-
-	void recenter (float &, float&, float &, float &, float&, float&, float&, float&, float&);
-
+	/**
+		Reads the given stl file in ASCII or Binary format and pushes the trianges into <c>mesh</c>.
+	
+		@param filename Name of the stl file.
+	*/
 	int readStlFile ( const char *filename );
 
+	/**
+		\brief Slices the model to obtain 2D slices.
+	
+		For all the trianlges in the mesh, the intersection line segments with the relevant planes
+		are computed and pushed into the appropriate slice.
+	
+		@param p Pointer to the beginning of the array of intersection planes.
+		@param s Pointer to the beginning of the array of slices.
+		@param sliceSize Specified slice size.
+		@param arr_len Length of the plane and slice arrays.
+	
+	*/
 	void sliceByTriangle(plane*p, slice*s,  float sliceSize, int arr_len);
 
 };

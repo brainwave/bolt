@@ -10,26 +10,6 @@ float plane::distanceFromPoint (vec3 point) {
 	return dot(point, normal) - distance;
 }	
 
-void slice::display_slice () {
-		cout<<"\n(Diagnostic Msg)\n";
-
-		for (auto sliceIterator = slice.begin(); sliceIterator != slice.end(); sliceIterator++ ) {
-	
-			cout<<"\nLineSegment: "<<sliceIterator->startpoint<<"\t"<<sliceIterator->endpoint;
-		}
-		cout<<"\n\n";
-	}
-			
-void stlMesh::display_all_elements () {
-
-	int counter=0;
-
-	cout<<"\n(Diagnostic Msg)Data in Mesh : ";
-	for( auto meshIterator=mesh.begin();meshIterator!=mesh.end();meshIterator++ )				
-		cout<<"\nTriangle No. "<<++counter<<" "<<*meshIterator;
-
-}
-
 int stlMesh::readStlFile ( const char *filename ) {
 			
 	bool isASCII=false; //false -binary, true -ASCII

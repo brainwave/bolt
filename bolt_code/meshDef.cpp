@@ -10,39 +10,6 @@ float plane::distanceFromPoint (vec3 point) {
 	return dot(point, normal) - distance;
 }	
 
-void slice::display_slice () {
-		cout<<"\n(Diagnostic Msg)\n";
-
-		for (auto sliceIterator = slice.begin(); sliceIterator != slice.end(); sliceIterator++ ) {
-	
-			cout<<"\nLineSegment: "<<sliceIterator->startpoint<<"\t"<<sliceIterator->endpoint;
-		}
-		cout<<"\n\n";
-	}
-
-void slice::store_slice(string &filename, const int sliceNo) {
-
-		filename = filename + to_string(sliceNo) + ".dat";
-
-		ofstream file;
-		file.open (filename);
-			
-		for ( auto sliceIterator = slice.begin(); sliceIterator != slice.end(); sliceIterator++ ) 			
-				file<<sliceIterator->startpoint<<" "<<sliceIterator->endpoint<<"\n";
-			
-		file.close();
-}
-
-void stlMesh::display_all_elements () {
-
-	int counter=0;
-
-	cout<<"\n(Diagnostic Msg)Data in Mesh : ";
-	for( auto meshIterator=mesh.begin();meshIterator!=mesh.end();meshIterator++ )				
-		cout<<"\nTriangle No. "<<++counter<<" "<<*meshIterator;
-
-}
-
 int stlMesh::readStlFile ( const char *filename ) {
 			
 	bool isASCII=false; //false -binary, true -ASCII
@@ -228,31 +195,7 @@ float xcenter = min_x + xrange/2, ycenter = min_y + yrange/2, zcenter = min_z + 
 	y_max = max_y - ycenter; y_min = min_y - ycenter;
 }
 
-void stlMesh::slice_mesh ( plane *p, slice *s) {
-
-			for(auto meshIterator = mesh.begin(); meshIterator != mesh.end(); meshIterator++) {
-
-				vector<vec3> intersections;
-
-				for (int i=0; i < 3; i++) {
-
-				float dp1 = p->distanceFromPoint(meshIterator->vertex[i]);
-				float dp2 = p->distanceFromPoint(meshIterator->vertex[(i+1)%3]);
-					
-				if( dp1*dp2 < 0) 
-					intersections.push_back (
-							meshIterator->vertex[i] + 
-							((meshIterator->vertex[(i+1)%3] - meshIterator->vertex[i]) * 
-							 (dp1/(dp1-dp2))) );
-				
-				}	
-
-				if(intersections.size()==2) {
-					  s->slice.push_back( linesegment(intersections[1], intersections[0]));		
-				}
-			}
-}
-
+// For all triangles in the mesh, consider only the relevant planes and push the intersection line segments into appropriate slice
 void stlMesh::sliceByTriangle(plane *pstart, slice *sstart, float sliceSize, int arr_len){
 
 	plane *p;
@@ -262,7 +205,6 @@ void stlMesh::sliceByTriangle(plane *pstart, slice *sstart, float sliceSize, int
 
 	float triangle_min_z, triangle_max_z;
 
-	// iterate through all triangles
 	for(auto t = mesh.begin(); t!=mesh.end(); t++){
 		
 		p=pstart;
@@ -272,7 +214,6 @@ void stlMesh::sliceByTriangle(plane *pstart, slice *sstart, float sliceSize, int
 		triangle_min_z=t->vertex[0].z;
 		triangle_max_z=t->vertex[0].z;
 	
-		// store the bottom-most and top-most z-coordinates of the triangle
 		for (int j=1; j<3; j++)	{
 
 			if(t->vertex[j].z<triangle_min_z) triangle_min_z=t->vertex[j].z;
@@ -299,20 +240,12 @@ void stlMesh::sliceByTriangle(plane *pstart, slice *sstart, float sliceSize, int
 		// move through planes till the plane is above the triangle
 		while(p->distance<=triangle_max_z && sliceCounter<arr_len && sliceCounter >=0){
 
-//			cout<<"\nSlice No "<<sliceCounter;
-		
 			vector<vec3> intersections;
 
-//			cout<<"\n Slice "<<sliceCounter;
 			for (int i=0; i < 3; i++) {
 
 				float dp1 = p->distanceFromPoint(t->vertex[i]);
 				float dp2 = p->distanceFromPoint(t->vertex[(i+1)%3]);
-
-
-			//	cout<<"\nVertex 1 x: "<<t->vertex[i].x<<" Vertex 1 y: "<<t->vertex[i].y
-			//		<<	" Vertex 2 x: "<<t->vertex[(i+1)%3].x<<" Vertex 2 y: "<<t->vertex[(i+1)%3].y
-			//		<<	"\nPlane Distnace: "<<p->distance<<" d1: "<<dp1<<" d2: "<<dp2;
 
 				if( dp1*dp2 < 0){ 
 					intersections.push_back (t->vertex[i] + ((t->vertex[(i+1)%3] - t->vertex[i]) * 

@@ -53,11 +53,14 @@ int glInit(int slicecounter, const float Rscale_x, const float Rscale_y, const f
 
 int boundaryVertexCount=0;
 
+// compares the x-coordinate of two points for sorting
 bool xCoordinateComparision(const glm::vec3 &a, const glm::vec3 &b){
 
 	return a.x<b.x;
 }
 
+// Considers all scan lines relevant to the slice and finds the intersection points
+// Returns all vertices that when taken in pairs, represent all line segments of the filled polygon
 vector <glm::vec3>  lineFill(vector <glm::vec3> vertices) { 
 
 	if(boundaryVertexCount == 0)
@@ -216,7 +219,7 @@ vector <glm::vec3>  lineFill(vector <glm::vec3> vertices) {
 
 }
 
-// Bresenham's Line Drawing Algorithm
+// Fills all pixels between (xa,ya) and (xb,yb)  using Bresenham's line drawing algorithm
 void lineDraw(int xa, int ya, int xb, int yb){
 	
 	int dx,dy,p,x,y,xStart,yStart,xEnd,yEnd;

@@ -3,6 +3,7 @@
 #include <vector>
 #include <fstream>
 #include <algorithm>
+#include <limits>
 using namespace std;
 
 #include <stdio.h>
@@ -73,8 +74,50 @@ bool activeEdgeTableComparision(const EdgeTableRecord &a, const EdgeTableRecord 
 	
 	if( a.x_y_min < b.x_y_min)		
 		return true;
-	else
-		return false;
+	else{
+		if(a.x_y_min == b.x_y_min){	
+			
+			if(a.y_min < b.y_min){
+			
+				return true;
+			}
+			else{
+		
+				if(a.y_min == b.y_min){
+				
+					if(a.y_max < b.y_max){
+	
+						return true;
+					}
+					else{
+						if(a.y_max ==  b.y_max){
+							
+							if(a.inverse_slope<b.inverse_slope){
+					
+								return true;
+							}
+							else{
+				
+								return false;
+							}
+						}
+						else{
+						
+							return false;
+						}
+					}
+				}
+				else{
+					
+					return false;
+				}
+			}
+		}
+		else{
+		
+			return false;
+		}
+	}
 }
 
 bool globalEdgeTableComparision (const EdgeTableRecord &a, const EdgeTableRecord &b){
@@ -132,7 +175,7 @@ vector <glm::vec3>  lineFill(vector <glm::vec3> vertices, int c) {
 	
 	// EDGE TABLE ALGORITHM
 
-	glm::vec3 vertex1, vertex2;
+	glm::vec3 vertex1, vertex2, leftVertex, rightVertex;
 	
 	vector <EdgeTableRecord> global,active;
 
@@ -187,28 +230,23 @@ vector <glm::vec3>  lineFill(vector <glm::vec3> vertices, int c) {
 				x_y_max = vertex1.x;
 			}
 
-	
-		//	if(y_max==y_min){	//horizontal edge, ignore
-		//		;
-		//	}	
-		//	else{
-	
-				if(y_max == y_min)
-					inverse_slope = 0;
-				else
-					inverse_slope = (vertex1.x - vertex2.x)/(vertex1.y - vertex2.y);
-				
-				EdgeTableRecord edge;
 
-				edge.y_min = y_min;
-				edge.y_max = y_max;
-				edge.x_y_min = x_y_min;
-				edge.x_y_max = x_y_max;
-				edge.inverse_slope = inverse_slope;
-				edge.checked = false;
+			if(y_max == y_min)
+				inverse_slope = numeric_limits<float>::max();
+			else
+				inverse_slope = (vertex1.x - vertex2.x)/(vertex1.y - vertex2.y);
+			
+			EdgeTableRecord edge;
+
+			edge.y_min = y_min;
+			edge.y_max = y_max;
+			edge.x_y_min = x_y_min;
+			edge.x_y_max = x_y_max;
+			edge.inverse_slope = inverse_slope;
+			edge.checked = false;
 				
-				global.push_back(edge);
-		//	}	
+	//		if(y_max!=y_min)
+			global.push_back(edge);
 		}
 	}
 
@@ -271,39 +309,172 @@ vector <glm::vec3>  lineFill(vector <glm::vec3> vertices, int c) {
 	//	cout<<"\n Active Edge Table ";
 
 		bool prevHorizontal = false;
+		bool isLeftHangingEdge, isRightHangingEdge;
+		bool isPrevLeftHangingEdge, isPrevRightHangingEdge;
+		bool flag;		
+	
+		isPrevLeftHangingEdge = isPrevRightHangingEdge = false;
+
+		int edgeCount = 0;
 
 		for(auto it = active.begin(); it!=active.end(); it++){
 	
 			vertex1.x = it->x_y_min;
 			vertex1.y = y;
 			vertex1.z = zCoord;
-						
+				
+		//	isLeftHangingEdge = true;		
+		//	isRightHangingEdge  = true;
+
 //			cout<<"\n "<<it->x_y_min<<" "<<it->y_min<<" "<<it->y_max;
 
-			if(it->y_max == it->y_min){ // horizontal edge - push both end points
-			
-				if(prevHorizontal == false){
-					
-//					intersections.push_back(vertex1);
-					prevHorizontal = true;
-				}
+			if(it->y_max == it->y_min){ // horizontal edge
 	
-				vertex2.x = it->x_y_max;
-				vertex2.y = y;
-				vertex2.z = zCoord;
-			}
-			else{
-				if(prevHorizontal == true){
+			
+				leftVertex.x = it->x_y_min;
+				rightVertex.x = it->x_y_max;
 				
-					intersections.push_back(vertex2);
+				leftVertex.y = rightVertex.y = y;
+				leftVertex.z = rightVertex.z = zCoord;
+
+				isLeftHangingEdge = isRightHangingEdge = true;
+
+				for(auto iter = active.begin(); iter!=active.end(); iter++){
+	
+					if(iter!=it && iter->x_y_min==it->x_y_min){
+	
+					//	cout<<"\n Common left vertex";
+						if(iter->y_min == it->y_min){
+						
+							cout<<"\n Common left vertex and ymin";
+							intersections.push_back(leftVertex);
+						}
+						isLeftHangingEdge = false;
+					}
+					if(iter!=it && iter->x_y_min==it->x_y_max){
+	
+					//	cout<<"\n Common right vertex";
+						if(iter->y_min == it->y_min){
+						
+							cout<<"\n Common right vertex and ymin";
+							intersections.push_back(rightVertex);
+						}
+						isRightHangingEdge = false;
+					}
 				}
-				prevHorizontal = false;
-				intersections.push_back(vertex1);
+		
+
+				if(isLeftHangingEdge || isRightHangingEdge){
+					
+						cout<<"\n ";
+						if(isLeftHangingEdge)
+							cout<<" Left Hanging";
+						if(isRightHangingEdge)
+							cout<<" Right Hanging";
+				}
+				
+
+				
+						
+	/*			for( auto iter = active.begin(); iter!=active.end(); iter++){
+			
+					if(iter!=it && iter->x_y_min == it->x_y_min){
+						
+						isLeftHangingEdge = false;
+					} 
+
+					if(iter!=it && iter->x_y_max == it->x_y_min){
+				
+						isRightHangingEdge = false;
+					}
+				}
+			
+				if(isLeftHangingEdge && isRightHangingEdge){
+						
+					if(edgeCount%2==1){
+						
+						if(!(isPrevLeftHangingEdge && isPrevRightHangingEdge))	
+							intersections.push_back(vertex1);
+						else{
+	
+							vertex1.x = (it-1)->x_y_max;
+							intersections.push_back(vertex1);
+							vertex1.x = it->x_y_min;
+							intersections.push_back(vertex1);
+						}
+					}
+					
+
+					isPrevLeftHangingEdge = isPrevRightHangingEdge = true;
+				}
+				else{
+	
+					isPrevLeftHangingEdge = isPrevRightHangingEdge = false;
+				}
+	*/
+			}	
+			else{
+			
+				flag=false;	
+			
+				for(auto iter=active.begin(); iter!=active.end(); iter++){
+	
+					if(iter!=it && iter->x_y_min == it->x_y_min){	
+	
+						if( (it->y_min == iter->y_min && it->y_min == y)
+						 || (it->y_max==iter->y_max && y==it->y_max)){
+				
+							intersections.push_back(vertex1);
+							flag = true;
+							break;
+						}
+						if( (it->y_min == iter->y_max && it->y_min==y)
+						 || (it->y_max == iter->y_min && it->y_max==y)){
+	
+							if(!(find(intersections.begin(),intersections.end(),vertex1)!=intersections.end())){
+
+								intersections.push_back(vertex1);
+							}
+							flag = true;
+							break;
+						}
+					}
+				}
+
+				if(!flag)
+					intersections.push_back(vertex1);
+
+	
+	/*			if(!(isPrevLeftHangingEdge && isPrevRightHangingEdge)){
+				
+					intersections.push_back(vertex1);
+				}
+				else{
+				
+					if(edgeCount%2==1){
+	
+						vertex1.x = (it-1)->x_y_max;
+						intersections.push_back(vertex1);
+						vertex1.x = it->x_y_min;
+						intersections.push_back(vertex1);
+					}
+				}
+				
+				isPrevLeftHangingEdge = isPrevRightHangingEdge = false;
+	*/
 			}
 
-			it->x_y_min = it->x_y_min + step*it->inverse_slope;
+			edgeCount++;
+
+		//	it->x_y_min = it->x_y_min + step*it->inverse_slope;
 		}
 
+			
+		for(auto it = active.begin(); it!=active.end(); it++){	
+			
+			if(it->y_max != it->y_min)	
+				it->x_y_min = it->x_y_min + step*it->inverse_slope;
+		}
 
 		if(intersections.size() % 2 == 1)
 			intersections.erase(intersections.end() - 1);

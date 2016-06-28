@@ -162,7 +162,7 @@ public:
 
 		@todo Remove parameters
 	*/
-	void recenter (float &xrange, float&yrange, float &zrange, float &x_max, float&x_min, float&y_max, float&y_min, float&z_max, float);
+	void recenter (float &xrange, float&yrange, float &zrange, float &x_max, float&x_min, float&y_max, float&y_min, float&z_max, float&z_min);
 
 	/**
 		Reads the given stl file in ASCII or Binary format and pushes the trianges into <c>mesh</c>.

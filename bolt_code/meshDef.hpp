@@ -20,6 +20,13 @@
 using namespace std;
 using namespace glm;
 
+/**
+ \brief overloaded << operator to write a vec3 into an outputstream
+	
+ 	@param output Output stream.
+	@param vector The vec3 to be written.
+ 
+*/
 ostream &operator<<(ostream & output, const vec3 &vector ) {
 	output<<vector.x<<" "<<vector.y<<" "<<vector.z;
 	return output;

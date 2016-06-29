@@ -197,10 +197,6 @@ vector <glm::vec3>  lineFill(vector <glm::vec3> vertices, int c) {
 
 			float y_min, y_max, x_y_min,x_y_max, inverse_slope;
 			
-	//		y_min = (vertex1.y<vertex2.y)?vertex1.y:vertex2.y;
-	//		y_max = (vertex1.y>vertex2.y)?vertex1.y:vertex2.y;
-	//		x_y_min = (vertex1.y<vertex2.y)?vertex1.x:vertex2.x;
-		
 			if(vertex1.y<vertex2.y){
 	
 				y_min = vertex1.y;
@@ -245,7 +241,6 @@ vector <glm::vec3>  lineFill(vector <glm::vec3> vertices, int c) {
 			edge.inverse_slope = inverse_slope;
 			edge.checked = false;
 				
-	//		if(y_max!=y_min)
 			global.push_back(edge);
 		}
 	}
@@ -254,11 +249,6 @@ vector <glm::vec3>  lineFill(vector <glm::vec3> vertices, int c) {
 	sort(global.begin(),global.end(),globalEdgeTableComparision);
 
 
-	// display global edge table
-//	for(auto it = global.begin(); it!=global.end(); it++){
-		
-//		cout<<"\n "<<it->y_min<<" "<<it->y_max<<" "<<it->x_y_min<<" "<<it->inverse_slope;
-//	}
 
 
 	bool flag;
@@ -279,25 +269,14 @@ vector <glm::vec3>  lineFill(vector <glm::vec3> vertices, int c) {
 		}
 	
 		
-//		int count = 0;
 	
 		// add edges with y_min = y to the active edge list
 		for(auto it = global.begin(); it!=global.end() && it->y_min<=y; ) {
 
-		//	if(it->checked==false){
-				
-		//		it->checked = true;
-		//		active.push_back(*it);
-		//		it++;
-		//	}
-
 			active.push_back(*it);
 			global.erase(it);
-//			count++;
 		}
 	
-//		cout<<"\n Count = "<<count;
-
 		// sort active edge table records in ascending order of x_y_min
 		sort(active.begin(),active.end(),activeEdgeTableComparision);
 
@@ -306,170 +285,44 @@ vector <glm::vec3>  lineFill(vector <glm::vec3> vertices, int c) {
 		intersections.clear();
 
 
-	//	cout<<"\n Active Edge Table ";
-
-		bool prevHorizontal = false;
-		bool isLeftHangingEdge, isRightHangingEdge;
-		bool isPrevLeftHangingEdge, isPrevRightHangingEdge;
-		bool flag;		
-	
-		isPrevLeftHangingEdge = isPrevRightHangingEdge = false;
-
-		int edgeCount = 0;
-
 		for(auto it = active.begin(); it!=active.end(); it++){
 	
 			vertex1.x = it->x_y_min;
 			vertex1.y = y;
 			vertex1.z = zCoord;
 				
-		//	isLeftHangingEdge = true;		
-		//	isRightHangingEdge  = true;
-
-//			cout<<"\n "<<it->x_y_min<<" "<<it->y_min<<" "<<it->y_max;
-
-			if(it->y_max == it->y_min){ // horizontal edge
+			if(y>it->y_min && y<it->y_max) {
 	
+				intersections.push_back(vertex1);
+			}
+			else if(y==it->y_min && y!=it->y_max){	
 			
-				leftVertex.x = it->x_y_min;
-				rightVertex.x = it->x_y_max;
-				
-				leftVertex.y = rightVertex.y = y;
-				leftVertex.z = rightVertex.z = zCoord;
-
-				isLeftHangingEdge = isRightHangingEdge = true;
-
 				for(auto iter = active.begin(); iter!=active.end(); iter++){
 	
-					if(iter!=it && iter->x_y_min==it->x_y_min){
-	
-					//	cout<<"\n Common left vertex";
-						if(iter->y_min == it->y_min){
+					if(iter->y_max==y){
 						
-							cout<<"\n Common left vertex and ymin";
-							intersections.push_back(leftVertex);
-						}
-						isLeftHangingEdge = false;
-					}
-					if(iter!=it && iter->x_y_min==it->x_y_max){
+						if(!(find(intersections.begin(),intersections.end(),vertex1)!=intersections.end())){
 	
-					//	cout<<"\n Common right vertex";
-						if(iter->y_min == it->y_min){
-						
-							cout<<"\n Common right vertex and ymin";
-							intersections.push_back(rightVertex);
+							intersections.push_back(vertex1);	
 						}
-						isRightHangingEdge = false;
 					}
 				}
-		
-
-				if(isLeftHangingEdge || isRightHangingEdge){
+			}
+			else if(y==it->y_max && y!=it->y_min){
+	
+				for(auto iter = active.begin(); iter!=active.end(); iter++){		
+			
+					if(iter->y_min==y){
 					
-						cout<<"\n ";
-						if(isLeftHangingEdge)
-							cout<<" Left Hanging";
-						if(isRightHangingEdge)
-							cout<<" Right Hanging";
-				}
-				
-
-				
-						
-	/*			for( auto iter = active.begin(); iter!=active.end(); iter++){
-			
-					if(iter!=it && iter->x_y_min == it->x_y_min){
-						
-						isLeftHangingEdge = false;
-					} 
-
-					if(iter!=it && iter->x_y_max == it->x_y_min){
-				
-						isRightHangingEdge = false;
+						if(!(find(intersections.begin(),intersections.end(),vertex1)!=intersections.end()))
+	
+							intersections.push_back(vertex1);
 					}
 				}
-			
-				if(isLeftHangingEdge && isRightHangingEdge){
-						
-					if(edgeCount%2==1){
-						
-						if(!(isPrevLeftHangingEdge && isPrevRightHangingEdge))	
-							intersections.push_back(vertex1);
-						else{
-	
-							vertex1.x = (it-1)->x_y_max;
-							intersections.push_back(vertex1);
-							vertex1.x = it->x_y_min;
-							intersections.push_back(vertex1);
-						}
-					}
-					
-
-					isPrevLeftHangingEdge = isPrevRightHangingEdge = true;
-				}
-				else{
-	
-					isPrevLeftHangingEdge = isPrevRightHangingEdge = false;
-				}
-	*/
-			}	
-			else{
-			
-				flag=false;	
-			
-				for(auto iter=active.begin(); iter!=active.end(); iter++){
-	
-					if(iter!=it && iter->x_y_min == it->x_y_min){	
-	
-						if( (it->y_min == iter->y_min && it->y_min == y)
-						 || (it->y_max==iter->y_max && y==it->y_max)){
-				
-							intersections.push_back(vertex1);
-							flag = true;
-							break;
-						}
-						if( (it->y_min == iter->y_max && it->y_min==y)
-						 || (it->y_max == iter->y_min && it->y_max==y)){
-	
-							if(!(find(intersections.begin(),intersections.end(),vertex1)!=intersections.end())){
-
-								intersections.push_back(vertex1);
-							}
-							flag = true;
-							break;
-						}
-					}
-				}
-
-				if(!flag)
-					intersections.push_back(vertex1);
-
-	
-	/*			if(!(isPrevLeftHangingEdge && isPrevRightHangingEdge)){
-				
-					intersections.push_back(vertex1);
-				}
-				else{
-				
-					if(edgeCount%2==1){
-	
-						vertex1.x = (it-1)->x_y_max;
-						intersections.push_back(vertex1);
-						vertex1.x = it->x_y_min;
-						intersections.push_back(vertex1);
-					}
-				}
-				
-				isPrevLeftHangingEdge = isPrevRightHangingEdge = false;
-	*/
 			}
 
-			edgeCount++;
-
-		//	it->x_y_min = it->x_y_min + step*it->inverse_slope;
 		}
-
-			
+		
 		for(auto it = active.begin(); it!=active.end(); it++){	
 			
 			if(it->y_max != it->y_min)	
@@ -484,18 +337,7 @@ vector <glm::vec3>  lineFill(vector <glm::vec3> vertices, int c) {
 			vertices.push_back(*x);
 		}		
 
-	//	cin.get();
 	}
-	
-
-			
-	// push all added vertices into vertices
-//	for(auto it = addedVertices.begin(); it!=addedVertices.end(); it++){
-//
-//		vertices.push_back(*it);
-//	}
-
-//	cin.get();
 	
 	return vertices;
 }

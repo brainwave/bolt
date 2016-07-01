@@ -27,7 +27,20 @@ int main ( int argc, char *argv[] ) {
 		cout<<"\nreadStlFile : "<<(double)(clock() - time)/CLOCKS_PER_SEC;
 
 
-		mesh.recenter(xrange, yrange, zrange, max_x, min_x, max_y, min_y, max_z, min_z);
+		mesh.recenter();
+
+		max_x = mesh.getMaxX();
+		min_x = mesh.getMinX();
+		
+		max_y = mesh.getMaxY();
+		min_y = mesh.getMinY();
+	
+		min_z = mesh.getMinZ();
+		max_z = mesh.getMaxZ();
+
+		xrange = max_x - min_x;
+		yrange = max_y - min_y;
+		zrange = max_z - min_z;
 
 		cout<<"\nRanges are "<<" "<<xrange<<" "<<yrange<<" "<<zrange<<" , Z max is at "<<max_z;
 
@@ -44,10 +57,10 @@ int main ( int argc, char *argv[] ) {
 		// save the address of the first place
 		plane *pstart = p;
 
-		int j=0;
+		//int j=0;
 
 		// initialize the planes - from min-z to one below max_z		
-		for(float i = min_z; i<=max_z-sliceSize && j<arr_len; i+=sliceSize,j++,p++){
+		for(float i = min_z; i<=max_z-sliceSize && slice_counter<arr_len; i+=sliceSize,slice_counter++,p++){
 
 			p->create_plane( vec3(0,0,1), i ) ;
 		}
@@ -62,9 +75,9 @@ int main ( int argc, char *argv[] ) {
 
 		cout<<"Time spent in slicing "<<(double) (clock() - time) / CLOCKS_PER_SEC;
 		
-		for( float i = min_z; i <= max_z-sliceSize; i+=sliceSize )
-			if(slice_counter<arr_len) 
-			 slice_counter++;
+	//	for( float i = min_z; i <= max_z-sliceSize; i+=sliceSize )
+	//		if(slice_counter<arr_len) 
+	//		 slice_counter++;
 		
 		showWindow(s, slice_counter, max_x, min_x, max_y, min_y);
 

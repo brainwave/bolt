@@ -156,13 +156,20 @@ class stlMesh {
 	float max_z = numeric_limits<float>::lowest(); ///< Maximum z coordinate in the mesh
 	
 public:
+	float getMinX();
+	float getMaxX();
+	float getMinY();
+	float getMaxY();
+	float getMinZ();
+	float getMaxZ();	
+	
 	/**
 		Caculates xrange, yrange, zrange and minimum and maximum x, y, z coordinates and re-centers the model around
 		(xrange/2,yrange/2,zrange/2) 
 
 		@todo Remove parameters
 	*/
-	void recenter (float &xrange, float&yrange, float &zrange, float &x_max, float&x_min, float&y_max, float&y_min, float&z_max, float&z_min);
+	void recenter ();
 
 	/**
 		Reads the given stl file in ASCII or Binary format and pushes the trianges into <c>mesh</c>.

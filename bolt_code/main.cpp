@@ -3,16 +3,15 @@
 int main ( int argc, char *argv[] ) {
 
 	float sliceSize;
-	float pixels_per_mm;	
 
 	// time calculation
 	clock_t time, startTime = clock();
 
-	if(!checkArguments(argc, argv, sliceSize, pixels_per_mm))
+	if(!checkArguments(argc, argv, sliceSize))
 		return 0;
 	
 	//ranges, min and max z values, and O(verall)scale_x, y and z
-	float xrange, yrange, zrange, min_z, max_z, max_x, min_x, max_y, min_y, Oscale_x=0.5f, Oscale_y=0.5f, Oscale_z=0.5f;
+	float xrange, yrange, zrange, min_z, max_z, max_x, min_x, max_y, min_y;
 
 	stlMesh mesh;
 
@@ -43,7 +42,7 @@ int main ( int argc, char *argv[] ) {
 
 		int arr_len= (int)(zrange/sliceSize)+1;
 
-		static int slice_counter=0; 
+		int slice_counter=0,max_slice_no=0; 
 
 		plane *p = new plane[arr_len];
 		slice *s = new slice[arr_len];
@@ -54,7 +53,7 @@ int main ( int argc, char *argv[] ) {
 		plane *pstart = p;
 
 		// initialize the planes - from min-z to one below max_z		
-		for(float i = min_z; i<=max_z-sliceSize && slice_counter<arr_len; i+=sliceSize,slice_counter++,p++){
+		for(float i = min_z; i<=max_z-sliceSize && max_slice_no<arr_len; i+=sliceSize,max_slice_no++,p++){
 
 			p->create_plane( vec3(0,0,1), i ) ;
 		}
@@ -69,7 +68,14 @@ int main ( int argc, char *argv[] ) {
 
 		cout<<"Time spent in slicing "<<(double) (clock() - time) / CLOCKS_PER_SEC;
 		
-		showWindow(s, slice_counter, max_x, min_x, max_y, min_y);
+	//	showWindow(s, slice_counter, max_x, min_x, max_y, min_y);
+
+		for(slice_counter=0;slice_counter<max_slice_no;slice_counter++){
+	
+			s->fillSlice();
+			generatePNG(*s,slice_counter,min_x,max_x,min_y,max_y);
+			s++;
+		}
 
 		cout<<"\nTotal Program time : "<<(double)(clock() - startTime)/CLOCKS_PER_SEC;
 	}

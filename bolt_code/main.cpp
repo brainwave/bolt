@@ -1,7 +1,5 @@
 #include "main.hpp"
 
-
-
 int main ( int argc, char *argv[] ) {
 
 	float sliceSize;
@@ -25,7 +23,6 @@ int main ( int argc, char *argv[] ) {
 	}
 	else {
 		cout<<"\nreadStlFile : "<<(double)(clock() - time)/CLOCKS_PER_SEC;
-
 
 		mesh.recenter();
 
@@ -53,11 +50,8 @@ int main ( int argc, char *argv[] ) {
 
 		cout << "\n(Diagnostic Msg) Successfully created plane and slice arrays ";
 		
-		
 		// save the address of the first place
 		plane *pstart = p;
-
-		//int j=0;
 
 		// initialize the planes - from min-z to one below max_z		
 		for(float i = min_z; i<=max_z-sliceSize && slice_counter<arr_len; i+=sliceSize,slice_counter++,p++){
@@ -75,14 +69,9 @@ int main ( int argc, char *argv[] ) {
 
 		cout<<"Time spent in slicing "<<(double) (clock() - time) / CLOCKS_PER_SEC;
 		
-	//	for( float i = min_z; i <= max_z-sliceSize; i+=sliceSize )
-	//		if(slice_counter<arr_len) 
-	//		 slice_counter++;
-		
 		showWindow(s, slice_counter, max_x, min_x, max_y, min_y);
 
 		cout<<"\nTotal Program time : "<<(double)(clock() - startTime)/CLOCKS_PER_SEC;
-
 	}
 }
 

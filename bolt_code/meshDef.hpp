@@ -136,6 +136,9 @@ struct linesegment {
 struct slice {
 
 	vector<linesegment> slice;	///< Vector of line segments that constitute the slice. 
+	bool isFilled = false;
+public:
+	void fillSlice();
 	
 };
 
@@ -194,5 +197,91 @@ public:
 
 };
 
+struct EdgeTableRecord{
+
+	float y_min;
+	float y_max;
+	float x_y_min;
+	float x_y_max;
+	float inverse_slope;
+	bool checked;
+};
+
+bool activeEdgeTableComparision(const EdgeTableRecord &a, const EdgeTableRecord &b){
+	
+	if( a.x_y_min < b.x_y_min)		
+		return true;
+	else{
+		if(a.x_y_min == b.x_y_min){	
+			
+			if(a.y_min < b.y_min){
+			
+				return true;
+			}
+			else{
+		
+				if(a.y_min == b.y_min){
+				
+					if(a.y_max < b.y_max){
+	
+						return true;
+					}
+					else{
+						if(a.y_max ==  b.y_max){
+							
+							if(a.inverse_slope<b.inverse_slope){
+					
+								return true;
+							}
+							else{
+				
+								return false;
+							}
+						}
+						else{
+						
+							return false;
+						}
+					}
+				}
+				else{
+					
+					return false;
+				}
+			}
+		}
+		else{
+		
+			return false;
+		}
+	}
+}
+
+bool globalEdgeTableComparision (const EdgeTableRecord &a, const EdgeTableRecord &b){
+
+		if(a.y_min < b.y_min)
+			return true;
+
+		else if(a.y_min == b.y_min){
+			
+			if(a.x_y_min < b.x_y_min)
+				return true;
+
+			else if(a.x_y_min == b.x_y_min){
+			
+				if(a.y_max < b.y_max)
+					return true;
+				
+				else
+					return false;
+			}
+	
+			else
+				return false;
+		}
+		
+		else
+			return false;
+}
 		
 #endif

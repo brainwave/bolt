@@ -20,39 +20,11 @@ using namespace std;
 // Shader sources
 //
 //Global Variables
-float  xscale, yscale, zscale;
-uint8_t *pixels = new uint8_t[800 * 600 * 3];
 
 int showSlice(slice *s, float &, float &, float &);
-int max_slice_no=0,cur_slice_no=0, vertexCount=0;
-int width=0, height=0;
 
-int endPointCount=0;
 png::image< png::rgb_pixel > image(800,600);
 
-//functions
-float minimum (float x, float y, float z) {
-	float min = x; /* assume x is the largest */
-	if (y < min) 
-		min = y;
-	if (z < min ) 
-		min = z;
-
-	return min ; /* max is the largest value */
-} 
-
-//R(ange)scale_x, y and z
-int glInit(int slicecounter, const float Rscale_x, const float Rscale_y, const float Rscale_z, const float pixels_per_mm = 0.5) {
-	//store globally relevant info
-	max_slice_no=slicecounter;
-
-	xscale = (pixels_per_mm)/(2*Rscale_x);
-	yscale = (pixels_per_mm)/(2*Rscale_y);
-	zscale = 1/(2*Rscale_z);
-	return 1;
-}
-
-int boundaryVertexCount=0;
 
 bool xCoordinateComparision(const glm::vec3 &a, const glm::vec3 &b){
 
@@ -148,9 +120,6 @@ bool globalEdgeTableComparision (const EdgeTableRecord &a, const EdgeTableRecord
 
 vector <glm::vec3>  lineFill(vector <glm::vec3> vertices) {
 
-
-	if(boundaryVertexCount == 0)
-		return vertices;
 
 	vector <glm::vec3> addedVertices, intersections;
 
@@ -428,37 +397,24 @@ void lineDraw(int xa, int ya, int xb, int yb){
 
 int showSlice(slice *s,  float &x_scale, float &y_scale, float &z_scale, float max_x, float min_x, float max_y, float min_y) {
 
+	int boundaryVertexCount = 0;	
+
 	vector<glm::vec3> vertices, addedVertices ;
 
-	boundaryVertexCount = 0;
-	vertexCount = 0;	
 	glm::vec3 temp_vertex;
 	
 	for ( auto it = s->slice.begin(); it != s->slice.end(); it++ ) {
 	
 		vertices.push_back(it->startpoint);
 		vertices.push_back(it->endpoint);
-		
 		boundaryVertexCount+=2;
 	}
 
-	vertices = lineFill(vertices);
-
-	float aspectratio = width/(float)height;
-	
-	yscale = minimum(xscale,yscale,zscale);
-	xscale = yscale;
-	zscale = yscale;
-	yscale*= aspectratio;	
-
-	x_scale=xscale;
-	y_scale=yscale;
-	z_scale=zscale;
+	if(boundaryVertexCount != 0)
+		vertices = lineFill(vertices);
 
 	bool first = true;	
 
-
-	vertexCount = 0;
 	
 	for (size_t y = 0; y < image.get_height(); y++ )
 		for (size_t x=0; x < image.get_width(); x++) {
@@ -505,21 +461,21 @@ int showSlice(slice *s,  float &x_scale, float &y_scale, float &z_scale, float m
 	return 0;
 }
 
-int showWindow(slice *s, int window,float x_scale, float y_scale, float z_scale, float max_x, float min_x, float max_y, float min_y) {
-	 //vertex shader
-
+int showWindow(slice *s, int max_slice_no, float x_scale, float y_scale, float z_scale, float max_x, float min_x, float max_y, float min_y) {
+	
+	int cur_slice_no = 0;	
 
 	clock_t startTime = clock();
 
 	while ( cur_slice_no < max_slice_no) {
-	showSlice(s,x_scale, y_scale, z_scale, max_x, min_x, max_y, min_y);	
+	
+		showSlice(s,x_scale, y_scale, z_scale, max_x, min_x, max_y, min_y);	
 
-	int color=0;
+		string pngFileName="png/slice_"+(to_string(cur_slice_no))+".png";
+		image.write(pngFileName);
 
-	string pngFileName="png/slice_"+(to_string(cur_slice_no))+".png";
-	image.write(pngFileName);
-
-	cur_slice_no++; s++;
+		cur_slice_no++;
+		s++;
 	}
 
 	cout<<"\nTotal time taken by slicer is "<<(double)(clock() - startTime)/CLOCKS_PER_SEC;

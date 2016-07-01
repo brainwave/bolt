@@ -92,10 +92,19 @@ void generatePNG(slice s, int slice_counter, float min_x, float max_x, float min
 
 	vector<glm::vec3> vertices;
 	
-	for ( auto it = s.slice.begin(); it != s.slice.end(); it++ ) {
+	for ( auto it = s.boundary.begin(); it != s.boundary.end(); it++ ) {
 	
 		vertices.push_back(it->startpoint);
 		vertices.push_back(it->endpoint);
+	}
+
+	if(s.isFilled){
+		
+		for(auto it=s.fill.begin(); it!=s.fill.end(); it++){
+		
+			vertices.push_back(it->startpoint);
+			vertices.push_back(it->endpoint);
+		}
 	}
 
 	bool first = true;	

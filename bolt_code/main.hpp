@@ -1,5 +1,6 @@
 #include "meshDef.cpp"
 #include "graphics.cpp"
+#include "slicer.cpp"
 #include "pngsupport.cpp"
 #include <stdlib.h>
 #include <array>

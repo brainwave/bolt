@@ -68,8 +68,7 @@ int main ( int argc, char *argv[] ) {
 
 		cout<<"Time spent in slicing "<<(double) (clock() - time) / CLOCKS_PER_SEC;
 		
-	//	showWindow(s, slice_counter, max_x, min_x, max_y, min_y);
-
+		// filling and png generation
 		for(slice_counter=0;slice_counter<max_slice_no;slice_counter++){
 	
 			s->fillSlice();

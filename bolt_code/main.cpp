@@ -58,24 +58,15 @@ int main ( int argc, char *argv[] ) {
 		// slicing 
 
 		time = clock();
-		mesh.sliceByTriangle(p,s,sliceSize,arr_len);
+		mesh.sliceMesh(p, s, sliceSize, arr_len);
 
 		cout<<"Time spent in slicing "<<(double) (clock() - time) / CLOCKS_PER_SEC;
 		
 		for( float i = min_z; i <= max_z-sliceSize; i+=sliceSize )
 			if(slice_counter<arr_len) 
 			 slice_counter++;
-			
-		//ofstream file;
-		//file.open("last_run_parameters.txt");
-		//file<<"SliceCount"<<"\n"<<slice_counter<<"\n";
 		
-		showSlice (s++,xrange, yrange, zrange, max_x, min_x, max_y, min_y);
-
-		//file<<"xScale\n"<<xscale<<"\nyScale"<<"\n"<<yscale<<"\nzScale"<<"\n"<<zscale<<"\n";
-		//file.close();
-		
-		showWindow(s,slice_counter, Oscale_x, Oscale_y, Oscale_z, max_x, min_x, max_y, min_y);
+		showWindow(s, slice_counter, max_x, min_x, max_y, min_y);
 
 		cout<<"\nTotal Program time : "<<(double)(clock() - startTime)/CLOCKS_PER_SEC;
 

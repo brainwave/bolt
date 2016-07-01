@@ -148,12 +148,12 @@ class stlMesh {
 	
 	vector <triangle> mesh;	///< Vector of triangles that constitute the mesh.
 	
-	float min_x = 999999.0f; ///< Minimum x coordinate in the mesh
-	float min_y = 999999.0f; ///< Minimum y coordinate in the mesh
-	float min_z = 999999.0f; ///< Minimum z coordinate in the mesh
-	float max_x = -999999.0f; ///< Maximum x coordinate in the mesh
-	float max_y = -999999.0f; ///< Maximum y coordniate in the mesh
-	float max_z = -999999.0f; ///< Maximum z coordinate in the mesh
+	float min_x = numeric_limits<float>::max(); ///< Minimum x coordinate in the mesh
+	float min_y = numeric_limits<float>::max(); ///< Minimum y coordinate in the mesh
+	float min_z = numeric_limits<float>::max(); ///< Minimum z coordinate in the mesh
+	float max_x = numeric_limits<float>::lowest(); ///< Maximum x coordinate in the mesh
+	float max_y = numeric_limits<float>::lowest(); ///< Maximum y coordniate in the mesh
+	float max_z = numeric_limits<float>::lowest(); ///< Maximum z coordinate in the mesh
 	
 public:
 	/**
@@ -183,7 +183,7 @@ public:
 		@param arr_len Length of the plane and slice arrays.
 	
 	*/
-	void sliceByTriangle(plane*p, slice*s,  float sliceSize, int arr_len);
+	void sliceMesh(plane*p, slice*s,  float sliceSize, int arr_len);
 
 };
 

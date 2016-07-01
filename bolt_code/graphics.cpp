@@ -121,7 +121,7 @@ bool globalEdgeTableComparision (const EdgeTableRecord &a, const EdgeTableRecord
 vector <glm::vec3>  lineFill(vector <glm::vec3> vertices) {
 
 
-	vector <glm::vec3> addedVertices, intersections;
+	vector <glm::vec3> intersections;
 
 	float yMin = vertices[0].y, yMax = vertices[0].y, xMin = vertices[0].x, xMax = vertices[0].x, step;
 	float zCoord = vertices[0].z;	
@@ -141,9 +141,9 @@ vector <glm::vec3>  lineFill(vector <glm::vec3> vertices) {
 	
 	// EDGE TABLE ALGORITHM
 
-	glm::vec3 vertex1, vertex2, leftVertex, rightVertex;
+	glm::vec3 vertex1, vertex2;
 	
-	vector <EdgeTableRecord> global,active;
+	vector <EdgeTableRecord> global, active;
 
 	// creation of the global edge table
 	for(auto it = vertices.begin(); it!=vertices.end(); it++){
@@ -214,14 +214,7 @@ vector <glm::vec3>  lineFill(vector <glm::vec3> vertices) {
 	// sort based on y_min, then x_y_min, then y_max	
 	sort(global.begin(),global.end(),globalEdgeTableComparision);
 
-
-
-
-	bool flag;
-
 	for(float y = yMin; y<=yMax; y+=step){
-
-		
 
 		// remove active edges with y_max < y
 		for(auto it = active.begin(); it!=active.end(); ){
@@ -233,8 +226,6 @@ vector <glm::vec3>  lineFill(vector <glm::vec3> vertices) {
 				it++;
 			}
 		}
-	
-		
 	
 		// add edges with y_min = y to the active edge list
 		for(auto it = global.begin(); it!=global.end() && it->y_min<=y; ) {
@@ -249,7 +240,6 @@ vector <glm::vec3>  lineFill(vector <glm::vec3> vertices) {
 		odd = true;
 
 		intersections.clear();
-
 
 		for(auto it = active.begin(); it!=active.end(); it++){
 	
@@ -395,13 +385,11 @@ void lineDraw(int xa, int ya, int xb, int yb){
 
 }
 
-int showSlice(slice *s,  float &x_scale, float &y_scale, float &z_scale, float max_x, float min_x, float max_y, float min_y) {
+int showSlice(slice *s, float min_x, float max_x, float min_y, float max_y) {
 
 	int boundaryVertexCount = 0;	
 
-	vector<glm::vec3> vertices, addedVertices ;
-
-	glm::vec3 temp_vertex;
+	vector<glm::vec3> vertices;
 	
 	for ( auto it = s->slice.begin(); it != s->slice.end(); it++ ) {
 	
@@ -425,7 +413,6 @@ int showSlice(slice *s,  float &x_scale, float &y_scale, float &z_scale, float m
 
 	float _x,_y;
 	int x1,x2,y1,y2;
-
 
 	for( auto it = vertices.begin(); it!= vertices.end(); it++){
 
@@ -457,11 +444,10 @@ int showSlice(slice *s,  float &x_scale, float &y_scale, float &z_scale, float m
 		}
 	}	
 
-
 	return 0;
 }
 
-int showWindow(slice *s, int max_slice_no, float x_scale, float y_scale, float z_scale, float max_x, float min_x, float max_y, float min_y) {
+int showWindow(slice *s, int max_slice_no, float max_x, float min_x, float max_y, float min_y) {
 	
 	int cur_slice_no = 0;	
 
@@ -469,7 +455,7 @@ int showWindow(slice *s, int max_slice_no, float x_scale, float y_scale, float z
 
 	while ( cur_slice_no < max_slice_no) {
 	
-		showSlice(s,x_scale, y_scale, z_scale, max_x, min_x, max_y, min_y);	
+		showSlice(s, min_x, max_x, min_y, max_y);	
 
 		string pngFileName="png/slice_"+(to_string(cur_slice_no))+".png";
 		image.write(pngFileName);

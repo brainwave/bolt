@@ -196,7 +196,7 @@ float xcenter = min_x + xrange/2, ycenter = min_y + yrange/2, zcenter = min_z + 
 }
 
 // For all triangles in the mesh, consider only the relevant planes and push the intersection line segments into appropriate slice
-void stlMesh::sliceByTriangle(plane *pstart, slice *sstart, float sliceSize, int arr_len){
+void stlMesh::sliceMesh(plane *pstart, slice *sstart, float sliceSize, int arr_len){
 
 	plane *p;
 	slice *s;

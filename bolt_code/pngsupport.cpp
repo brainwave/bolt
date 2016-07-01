@@ -1,8 +1,25 @@
+/**
+* @file pngsupport.cpp
+* \brief PNG Support File.
+*
+*	Defines methods for generating a PNG from the given file.
+*/
+
 #include <png++/png.hpp>
 
 png::image <png::rgb_pixel> image(800,600);
 
-// Bresenham's line drawing algorithm
+/**
+ \brief Draws a line between the points (xa,ya) and (xb,yb).
+
+	Uses <i>Bresenham</i>'s line drawing algorithm to fill all pixels between points
+	(xa,ya) and (xb,yb).
+
+	@param xa x-coordinate of first point.
+	@param ya y-coordinate of first point.
+	@param xb x-coordinate of second point.
+	@param yb y-coordinate of second point.
+*/
 void drawLine(int xa, int ya, int xb, int yb){
 	
 	int dx,dy,p,x,y,xStart,yStart,xEnd,yEnd;
@@ -88,6 +105,16 @@ void drawLine(int xa, int ya, int xb, int yb){
 	}
 }
 
+/**
+ \brief Generates a PNG for the given slice.
+
+	@param s Slice for which PNG is to be generated.
+	@param slice_counter Current slice number.
+	@param min_x Minimum x-coordinate in the mesh after recentering.
+	@param max_x Maximum x-coordinate in the mesh after recentering.
+	@param min_y Minimum y-coordinate in the mesh after recentering.
+	@param max_y Maximum y-coordinate in the mesh after recentering.
+*/
 void generatePNG(slice s, int slice_counter, float min_x, float max_x, float min_y, float max_y){
 
 	vector<glm::vec3> vertices;

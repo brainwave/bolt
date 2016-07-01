@@ -2,8 +2,7 @@
 * @file meshDef.hpp
 * \brief Header file for the mesh.
 *	
-* Defines the structures that represent components of the mesh, the
-* inersection planes and the slices.
+* Defines the structures that represent the mesh and the triangles in them.
 */
 
 
@@ -83,7 +82,9 @@ struct triangle {
 	Specified by a list of triangles.
 */
 class stlMesh {
-	
+
+private:
+		
 	vector <triangle> mesh;	///< Vector of triangles that constitute the mesh.
 	
 	float min_x = numeric_limits<float>::max(); ///< Minimum x coordinate in the mesh
@@ -94,18 +95,52 @@ class stlMesh {
 	float max_z = numeric_limits<float>::lowest(); ///< Maximum z coordinate in the mesh
 	
 public:
+	/**
+	 \brief Returns minimum x-coordinate in the mesh after recentering.
+
+		\Warning <c>recenter()</c> needs to be called atleast once before this.
+	 */
 	float getMinX();
+
+	/** 
+	 \brief Returns maximum x-coordinate in the mesh after recentering. 
+	
+		\Warning <c>recenter()</c> needs to be called atleast once before this.
+	*/
 	float getMaxX();
-	float getMinY();
-	float getMaxY();
-	float getMinZ();
-	float getMaxZ();	
+	
+	/**
+	 \brief Returns minimum y-coordinate in the mesh after recentering. 
+	
+		\Warning <c>recenter()</c> needs to be called atleast once before this.
+	*/
+	float getMinY();	
+
+	/** 
+	 \brief Returns maximum y-coordinate in the mesh after recentering. 
+
+		\Warning <c>recenter()</c> needs to be called atleast once before this.
+	*/
+	float getMaxY();	
+
+	/** 
+	 \brief Returns minimum z-coordinate in the mesh after recentering. 
+	
+		\Warning <c>recenter()</c> needs to be called atleast once before this.
+	*/
+	float getMinZ();	
+
+	/** 
+	 \brief Returns maximum z-coordniate in the mesh after recentering. 
+
+		\Warning <c>recenter()</c> needs to be called atleast once before this.
+	*/
+	float getMaxZ();
 	
 	/**
 		Caculates xrange, yrange, zrange and minimum and maximum x, y, z coordinates and re-centers the model around
 		(xrange/2,yrange/2,zrange/2) 
-
-		@todo Remove parameters
+			
 	*/
 	void recenter ();
 

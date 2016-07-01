@@ -1,3 +1,11 @@
+/**
+* @file main.hpp
+* \brief Header file for main.cpp
+*
+* Includes all other header files and programs. 
+* Also defines helper methods for main.
+*/
+
 #include "meshDef.cpp"
 #include "graphics.cpp"
 #include "slicer.cpp"

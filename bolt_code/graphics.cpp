@@ -3,14 +3,11 @@
 #include <vector>
 #include <fstream>
 #include <algorithm>
+#include <limits>
 using namespace std;
 
 #include <stdio.h>
 #include <unistd.h>
-
-#include <GL/glew.h>
-
-#include <GLFW/glfw3.h>
 
 #include "glm/glm.hpp"
 #include "glm/gtc/type_ptr.hpp"
@@ -19,29 +16,11 @@ using namespace std;
 #include <png++/png.hpp>
 
 #include "meshDef.cpp"
+#include <time.h>
 // Shader sources
-
-const GLchar* vshader =
-    "#version 150 \n"
-    "in vec3 position;"
-    "uniform mat4 transform;"
-	"void main()"
-    "{"
-    "    gl_Position  = transform*vec4(position, 1.0);"
-    "}";
-
-const GLchar* fshader =
-    "#version 150 \n"
-    "uniform vec4 lineColor;"
-    "out vec4 fragColor;"
-    "void main()"
-    "{"
-    "    fragColor = lineColor;"
-    "}";
-
+//
 //Global Variables
-GLuint vao, vbo,shaderProgram ;
-GLfloat  xscale, yscale, zscale;
+float  xscale, yscale, zscale;
 uint8_t *pixels = new uint8_t[800 * 600 * 3];
 
 int showSlice(slice *s, float &, float &, float &);
@@ -49,8 +28,10 @@ int max_slice_no=0,cur_slice_no=0, vertexCount=0;
 int width=0, height=0;
 
 int endPointCount=0;
+png::image< png::rgb_pixel > image(800,600);
+
 //functions
-float minimum (GLfloat x, GLfloat y, GLfloat z) {
+float minimum (float x, float y, float z) {
 	float min = x; /* assume x is the largest */
 	if (y < min) 
 		min = y;
@@ -60,131 +41,308 @@ float minimum (GLfloat x, GLfloat y, GLfloat z) {
 	return min ; /* max is the largest value */
 } 
 
-static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
-    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
-			glfwSetWindowShouldClose(window,GL_TRUE);
-	
-//	if (key == GLFW_KEY_SPACE && action == GLFW_PRESS && cur_slice_no<max_slice_no)
-
-}
-
-
 //R(ange)scale_x, y and z
-GLFWwindow* glInit(int slicecounter, const GLfloat Rscale_x, const GLfloat Rscale_y, const GLfloat Rscale_z, const GLfloat pixels_per_mm = 0.5) {
+int glInit(int slicecounter, const float Rscale_x, const float Rscale_y, const float Rscale_z, const float pixels_per_mm = 0.5) {
 	//store globally relevant info
 	max_slice_no=slicecounter;
 
 	xscale = (pixels_per_mm)/(2*Rscale_x);
 	yscale = (pixels_per_mm)/(2*Rscale_y);
 	zscale = 1/(2*Rscale_z);
-
-	GLFWwindow* window;
-	if (!glfwInit())
-	    exit(EXIT_FAILURE);
-
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	
-	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-
-
-	window = glfwCreateWindow(800, 600, "Slice Viewer", NULL, NULL);
-if (!window) {
-	    glfwTerminate();
-	    exit(EXIT_FAILURE);
-	}
-
-	glfwMakeContextCurrent(window);
-	glfwSetKeyCallback(window, key_callback);
-	glfwSwapInterval(1);
-
-	glfwGetFramebufferSize (window, &width, &height);
-
-	glewExperimental = GL_TRUE;
-	if(glewInit()!=GLEW_OK) {
-		cout<<"\n(Diagnostic Msg) Error: Couldn't initiazlie glew.";
-		exit(EXIT_FAILURE);
-	}
-
-	glGetError();
-	
-	glGenBuffers(1, &vbo);
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	
-	glGenVertexArrays(1, &vao);
-	glBindVertexArray(vao);
-	glEnableVertexAttribArray(0);
-	
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
-
-	GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
-	glShaderSource (vertexShader, 1, &vshader, NULL);
-	glCompileShader(vertexShader);
-
-	//check vertex shader compilation
-	GLint status=0;
-	glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &status);
-	if(status==GL_FALSE) {
-		GLint logLen=0;
-		glGetShaderiv(vertexShader, GL_INFO_LOG_LENGTH, &logLen);
-		GLchar* logStr = new GLchar[logLen];
-		glGetShaderInfoLog(vertexShader, logLen, 0, logStr);
-
-		cout<<"\nVertex Shader Error "<<logStr;
-	}
-	
-	//frag shader
-	GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);	
-	glShaderSource (fragmentShader, 1, &fshader, NULL);	
-	glCompileShader(fragmentShader);
-	status=0;
-	//check fragshader compilation
-	glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &status);
-	if(status==GL_FALSE) {
-		GLint logLen=0;
-		glGetShaderiv(fragmentShader, GL_INFO_LOG_LENGTH, &logLen);
-		GLchar* logStr = new GLchar[logLen];
-		glGetShaderInfoLog(fragmentShader, logLen, 0, logStr);
-
-		cout<<"\nFragment Shader Error "<<logStr;
-	}
-	
-	//shader program
-	shaderProgram = glCreateProgram();
-	
-	glAttachShader(shaderProgram, fragmentShader);
-	glAttachShader( shaderProgram, vertexShader);
-
-	glLinkProgram(shaderProgram);
-
-	status=0;
-	glGetProgramiv(shaderProgram, GL_LINK_STATUS, &status);
-	
-	//check linking
-	if(status==GL_FALSE) {
-		GLint logLen=0;
-		glGetProgramiv(shaderProgram, GL_INFO_LOG_LENGTH, &logLen);
-		cout<<"\nLog Length: "<<logLen<<"\n";
-
-		GLchar* logStr = new GLchar[logLen];
-		glGetProgramInfoLog(shaderProgram, logLen, 0, logStr);
-
-		cout<<"\nProgram Linking Error "<<logStr;
-	}
-	
-	glUseProgram(shaderProgram);
-	
-	return window;
+	return 1;
 }
 
 int boundaryVertexCount=0;
-
 
 bool xCoordinateComparision(const glm::vec3 &a, const glm::vec3 &b){
 
 	return a.x<b.x;
 }
+
+
+struct EdgeTableRecord{
+
+	float y_min;
+	float y_max;
+	float x_y_min;
+	float x_y_max;
+	float inverse_slope;
+	bool checked;
+};
+
+bool activeEdgeTableComparision(const EdgeTableRecord &a, const EdgeTableRecord &b){
+	
+	if( a.x_y_min < b.x_y_min)		
+		return true;
+	else{
+		if(a.x_y_min == b.x_y_min){	
+			
+			if(a.y_min < b.y_min){
+			
+				return true;
+			}
+			else{
+		
+				if(a.y_min == b.y_min){
+				
+					if(a.y_max < b.y_max){
+	
+						return true;
+					}
+					else{
+						if(a.y_max ==  b.y_max){
+							
+							if(a.inverse_slope<b.inverse_slope){
+					
+								return true;
+							}
+							else{
+				
+								return false;
+							}
+						}
+						else{
+						
+							return false;
+						}
+					}
+				}
+				else{
+					
+					return false;
+				}
+			}
+		}
+		else{
+		
+			return false;
+		}
+	}
+}
+
+bool globalEdgeTableComparision (const EdgeTableRecord &a, const EdgeTableRecord &b){
+
+		if(a.y_min < b.y_min)
+			return true;
+
+		else if(a.y_min == b.y_min){
+			
+			if(a.x_y_min < b.x_y_min)
+				return true;
+
+			else if(a.x_y_min == b.x_y_min){
+			
+				if(a.y_max < b.y_max)
+					return true;
+				
+				else
+					return false;
+			}
+	
+			else
+				return false;
+		}
+		
+		else
+			return false;
+}
+
+
+
+vector <glm::vec3>  lineFill(vector <glm::vec3> vertices, int c) {
+
+
+	if(boundaryVertexCount == 0)
+		return vertices;
+
+	vector <glm::vec3> addedVertices, intersections;
+
+	float yMin = vertices[0].y, yMax = vertices[0].y, xMin = vertices[0].x, xMax = vertices[0].x, step;
+	float zCoord = vertices[0].z;	
+
+	bool first = true;
+	bool odd = true;
+
+	
+	// find ymax and ymin
+	for(auto it = vertices.begin(); it!=vertices.end(); it++){
+
+		yMin = (it->y < yMin) ? it->y : yMin; yMax = (it->y > yMax) ? it->y : yMax;
+		xMin = (it->x < xMin) ? it->x : xMin; xMax = (it->x > xMax) ? it->x : xMax;
+	}
+
+	step =(yMax - yMin)/600;
+	
+	// EDGE TABLE ALGORITHM
+
+	glm::vec3 vertex1, vertex2, leftVertex, rightVertex;
+	
+	vector <EdgeTableRecord> global,active;
+
+	// creation of the global edge table
+	for(auto it = vertices.begin(); it!=vertices.end(); it++){
+	
+		if(first){
+		
+			vertex1 = *it;
+			
+			first = false;
+		}
+
+		else{
+			
+			vertex2 = *it;
+	
+			first = true;			
+
+			float y_min, y_max, x_y_min,x_y_max, inverse_slope;
+			
+			if(vertex1.y<vertex2.y){
+	
+				y_min = vertex1.y;
+				y_max = vertex2.y;
+				x_y_min = vertex1.x;
+				x_y_max = vertex2.x;
+			}
+			else if(vertex1.y == vertex2.y){
+			
+				y_min = y_max = vertex1.y;
+				if(vertex1.x<vertex2.x){
+					
+					x_y_min = vertex1.x;
+					x_y_max = vertex2.x;
+				}
+				else{
+			
+					x_y_min = vertex2.x;
+					x_y_max = vertex1.x;
+				}
+			}
+			else{
+	
+				y_min = vertex2.y;
+				y_max = vertex1.y;
+				x_y_min = vertex2.x;
+				x_y_max = vertex1.x;
+			}
+
+
+			if(y_max == y_min)
+				inverse_slope = numeric_limits<float>::max();
+			else
+				inverse_slope = (vertex1.x - vertex2.x)/(vertex1.y - vertex2.y);
+			
+			EdgeTableRecord edge;
+
+			edge.y_min = y_min;
+			edge.y_max = y_max;
+			edge.x_y_min = x_y_min;
+			edge.x_y_max = x_y_max;
+			edge.inverse_slope = inverse_slope;
+			edge.checked = false;
+				
+			global.push_back(edge);
+		}
+	}
+
+	// sort based on y_min, then x_y_min, then y_max	
+	sort(global.begin(),global.end(),globalEdgeTableComparision);
+
+
+
+
+	bool flag;
+
+	for(float y = yMin; y<=yMax; y+=step){
+
+		
+
+		// remove active edges with y_max < y
+		for(auto it = active.begin(); it!=active.end(); ){
+
+			if(it->y_max<y){
+				active.erase(it);
+			}
+			else{
+				it++;
+			}
+		}
+	
+		
+	
+		// add edges with y_min = y to the active edge list
+		for(auto it = global.begin(); it!=global.end() && it->y_min<=y; ) {
+
+			active.push_back(*it);
+			global.erase(it);
+		}
+	
+		// sort active edge table records in ascending order of x_y_min
+		sort(active.begin(),active.end(),activeEdgeTableComparision);
+
+		odd = true;
+
+		intersections.clear();
+
+
+		for(auto it = active.begin(); it!=active.end(); it++){
+	
+			vertex1.x = it->x_y_min;
+			vertex1.y = y;
+			vertex1.z = zCoord;
+				
+			if(y>it->y_min && y<it->y_max) {
+	
+				intersections.push_back(vertex1);
+			}
+			else if(y==it->y_min && y!=it->y_max){	
+			
+				for(auto iter = active.begin(); iter!=active.end(); iter++){
+	
+					if(iter->y_max==y){
+						
+						if(!(find(intersections.begin(),intersections.end(),vertex1)!=intersections.end())){
+	
+							intersections.push_back(vertex1);	
+						}
+					}
+				}
+			}
+			else if(y==it->y_max && y!=it->y_min){
+	
+				for(auto iter = active.begin(); iter!=active.end(); iter++){		
+			
+					if(iter->y_min==y){
+					
+						if(!(find(intersections.begin(),intersections.end(),vertex1)!=intersections.end()))
+	
+							intersections.push_back(vertex1);
+					}
+				}
+			}
+
+		}
+		
+		for(auto it = active.begin(); it!=active.end(); it++){	
+			
+			if(it->y_max != it->y_min)	
+				it->x_y_min = it->x_y_min + step*it->inverse_slope;
+		}
+
+		if(intersections.size() % 2 == 1)
+			intersections.erase(intersections.end() - 1);
+
+		for(auto x = intersections.begin(); x!=intersections.end();x++){
+		
+			vertices.push_back(*x);
+		}		
+
+	}
+	
+	return vertices;
+}
+
+
 
 vector <glm::vec3>  lineFill(vector <glm::vec3> vertices) { 
 
@@ -344,8 +502,94 @@ vector <glm::vec3>  lineFill(vector <glm::vec3> vertices) {
 
 }
 
+// Bresenham's Line Drawing Algorithm
+void lineDraw(int xa, int ya, int xb, int yb){
+	
+	int dx,dy,p,x,y,xStart,yStart,xEnd,yEnd;
 
-int showSlice(slice *s,  GLfloat &x_scale, GLfloat &y_scale, GLfloat &z_scale) {
+	dx = abs(xb - xa);
+	dy = abs(yb - ya);
+	
+	if(dx>=dy){
+
+		p = 2*dy -dx; //p0
+
+		// draw from left to right
+		if(xa>xb){
+
+			x = xb;
+			y = yb;
+			yStart = yb;
+			yEnd = ya;
+			xEnd = xa;
+		}
+		else{
+
+			x = xa;
+			y = ya;
+			yStart = ya;
+			yEnd = yb;
+			xEnd = xb;
+		}
+
+		image[y][x] = png::rgb_pixel(0,0,255);
+
+		while(x<xEnd){
+
+			x = x + 1;
+			if (p<0)
+				p = p+2*dy;
+			else{
+
+				y = y+1*(yEnd - yStart)/dy;
+				p = p + 2*(dy-dx);
+			}
+
+			image[y][x] = png::rgb_pixel(0,0,255);
+		}
+	}
+	else{
+
+		p = 2*dx -dy; //p0
+
+		// draw from bottom to top
+		if(ya>yb){
+
+			y = yb;
+			x = xb;
+			xStart = xb;
+			xEnd = xa;
+			yEnd = ya;
+		}
+		else{
+
+			y = ya;
+			x = xa;
+			xStart = xa;
+			xEnd = xb;
+			yEnd = yb;
+		}
+
+		image[y][x] = png::rgb_pixel(0,0,255);
+
+		while(y<yEnd){
+
+			y = y + 1;
+			if (p<0)
+				p = p+2*dx;
+			else{
+
+				x = x+1*(xEnd-xStart)/dx;
+				p = p + 2*(dx-dy);
+			}
+
+			image[y][x] = png::rgb_pixel(0,0,255);
+		}
+	}
+
+}
+
+int showSlice(slice *s,  float &x_scale, float &y_scale, float &z_scale, float max_x, float min_x, float max_y, float min_y) {
 
 	vector<glm::vec3> vertices, addedVertices ;
 
@@ -363,9 +607,9 @@ int showSlice(slice *s,  GLfloat &x_scale, GLfloat &y_scale, GLfloat &z_scale) {
 
 //	fclose(file);
 
-//	vertices = lineFill(vertices);
+	vertices = lineFill(vertices,1);
 
-	GLfloat aspectratio = width/(float)height;
+	float aspectratio = width/(float)height;
 	
 	yscale = minimum(xscale,yscale,zscale);
 	xscale = yscale;
@@ -376,80 +620,79 @@ int showSlice(slice *s,  GLfloat &x_scale, GLfloat &y_scale, GLfloat &z_scale) {
 	y_scale=yscale;
 	z_scale=zscale;
 
-	glm::mat4 glm_tm = glm::scale(glm::mat4(1.0),glm::vec3(xscale,yscale,zscale));
-
-	GLint tm = glGetUniformLocation(shaderProgram, "transform");
-	if(tm ==-1 ) {
-		cout<<"\nError, couldn't bind transform ";
-			return 1; 
-	}
-
+	bool first = true;	
 
 
 	vertexCount = 0;
-	for ( auto it = vertices.begin(); it != vertices.end(); it++) 
-			vertexCount++;
+//	for ( auto it = vertices.begin(); it != vertices.end(); it++){ 
+//				
+////			cout<<"\n "<<*it;
+//			vertexCount++;
+//	}
 	
-	glUniformMatrix4fv(tm, 1, GL_FALSE, glm::value_ptr(glm_tm));
+	//for (size_t y = 0; y < image.get_height(); y++ )
+	//	for (size_t x=0; x < image.get_width(); x++) {
 
-	glBufferData(GL_ARRAY_BUFFER, 3*sizeof(GLfloat)*vertices.size(), &vertices[0].x, GL_DYNAMIC_DRAW);
+	//		
+	//		image[y][x] = png::rgb_pixel(0,0,0);
+	//	}
+
+
+	float _x,_y;
+	int x1,x2,y1,y2;
+
+
+	//for( auto it = vertices.begin(); it!= vertices.end(); it++){
+	//
+	//	if(first){
+	//		
+	//		first = false;
+	//		
+	//		_x = (it->x - min_x)/(max_x - min_x) * 599 ;
+	//		_y = (it->y - min_y)/(max_y - min_y) * 599 ;
+	//	
+	//		x1 = (int)_x;
+	//		y1 = (int)_y;
+	//
+	//	}
+	//	else{
+	//		first = true;
+	//		
+	//		_x = (it->x - min_x)/(max_x - min_x) * 599;
+	//		_y = (it->y - min_y)/(max_y - min_y) * 599;
+	//
+	//		x2 = (int)_x;
+	//		y2 = (int)_y;
+	//	
+	//	//	if( x1>=0 && x1<600 && x2>=0 && x2<600 && y1>=0 && y1<600 && y2>=0 && y2<600)
+	//			//lineDraw(x1,y1,x2,y2);
+	//	//	else
+	//	//		 cout<<"\n Out of bounds";
+	//	}
+	//}
+
 
 	return 0;
 }
 
-int showWindow(slice *s, GLFWwindow* window,GLfloat x_scale, GLfloat y_scale, GLfloat z_scale) {
+int showWindow(slice *s, int window,float x_scale, float y_scale, float z_scale, float max_x, float min_x, float max_y, float min_y) {
 	 //vertex shader
-	while(!glfwWindowShouldClose(window) && cur_slice_no < max_slice_no) {
-
-	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-
-//	glDrawArrays(GL_LINES, 0, vertexCount);
 
 
-	GLint loc = glGetUniformLocation(shaderProgram,"lineColor");
+	clock_t startTime = clock();
 
-
-	// fill color
-	if(loc!=-1){
-	
-		glUniform4f(loc,0.0f,0.0f,1.0f,1.0f);
-	}
-	
-	// draw fill
-	glDrawArrays(GL_LINES, boundaryVertexCount, vertexCount-boundaryVertexCount+1);	
-
-
-	// boundary color
-	if(loc!=-1){
-
-		glUniform4f(loc,1.0f,0.0f,0.0f,1.0f);
-	}
-	
-	// draw boundary
-	glDrawArrays(GL_LINES, 0, boundaryVertexCount);
-	
-	showSlice(s,x_scale, y_scale, z_scale);	
-
-	glReadPixels (0, 0, 800, 600, GL_RGB, GL_UNSIGNED_BYTE, (GLvoid*)pixels);
-
-	png::image< png::rgb_pixel > image(800,600);
+	while ( cur_slice_no < max_slice_no) {
+	showSlice(s,x_scale, y_scale, z_scale, max_x, min_x, max_y, min_y);	
 
 	int color=0;
 
-	for (size_t y = image.get_height()-1; y >0; --y )
-		for (size_t x=0; x < image.get_width(); ++x) {
-			image[y][x] = png::rgb_pixel(*(pixels + color++),*(pixels + color++),*(pixels + color++));
-		}
-
-
 	string pngFileName="png/slice_"+(to_string(cur_slice_no))+".png";
-	image.write(pngFileName);
+	//image.write(pngFileName);
 
 	cur_slice_no++; s++;
-	
-	glfwPollEvents();
-	glfwSwapBuffers(window);
-	
 	}
+
+	cout<<"\nTotal time taken by slicer is "<<(double)(clock() - startTime)/CLOCKS_PER_SEC;
+	
 	return 0;
 }

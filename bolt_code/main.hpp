@@ -1,5 +1,15 @@
+/**
+* @file main.hpp
+* \brief Header file for main.cpp
+*
+* Includes all other header files and programs. 
+* Also defines helper methods for main.
+*/
+
 #include "meshDef.cpp"
 #include "graphics.cpp"
+#include "slicer.cpp"
+#include "pngsupport.cpp"
 #include <stdlib.h>
 #include <array>
 #include <unistd.h>
@@ -7,10 +17,9 @@
 #include <chrono>
 
 
-bool checkArguments(int argc, char *argv[], float &sliceSize, float &pixels_per_mm){
+bool checkArguments(int argc, char *argv[], float &sliceSize){
 	
 	sliceSize = 0.1;
-	pixels_per_mm = 0.5;
 
 	switch(argc){
 	
@@ -19,7 +28,7 @@ bool checkArguments(int argc, char *argv[], float &sliceSize, float &pixels_per_
 			return false;
 			
 		case 2:
-			cout<<"\nSlicing "<<argv[1]<<" with default slice size of "<<sliceSize<<" and default pixels/mm as "<<pixels_per_mm;
+			cout<<"\nSlicing "<<argv[1]<<" with default slice size of "<<sliceSize;
 			break;		
 	
 		case 3: 
@@ -29,26 +38,8 @@ bool checkArguments(int argc, char *argv[], float &sliceSize, float &pixels_per_
 				cout<<"\nPlease specify a slice size between 0.001 and 1 ";
 				return false;
 			}
-			cout<<"\nSlicing "<<argv[1]<<" with supplied slice size of "<<sliceSize<<" and default pixels/mm as "<<pixels_per_mm;
+			cout<<"\nSlicing "<<argv[1]<<" with supplied slice size of "<<sliceSize;
 			break;
-
-		case 4:
-			sliceSize = atof(argv[2]);
-			if(sliceSize>1 || sliceSize<0.001 || sliceSize==NAN){
-	
-				cout<<"\nPlease specify a slice size between 0.001 and 1 ";
-				return false;
-			} 
-
-			pixels_per_mm = atof(argv[3]);
-			if(pixels_per_mm <= 0 || pixels_per_mm==NAN){
-				
-				cout<<"\nPlease specify a positive pixel-per-mm value";
-				return false;
-			}
-			cout<<"\n Slicing "<<argv[1]<<" with supplied slice size of "<<sliceSize<<" and supplied pixels/mm as "<<pixels_per_mm;
-			break;
-
 
 		default: 
 			cout << "\nExtraneous parameters supplied, exiting. ";

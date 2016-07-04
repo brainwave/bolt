@@ -4,7 +4,7 @@
 #include "meshDef.hpp"
 #include <fstream>
 #include <time.h>
-
+#include <algorithm>
 float plane::distanceFromPoint (vec3 point) {
 	normal = glm::normalize (normal);
 	return dot(point, normal) - distance;
@@ -160,9 +160,18 @@ int stlMesh::readStlFile ( const char *filename ) {
 		return 1;
 }
 
-void stlMesh::recenter(float &xrange, float&yrange, float&zrange, float& x_max, float& x_min, float& y_max, float& y_min, float& z_max, float& z_min) {
+float stlMesh::getMinX(){ return min_x; }
+float stlMesh::getMaxX(){ return max_x; }
+float stlMesh::getMinY(){ return min_y; }
+float stlMesh::getMaxY(){ return max_y; }
+float stlMesh::getMinZ(){ return min_z; }
+float stlMesh::getMaxZ(){ return max_z; }
 
-for ( auto meshIterator = mesh.begin(); meshIterator != mesh.end(); meshIterator++ ) 
+void stlMesh::recenter() {
+
+	float xrange, yrange, zrange;
+
+	for ( auto meshIterator = mesh.begin(); meshIterator != mesh.end(); meshIterator++ ) 
 		for ( int i = 0; i < 3; i++ ) {
 			
 			min_z = ( min_z > meshIterator -> vertex[i].z ) ? meshIterator -> vertex[i].z : min_z;
@@ -176,27 +185,26 @@ for ( auto meshIterator = mesh.begin(); meshIterator != mesh.end(); meshIterator
 
 	}
 
-xrange = max_x - min_x; yrange = max_y - min_y; zrange = max_z - min_z;
+	xrange = max_x - min_x; yrange = max_y - min_y; zrange = max_z - min_z;
 
-
-float xcenter = min_x + xrange/2, ycenter = min_y + yrange/2, zcenter = min_z + zrange/2;
-
+	float xcenter = min_x + xrange/2, ycenter = min_y + yrange/2, zcenter = min_z + zrange/2;
 
 		for ( auto meshIterator = mesh.begin(); meshIterator != mesh.end(); meshIterator++) {
 			for( int i =0; i <3; i++ ) {
+
 				meshIterator->vertex[i].x -= xcenter;
 				meshIterator->vertex[i].y -= ycenter;
 				meshIterator->vertex[i].z -= zcenter;
 			}
 		}
 
-	z_max = max_z - zcenter; z_min = min_z - zcenter;
-	x_max = max_x - xcenter; x_min = min_x - xcenter;
-	y_max = max_y - ycenter; y_min = min_y - ycenter;
+	max_x -= xcenter; min_x -= xcenter;
+	max_y -= ycenter; min_y -= ycenter;
+	max_z -= zcenter; min_z -= zcenter;	
 }
 
 // For all triangles in the mesh, consider only the relevant planes and push the intersection line segments into appropriate slice
-void stlMesh::sliceByTriangle(plane *pstart, slice *sstart, float sliceSize, int arr_len){
+void stlMesh::sliceMesh(plane *pstart, slice *sstart, float sliceSize, int arr_len){
 
 	plane *p;
 	slice *s;
@@ -255,7 +263,7 @@ void stlMesh::sliceByTriangle(plane *pstart, slice *sstart, float sliceSize, int
 			}
 			
 			if(intersections.size()==2) 
-					 s->slice.push_back( linesegment(intersections[1], intersections[0]));		
+					 s->boundary.push_back( linesegment(intersections[1], intersections[0]));		
 				
 			p++;
 			s++;

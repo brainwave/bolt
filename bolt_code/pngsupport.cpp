@@ -50,7 +50,7 @@ void drawLine(int xa, int ya, int xb, int yb){
 			xEnd = xb;
 		}
 
-		image[y][x] = png::rgb_pixel(0,0,255);
+		image[y][x] = png::rgb_pixel(255,255,255);
 
 		while(x<xEnd){
 
@@ -63,7 +63,7 @@ void drawLine(int xa, int ya, int xb, int yb){
 				p = p + 2*(dy-dx);
 			}
 
-			image[y][x] = png::rgb_pixel(0,0,255);
+			image[y][x] = png::rgb_pixel(255,255,255);
 		}
 	}
 	else{
@@ -88,7 +88,7 @@ void drawLine(int xa, int ya, int xb, int yb){
 			yEnd = yb;
 		}
 
-		image[y][x] = png::rgb_pixel(0,0,255);
+		image[y][x] = png::rgb_pixel(255,255,255);
 
 		while(y<yEnd){
 
@@ -101,7 +101,7 @@ void drawLine(int xa, int ya, int xb, int yb){
 				p = p + 2*(dx-dy);
 			}
 
-			image[y][x] = png::rgb_pixel(0,0,255);
+			image[y][x] = png::rgb_pixel(255,255,255);
 		}
 	}
 }

@@ -103,7 +103,6 @@ void slice::fillSlice() {
 	bool first = true;
 	bool odd = true;
 
-	
 	// find ymax and ymin
 	for(auto it = vertices.begin(); it!=vertices.end(); it++){
 
@@ -262,16 +261,12 @@ void slice::fillSlice() {
 		if(intersections.size() % 2 == 1)
 			intersections.erase(intersections.end() - 1);
 
-		for(auto x = intersections.begin(); x!=intersections.end();x++){
-		
-			vertices.push_back(*x);
-		}		
-
-	}
-
-	for(auto it = vertices.begin(); it!=vertices.end(); it+=2){
 	
-		fill.push_back(linesegment(*it,*(it+1)));
+		for(auto iter = intersections.begin(); iter!=intersections.end(); iter+=2){	
+			
+			fill.push_back(linesegment(*iter,*(iter+1)));
+		}	
+
 	}
 
 	isFilled = true;

@@ -6,6 +6,7 @@
 */
 
 #include <png++/png.hpp>
+#include <boost/filesystem.hpp>
 
 png::image <png::rgb_pixel> image(800,600);
 
@@ -172,7 +173,14 @@ void generatePNG(slice s, int slice_counter, float min_x, float max_x, float min
 			drawLine(x1,y1,x2,y2);
 		}
 	}	
+	
+	string folder = "png";
+	const char* path = folder.c_str();
 
-	string pngFileName="png/slice_"+(to_string(slice_counter))+".png";
+	boost::filesystem::path dir(path);
+	boost::filesystem::create_directory(dir);
+	
+	string pngFileName=folder+"/slice_"+(to_string(slice_counter))+".png";
+
 	image.write(pngFileName);
 }

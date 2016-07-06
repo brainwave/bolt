@@ -2,12 +2,12 @@
 
 int main ( int argc, char *argv[] ) {
 
-	float sliceSize; string pngDir;
+	float sliceSize; string pngDir; int xres, yres;
 
 	// time calculation
 	clock_t time, startTime = clock();
 
-	if(!checkArguments(argc, argv, sliceSize, pngDir))
+	if(!checkArguments(argc, argv, sliceSize, pngDir, xres, yres))
 		return 0;
 	
 	//ranges, min and max z values, and O(verall)scale_x, y and z

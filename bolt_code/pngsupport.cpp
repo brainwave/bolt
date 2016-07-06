@@ -8,8 +8,23 @@
 #include <png++/png.hpp>
 #include <boost/filesystem.hpp>
 
-png::image <png::rgb_pixel> image(800,600);
+#define SMALLER_DIM ( image.get_height() < image.get_width() ? image.get_height():image.get_width())
 
+
+png::image <png::rgb_pixel> image(800, 600);
+string folder = "png";
+
+void initPNG (int xres, int yres, string pngDir ) {
+
+	image.resize ( xres, yres );
+
+	folder = pngDir.c_str();
+
+	boost::filesystem::path dir ( pngDir.c_str() );
+	boost::filesystem::create_directory ( dir );
+
+}
+	
 /**
  \brief Draws a line between the points (xa,ya) and (xb,yb).
 
@@ -116,6 +131,7 @@ void drawLine(int xa, int ya, int xb, int yb){
 	@param min_y Minimum y-coordinate in the mesh after recentering.
 	@param max_y Maximum y-coordinate in the mesh after recentering.
 */
+
 void generatePNG(slice s, int slice_counter, float min_x, float max_x, float min_y, float max_y){
 
 	vector<glm::vec3> vertices;
@@ -153,8 +169,8 @@ void generatePNG(slice s, int slice_counter, float min_x, float max_x, float min
 			
 			first = false;
 			
-			_x = (it->x - min_x)/(max_x - min_x) * 599;
-			_y = (it->y - min_y)/(max_y - min_y) * 599;
+			_x = (it->x - min_x)/(max_x - min_x) * SMALLER_DIM;
+			_y = (it->y - min_y)/(max_y - min_y) * SMALLER_DIM;
 		
 			x1 = (int)_x;
 			y1 = (int)_y;
@@ -164,8 +180,8 @@ void generatePNG(slice s, int slice_counter, float min_x, float max_x, float min
 		else{
 			first = true;
 			
-			_x = (it->x - min_x)/(max_x - min_x) * 599;
-			_y = (it->y - min_y)/(max_y - min_y) * 599;
+			_x = (it->x - min_x)/(max_x - min_x) * SMALLER_DIM;
+			_y = (it->y - min_y)/(max_y - min_y) * SMALLER_DIM;
 
 			x2 = (int)_x;
 			y2 = (int)_y;
@@ -173,12 +189,6 @@ void generatePNG(slice s, int slice_counter, float min_x, float max_x, float min
 			drawLine(x1,y1,x2,y2);
 		}
 	}	
-	
-	string folder = "png";
-	const char* path = folder.c_str();
-
-	boost::filesystem::path dir(path);
-	boost::filesystem::create_directory(dir);
 	
 	string pngFileName=folder+"/slice_"+(to_string(slice_counter))+".png";
 

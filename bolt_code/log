@@ -1,3 +1,0 @@
-2016-04-17 12:20	Started glm port of stlparser code
-2016-04-17 13:03	Wrote basic vector structure using glm::vec3 instead of floats x,y and z
-

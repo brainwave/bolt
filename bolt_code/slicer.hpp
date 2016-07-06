@@ -102,7 +102,6 @@ struct EdgeTableRecord{
 
 	float inverse_slope;	///< Inverse of the slope of the edge.
 		
-	bool checked;	///< Set to true if the edge has already been added to the <c>global</c> edge table.
 };
 
 /**

@@ -101,9 +101,7 @@ void slice::fillSlice() {
 	float zCoord = vertices[0].z;	
 
 	bool first = true;
-	bool odd = true;
 
-	
 	// find ymax and ymin
 	for(auto it = vertices.begin(); it!=vertices.end(); it++){
 
@@ -111,7 +109,7 @@ void slice::fillSlice() {
 		xMin = (it->x < xMin) ? it->x : xMin; xMax = (it->x > xMax) ? it->x : xMax;
 	}
 
-	step =(yMax - yMin)/600;
+	step =(yMax - yMin)/600/1.1;
 	
 	// EDGE TABLE ALGORITHM
 
@@ -179,9 +177,9 @@ void slice::fillSlice() {
 			edge.x_y_min = x_y_min;
 			edge.x_y_max = x_y_max;
 			edge.inverse_slope = inverse_slope;
-			edge.checked = false;
-				
-			global.push_back(edge);
+		
+			if(y_min != y_max)				
+				global.push_back(edge);
 		}
 	}
 
@@ -194,24 +192,32 @@ void slice::fillSlice() {
 		for(auto it = active.begin(); it!=active.end(); ){
 
 			if(it->y_max<y){
+	
 				active.erase(it);
 			}
 			else{
+	
 				it++;
 			}
 		}
 	
 		// add edges with y_min = y to the active edge list
 		for(auto it = global.begin(); it!=global.end() && it->y_min<=y; ) {
-
-			active.push_back(*it);
+			
+			if(y==it->y_min){
+			
+				active.push_back(*it);
+			}
+			else if(y>it->y_min){
+				
+				it->x_y_min = it->inverse_slope*(y - it->y_max) + it->x_y_max;
+				active.push_back(*it);
+			}
 			global.erase(it);
 		}
 	
 		// sort active edge table records in ascending order of x_y_min
 		sort(active.begin(),active.end(),activeEdgeTableComparision);
-
-		odd = true;
 
 		intersections.clear();
 
@@ -250,7 +256,6 @@ void slice::fillSlice() {
 					}
 				}
 			}
-
 		}
 		
 		for(auto it = active.begin(); it!=active.end(); it++){	
@@ -262,16 +267,12 @@ void slice::fillSlice() {
 		if(intersections.size() % 2 == 1)
 			intersections.erase(intersections.end() - 1);
 
-		for(auto x = intersections.begin(); x!=intersections.end();x++){
-		
-			vertices.push_back(*x);
-		}		
-
-	}
-
-	for(auto it = vertices.begin(); it!=vertices.end(); it+=2){
 	
-		fill.push_back(linesegment(*it,*(it+1)));
+		for(auto iter = intersections.begin(); iter!=intersections.end(); iter+=2){	
+			
+			fill.push_back(linesegment(*iter,*(iter+1)));
+		}	
+
 	}
 
 	isFilled = true;

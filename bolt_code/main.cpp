@@ -2,12 +2,12 @@
 
 int main ( int argc, char *argv[] ) {
 
-	float sliceSize;
+	float sliceSize; string pngDir;
 
 	// time calculation
 	clock_t time, startTime = clock();
 
-	if(!checkArguments(argc, argv, sliceSize))
+	if(!checkArguments(argc, argv, sliceSize, pngDir))
 		return 0;
 	
 	//ranges, min and max z values, and O(verall)scale_x, y and z
@@ -16,7 +16,7 @@ int main ( int argc, char *argv[] ) {
 	stlMesh mesh;
 
 	time = clock();
-	if ( mesh.readStlFile(argv[1]) ) {
+	if ( mesh.readStlFile( argv[1]) ) {
 		cout << "\nProgram Failed" ;
 		return 1;
 	}
@@ -67,6 +67,8 @@ int main ( int argc, char *argv[] ) {
 		mesh.sliceMesh(p, s, sliceSize, arr_len);
 
 		cout<<"Time spent in slicing "<<(double) (clock() - time) / CLOCKS_PER_SEC;
+
+		initPNG ( xres, yres, pngDir );
 		
 		// filling and png generation
 		for(slice_counter=0;slice_counter<max_slice_no;slice_counter++){

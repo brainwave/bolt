@@ -73,6 +73,13 @@ struct triangle {
 		
 		return output;
 	}
+
+	//setter to set vertices
+	void setVertices(vec3 a, vec3 b, vec3 c) {
+		vertex[0] = a;
+		vertex[1] = b;
+		vertex[2] = c;		
+	}
 	
 };
 
@@ -86,6 +93,7 @@ class stlMesh {
 private:
 		
 	vector <triangle> mesh;	///< Vector of triangles that constitute the mesh.
+	vector <triangle> supportMesh;
 	
 	float min_x = numeric_limits<float>::max(); ///< Minimum x coordinate in the mesh
 	float min_y = numeric_limits<float>::max(); ///< Minimum y coordinate in the mesh
@@ -164,7 +172,8 @@ public:
 	
 	*/
 	void sliceMesh(plane*p, slice*s,  float sliceSize, int arr_len);
-
+	
+	void projectTriangle(triangle *t);
 
 	void boundBox();
 };

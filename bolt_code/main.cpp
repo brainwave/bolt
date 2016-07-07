@@ -69,6 +69,9 @@ int main ( int argc, char *argv[] ) {
 		time = clock();
 		mesh.sliceMesh(p, s, sliceSize, arr_len);
 
+		//Slice supports
+		mesh.sliceMesh(p, s, sliceSize, arr_len);
+
 		cout<<"Time spent in slicing "<<(double) (clock() - time) / CLOCKS_PER_SEC;
 
 		initPNG ( xres, yres, pngDir );

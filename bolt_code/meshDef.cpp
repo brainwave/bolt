@@ -274,7 +274,6 @@ void stlMesh::sliceMesh(plane *pstart, slice *sstart, float sliceSize, int arr_l
 			
  		}
 	}
-
 }
 
 float sign (vec3 p1, vec3 p2, vec3 p3)
@@ -321,14 +320,39 @@ void stlMesh::boundBox()
 		for(auto t = mesh.begin(); t != mesh.end(); t++) {		//need to find smaller set of triangles
 			if(enclosed(*p, &*t)) { 							//&*t converts iterator of triangles to a pointer to a triangle
 				intersections.push_back(*t);
-				p->z = t->vertex[2].z;
 				cout<<"Support generated at "<<p->x<<","<<p->y<<","<<p->z<<"\n";   
+				projectTriangle(&*t);
 			}
 		}
 	}
 }
 
+void stlMesh::projectTriangle(triangle *triA)
+{
+	vec3 vertex[3];
+	triangle triB;
 
+        for(int i=0; i<3; i++) {
+                vertex[i].x = triA->vertex[i].x;
+                vertex[i].y = triA->vertex[i].y;
+                vertex[i].z = getMinZ();
+        }
+        triB.setVertices(vertex[0], vertex[1], vertex[2]);
+	supportMesh.push_back(triB);
+
+
+
+        //Manually connecting vertices
+        triangle dummy;
+//      dummy.setVertices(triA.vertex[0], triB.vertex[0], triA.vertex[1]);      supportMesh.push_back(dummy);
+        dummy.setVertices(triA->vertex[1], triB.vertex[1], triA->vertex[2]);    supportMesh.push_back(dummy);
+        dummy.setVertices(triA->vertex[2], triB.vertex[2], triA->vertex[0]);    supportMesh.push_back(dummy);
+
+//      dummy.setVertices(triB.vertex[1], triA.vertex[1], triB.vertex[0]);      supportMesh.push_back(dummy);
+        dummy.setVertices(triB.vertex[0], triA->vertex[0], triB.vertex[2]);     supportMesh.push_back(dummy);
+        dummy.setVertices(triB.vertex[2], triA->vertex[2], triB.vertex[1]);     supportMesh.push_back(dummy);
+
+}
 
 /*
 //if contact area between 2 adjacent slices is small, generate support

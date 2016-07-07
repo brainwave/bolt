@@ -1,13 +1,16 @@
 #include "main.hpp"
 
+
 int main ( int argc, char *argv[] ) {
 
 	float sliceSize; string pngDir; int xres, yres;
-
+	
+	int hollow;
+	
 	// time calculation
 	clock_t time, startTime = clock();
 
-	if(!checkArguments(argc, argv, sliceSize, pngDir, xres, yres))
+	if(!checkArguments(argc, argv, sliceSize, pngDir, xres, yres, hollow))
 		return 0;
 	
 	//ranges, min and max z values, and O(verall)scale_x, y and z
@@ -16,7 +19,19 @@ int main ( int argc, char *argv[] ) {
 	stlMesh mesh;
 
 	time = clock();
-	if ( mesh.readStlFile( argv[1]) ) {
+	
+	string fileName = string(argv[1]);
+	
+	if(hollow){
+	
+		string hollowingCommand = "openscad -o scad/test.stl -D 'model=\""+fileName+"\"' -D 'thickness=0.1' hollow.scad";
+
+		system(hollowingCommand.c_str());	
+
+		fileName = "scad/test.stl";
+	}
+
+	if ( mesh.readStlFile(fileName.c_str())) {
 		cout << "\nProgram Failed" ;
 		return 1;
 	}

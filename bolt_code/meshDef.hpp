@@ -1,3 +1,11 @@
+/** 	
+* @file meshDef.hpp
+* \brief Header file for the mesh.
+*	
+* Defines the structures that represent the mesh and the triangles in them.
+*/
+
+
 #ifndef MESHDEF_H
 #define MESHDEF_H
 
@@ -6,29 +14,56 @@
 
 #include "glm/glm.hpp"
 #include "glm/gtx/string_cast.hpp"
+#include "slicer.hpp"
 #include <vector>
 
 using namespace std;
 using namespace glm;
 
+/**
+ \brief overloaded << operator to write a vec3 into an outputstream
+	
+ 	@param output Output stream.
+	@param vector The vec3 to be written.
+ 
+*/
 ostream &operator<<(ostream & output, const vec3 &vector ) {
 	output<<vector.x<<" "<<vector.y<<" "<<vector.z;
 	return output;
 }
 
+/**
+ \brief Mesh triangle
+	
+	Represents one triangle in a mesh. 
+	Specified by 3 vertices and a normal vector.
+*/
 struct triangle {
 	
-	vec3 vertex[3], normal;
+	vec3 vertex[3]; ///< The three vertices of the triangle
+	vec3 normal;	///< Outward normal vector of the triangle
 
+	/**
+		Overloaded >> operator to read a triangle into a vec3 array of size 4.
+
+		@param vertex Index 0 is the normal. Index 1,2,3 represent the vertices.
+		@param &t Reference to the triangle variable.
+	*/
 	friend triangle& operator>>(const vec3 vertex[4], triangle &t){ 
 
 		t.normal = vertex[0];	
 		for(int i=0;i<3;i++) 
 			t.vertex[i] 	= vertex[i+1];
 		
-		//vertex[0] is normal, vertex 1, 2, 3 are the vertices. Read accordingly.
 		return t;
 	}
+
+	/**
+	 	Overloaded << operator to write a triangle into an output stream.
+
+	 	@param output Reference to the output stream.
+	 	@param t Reference to the triangle variable.
+	*/
 	friend ostream& operator<<(ostream &output, const triangle &t) {
 		
 		output	<<"\nVertex 1 : "<<t.vertex[0].x<<"i+"<<t.vertex[0].y<<"j+"<<t.vertex[0].z<<"k"
@@ -41,59 +76,95 @@ struct triangle {
 	
 };
 
-struct plane {
+/**
+ \brief Represents the input mesh. 
 	
-	float distanceFromPoint (vec3 point);
-
-	vec3 normal; float distance;
-
-	void create_plane (vec3 n, float d=0.0f ){
-			normal=n;
-			distance=d;
-	}
-
-};
-
-struct linesegment {
-	
-	linesegment (vec3 point1, vec3 point2) : startpoint (point1), endpoint (point2) {}
-	
-	vec3 startpoint, endpoint;
-};
-
-struct slice {
-
-	vector<linesegment> slice;
-	
-	void display_slice ( void );
-
-	void store_slice (string &filename,const int sliceNo);
-};
-
+	Specified by a list of triangles.
+*/
 class stlMesh {
+
+private:
+		
+	vector <triangle> mesh;	///< Vector of triangles that constitute the mesh.
 	
-	vector <triangle> mesh;
-
-	float min_z = 999999.0f, min_x = 999999.0f, min_y = 999999.0f;
-	float max_z = -999999.f,max_x = -999999.f, max_y = -9999999.0f;
-
+	float min_x = numeric_limits<float>::max(); ///< Minimum x coordinate in the mesh
+	float min_y = numeric_limits<float>::max(); ///< Minimum y coordinate in the mesh
+	float min_z = numeric_limits<float>::max(); ///< Minimum z coordinate in the mesh
+	float max_x = numeric_limits<float>::lowest(); ///< Maximum x coordinate in the mesh
+	float max_y = numeric_limits<float>::lowest(); ///< Maximum y coordniate in the mesh
+	float max_z = numeric_limits<float>::lowest(); ///< Maximum z coordinate in the mesh
 	
 public:
-	void slice_mesh (plane *p, slice *s);
+	/**
+	 \brief Returns minimum x-coordinate in the mesh after recentering.
 
-	void displayMesh ( triangle &t );
+		\Warning <c>recenter()</c> needs to be called atleast once before this.
+	 */
+	float getMinX();
 
-	void display_all_elements ();
+	/** 
+	 \brief Returns maximum x-coordinate in the mesh after recentering. 
+	
+		\Warning <c>recenter()</c> needs to be called atleast once before this.
+	*/
+	float getMaxX();
+	
+	/**
+	 \brief Returns minimum y-coordinate in the mesh after recentering. 
+	
+		\Warning <c>recenter()</c> needs to be called atleast once before this.
+	*/
+	float getMinY();	
 
-	void set_min_max_var_z ( float &min_z, float &max_z, float &min_x, float &max_x, float &min_y, float &max_y) ;
+	/** 
+	 \brief Returns maximum y-coordinate in the mesh after recentering. 
 
-	void recenter ( const float xshift, const float yshift, const float zshift );
+		\Warning <c>recenter()</c> needs to be called atleast once before this.
+	*/
+	float getMaxY();	
 
+	/** 
+	 \brief Returns minimum z-coordinate in the mesh after recentering. 
+	
+		\Warning <c>recenter()</c> needs to be called atleast once before this.
+	*/
+	float getMinZ();	
+
+	/** 
+	 \brief Returns maximum z-coordniate in the mesh after recentering. 
+
+		\Warning <c>recenter()</c> needs to be called atleast once before this.
+	*/
+	float getMaxZ();
+	
+	/**
+		Caculates xrange, yrange, zrange and minimum and maximum x, y, z coordinates and re-centers the model around
+		(xrange/2,yrange/2,zrange/2) 
+			
+	*/
+	void recenter ();
+
+	/**
+		Reads the given stl file in ASCII or Binary format and pushes the trianges into <c>mesh</c>.
+	
+		@param filename Name of the stl file.
+	*/
 	int readStlFile ( const char *filename );
 
-	void sliceByTriangle(plane*p, slice*s,  float sliceSize, int arr_len);
+	/**
+		\brief Slices the model to obtain 2D slices.
+	
+		For all the trianlges in the mesh, the intersection line segments with the relevant planes
+		are computed and pushed into the appropriate slice.
+	
+		@param p Pointer to the beginning of the array of intersection planes.
+		@param s Pointer to the beginning of the array of slices.
+		@param sliceSize Specified slice size.
+		@param arr_len Length of the plane and slice arrays.
+	
+	*/
+	void sliceMesh(plane*p, slice*s,  float sliceSize, int arr_len);
 
 };
 
-		
 #endif

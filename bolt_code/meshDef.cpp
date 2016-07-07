@@ -6,7 +6,6 @@
 #include <time.h>
 #include <algorithm>
 
-vector<vec3> supportPoints;
 
 float plane::distanceFromPoint (vec3 point) {
 	normal = glm::normalize (normal);
@@ -295,6 +294,8 @@ bool enclosed(vec3 point, triangle *t)
 void stlMesh::boundBox()
 {
 	vector<triangle> intersections;
+	vector<vec3> points;   
+
 	vec3 corners[4];
 	corners[0].x = getMinX(); 	corners[0].y = getMinY();
 	corners[1].x = getMinX(); 	corners[1].y = getMaxY();
@@ -302,7 +303,6 @@ void stlMesh::boundBox()
 	corners[3].x = getMaxX();	corners[3].y = getMinY();
 
 	//Generate a series of points in the box to potentially draw supports from
-	vector<vec3> points;   
 	float x_interval = abs( (max_x - min_x)/10 );
 	float y_interval = abs( (max_y - min_y)/10 );
 	
@@ -321,38 +321,12 @@ void stlMesh::boundBox()
 			if(enclosed(*p, &*t)) { 							//&*t converts iterator of triangles to a pointer to a triangle
 				intersections.push_back(*t);
 				cout<<"Support generated at "<<p->x<<","<<p->y<<","<<p->z<<"\n";   
-				projectTriangle(&*t);
+				supportPoints.push_back(*p);
 			}
 		}
 	}
 }
 
-void stlMesh::projectTriangle(triangle *triA)
-{
-	vec3 vertex[3];
-	triangle triB;
-
-        for(int i=0; i<3; i++) {
-                vertex[i].x = triA->vertex[i].x;
-                vertex[i].y = triA->vertex[i].y;
-                vertex[i].z = getMinZ();
-        }
-        triB.setVertices(vertex[0], vertex[1], vertex[2]);
-	supportMesh.push_back(triB);
-
-
-
-        //Manually connecting vertices
-        triangle dummy;
-//      dummy.setVertices(triA.vertex[0], triB.vertex[0], triA.vertex[1]);      supportMesh.push_back(dummy);
-        dummy.setVertices(triA->vertex[1], triB.vertex[1], triA->vertex[2]);    supportMesh.push_back(dummy);
-        dummy.setVertices(triA->vertex[2], triB.vertex[2], triA->vertex[0]);    supportMesh.push_back(dummy);
-
-//      dummy.setVertices(triB.vertex[1], triA.vertex[1], triB.vertex[0]);      supportMesh.push_back(dummy);
-        dummy.setVertices(triB.vertex[0], triA->vertex[0], triB.vertex[2]);     supportMesh.push_back(dummy);
-        dummy.setVertices(triB.vertex[2], triA->vertex[2], triB.vertex[1]);     supportMesh.push_back(dummy);
-
-}
 
 /*
 //if contact area between 2 adjacent slices is small, generate support

@@ -14,6 +14,7 @@
 #include <unistd.h>
 #include <time.h>
 #include <chrono>
+#include <fstream>
 
 bool is_slice_size_sane ( char* sliceArgument , float& sliceSize ){
 
@@ -89,4 +90,39 @@ bool checkArguments(int argc, char *argv[], float &sliceSize, string &pngDir, in
 	
 	return true;
 
+}
+
+void writeSCAD(stlMesh mesh, char* filename, vector<vec3> supportPoints){
+
+	//Calculate values to recenter shape by
+	float xcentre = (abs(mesh.getMinX())+mesh.getMaxX()) * -1;
+	float ycentre = (abs(mesh.getMinY())+mesh.getMaxY()) * -1;
+	float zcentre = 0;
+	
+	float h = mesh.getMaxZ() - mesh.getMinZ(), r = 2;
+	float x,y,z;	x = y = z = 0;
+	
+	fstream outfile; 	
+	
+	outfile.open("/home/nikki/bolt/bolt_code/output.scad", ios::out | ios::trunc);
+	if(outfile.is_open()) {
+
+		outfile<<"union() { \n";
+		outfile<<"translate(["<<xcentre<<","<<ycentre<<","<<zcentre<<"]) ";	//recenter shape
+		outfile<<"import(\""<<filename<<"\");\n";
+		
+		//For loop
+		for(auto it = supportPoints.begin(); it!=supportPoints.end(); it++) {	
+			x = it->x; y = it->y; z = it->z;
+			outfile<<"translate(["<<x<<","<<y<<","<<z<<"]) ";
+			outfile<<"cylinder("<<h<<","<<r<<","<<r<<");\n";
+		}
+		outfile<<"}\n";	
+		cout<<"\nWrote to file\n"; 
+	}
+	
+	else
+		cout<<"ERROR: COULD NOT OPEN FILE\n";
+	outfile.close();
+	
 }

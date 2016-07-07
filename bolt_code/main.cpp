@@ -23,7 +23,7 @@ int main ( int argc, char *argv[] ) {
 	else {
 		cout<<"\nreadStlFile : "<<(double)(clock() - time)/CLOCKS_PER_SEC;
 
-		mesh.recenter();
+		mesh.recenter();	
 
 		max_x = mesh.getMaxX();
 		min_x = mesh.getMinX();
@@ -65,12 +65,11 @@ int main ( int argc, char *argv[] ) {
 		mesh.boundBox();
 
 		// slicing 
-
 		time = clock();
 		mesh.sliceMesh(p, s, sliceSize, arr_len);
 
-		//Slice supports
-		mesh.sliceMesh(p, s, sliceSize, arr_len);
+		//writing SCAD file
+		writeSCAD(mesh, argv[1], mesh.supportPoints);
 
 		cout<<"Time spent in slicing "<<(double) (clock() - time) / CLOCKS_PER_SEC;
 

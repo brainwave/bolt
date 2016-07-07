@@ -93,7 +93,6 @@ class stlMesh {
 private:
 		
 	vector <triangle> mesh;	///< Vector of triangles that constitute the mesh.
-	vector <triangle> supportMesh;
 	
 	float min_x = numeric_limits<float>::max(); ///< Minimum x coordinate in the mesh
 	float min_y = numeric_limits<float>::max(); ///< Minimum y coordinate in the mesh
@@ -103,6 +102,8 @@ private:
 	float max_z = numeric_limits<float>::lowest(); ///< Maximum z coordinate in the mesh
 	
 public:
+	vector<vec3> supportPoints;  //points at which to draw supports
+
 	/**
 	 \brief Returns minimum x-coordinate in the mesh after recentering.
 

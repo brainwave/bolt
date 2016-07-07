@@ -185,8 +185,8 @@ public:
 	*/
 	void sliceByTriangle(plane*p, slice*s,  float sliceSize, int arr_len);
 
-	void supportGenerator(slice *s, int arr_len, int skipAmnt);
 
+	void boundBox();
 };
 
 		

@@ -630,46 +630,46 @@ int showSlice(slice *s,  float &x_scale, float &y_scale, float &z_scale, float m
 //			vertexCount++;
 //	}
 	
-	//for (size_t y = 0; y < image.get_height(); y++ )
-	//	for (size_t x=0; x < image.get_width(); x++) {
+	for (size_t y = 0; y < image.get_height(); y++ )
+		for (size_t x=0; x < image.get_width(); x++) {
 
-	//		
-	//		image[y][x] = png::rgb_pixel(0,0,0);
-	//	}
+			
+			image[y][x] = png::rgb_pixel(0,0,0);
+		}
 
 
 	float _x,_y;
 	int x1,x2,y1,y2;
 
 
-	//for( auto it = vertices.begin(); it!= vertices.end(); it++){
-	//
-	//	if(first){
-	//		
-	//		first = false;
-	//		
-	//		_x = (it->x - min_x)/(max_x - min_x) * 599 ;
-	//		_y = (it->y - min_y)/(max_y - min_y) * 599 ;
-	//	
-	//		x1 = (int)_x;
-	//		y1 = (int)_y;
-	//
-	//	}
-	//	else{
-	//		first = true;
-	//		
-	//		_x = (it->x - min_x)/(max_x - min_x) * 599;
-	//		_y = (it->y - min_y)/(max_y - min_y) * 599;
-	//
-	//		x2 = (int)_x;
-	//		y2 = (int)_y;
-	//	
-	//	//	if( x1>=0 && x1<600 && x2>=0 && x2<600 && y1>=0 && y1<600 && y2>=0 && y2<600)
-	//			//lineDraw(x1,y1,x2,y2);
-	//	//	else
-	//	//		 cout<<"\n Out of bounds";
-	//	}
-	//}
+	for( auto it = vertices.begin(); it!= vertices.end(); it++){
+	
+		if(first){
+			
+			first = false;
+			
+			_x = (it->x - min_x)/(max_x - min_x) * 599 ;
+			_y = (it->y - min_y)/(max_y - min_y) * 599 ;
+		
+			x1 = (int)_x;
+			y1 = (int)_y;
+	
+		}
+		else{
+			first = true;
+			
+			_x = (it->x - min_x)/(max_x - min_x) * 599;
+			_y = (it->y - min_y)/(max_y - min_y) * 599;
+	
+			x2 = (int)_x;
+			y2 = (int)_y;
+		
+			if( x1>=0 && x1<600 && x2>=0 && x2<600 && y1>=0 && y1<600 && y2>=0 && y2<600)
+				lineDraw(x1,y1,x2,y2);
+			else
+				cout<<"\n Out of bounds";
+		}
+	}
 
 
 	return 0;
@@ -687,7 +687,7 @@ int showWindow(slice *s, int window,float x_scale, float y_scale, float z_scale,
 	int color=0;
 
 	string pngFileName="png/slice_"+(to_string(cur_slice_no))+".png";
-	//image.write(pngFileName);
+	image.write(pngFileName);
 
 	cur_slice_no++; s++;
 	}

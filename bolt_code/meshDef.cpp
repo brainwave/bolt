@@ -266,6 +266,58 @@ void stlMesh::sliceByTriangle(plane *pstart, slice *sstart, float sliceSize, int
 
 }
 
+float sign (vec3 p1, vec3 p2, vec3 p3)
+{
+    return (p1.x - p3.x) * (p2.y - p3.y) - (p2.x - p3.x) * (p1.y - p3.y);
+}
+
+// Check if a given point lies within a triangle (2D)
+bool enclosed(vec3 point, triangle *t)
+{
+	bool b1, b2, b3;
+	
+	b1 = sign(point, t->vertex[0], t->vertex[1]) < 0.0f;
+	b2 = sign(point, t->vertex[1], t->vertex[2]) < 0.0f;
+	b3 = sign(point, t->vertex[2], t->vertex[0]) < 0.0f;
+
+	return ((b1 == b2) && (b2 == b3));
+}
+void stlMesh::boundBox()
+{
+	vector<triangle> intersections;
+	vec3 corners[4];
+	corners[0].x = min_x; 	corners[0].y = min_y;
+	corners[1].x = min_x; 	corners[1].y = max_y;
+	corners[2].x = max_x; 	corners[2].y = max_y;
+	corners[3].x = max_x;	corners[3].y = min_y;
+
+	//Generate a series of points in the box to potentially draw supports from
+	vector<vec3> points;
+	int x_interval = abs( (abs(max_x) - abs(min_x))/10 );
+	int y_interval = abs( (abs(max_y) - abs(min_y))/10 );
+
+	for(int i=min_x; i<max_x; i+=x_interval) {
+		for(int j=min_y; j<max_y; j+=y_interval) {
+			vec3 point; point.x = i; point.y = j;
+			points.push_back(point);
+		}	
+	}
+	
+	//Iterate through all triangles and find points of intersection for all the points 
+	for(auto p = points.begin(); p != points.end(); p++) {
+		for(auto t = mesh.begin(); t != mesh.end(); t++) {
+			if(enclosed(*p, &*t)) { 							//&*t converts iterator of triangles to a pointer to a triangle
+//				intersections.push_back(*t);
+//				cout<<"Support generated at "<<p->x<<","<<p->y<<"\n";
+			}
+		}
+	}
+			
+}
+
+
+
+/*
 
 //return true if slice a is enclosed within slice b 
 bool enclosed(slice *a, slice *b)
@@ -317,14 +369,14 @@ void stlMesh::supportGenerator( slice *sstart, int arr_len, int skipAmnt )
 			int x1,y1, x2, y2, l=20;
 			x1 = top->slice[j].startpoint.x; y1 = top->slice[j].startpoint.y;	
 			x2 = top->slice[j].endpoint.x; y2 = top->slice[j].endpoint.y;	
-			/*vec3 point[4]; 
+			vec3 point[4]; 
 			point[0].x = x-l; point[0].y = y-l; point[1].x = x+l; point[1].y = y-l;
 			point[2].x = x-l; point[2].y = y+l; point[3].x = x+l; point[3].y = y+l;
 			//tiny square of length 10 mm centred at x, y
 			for(int k=0; k<4; k++)
 				points.push_back(linesegment(point[k], point[k+1]));
 			points.push_back(linesegment(point[3], point[0]));
-			*/
+
 			vec3 midpoint; midpoint.x=(x1+x2)/2; midpoint.y=(y2-y1)/2;
 			vec3 point; point.x = midpoint.x+l; point.y = midpoint.y;
 			points.push_back(linesegment(midpoint, point));
@@ -353,4 +405,5 @@ void stlMesh::supportGenerator( slice *sstart, int arr_len, int skipAmnt )
 //  cout<<"\nAFTER: "<<s->slice.size()<<endl;
 
 }
+*/
 #endif

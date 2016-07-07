@@ -55,15 +55,17 @@ int main ( int argc, char *argv[] ) {
 		// restore first place to p
 		p=pstart;
 	
+		//Generate supports
+		mesh.boundBox();
+
 		// slicing 
 
 		time = clock();
 		mesh.sliceByTriangle(p,s,sliceSize,arr_len);
 
+		
 		cout<<"Time spent in slicing "<<(double) (clock() - time) / CLOCKS_PER_SEC;
 	
-		//SUPPORT GENERATION
-		mesh.supportGenerator(s, arr_len, 15);	//skipAmnt = 15 slices	
 
 		for( float i = min_z; i <= max_z-sliceSize; i+=sliceSize )
 			if(slice_counter<arr_len) 

@@ -5,6 +5,9 @@
 #include <fstream>
 #include <time.h>
 #include <algorithm>
+
+vector<vec3> supportPoints;
+
 float plane::distanceFromPoint (vec3 point) {
 	normal = glm::normalize (normal);
 	return dot(point, normal) - distance;
@@ -294,69 +297,40 @@ void stlMesh::boundBox()
 {
 	vector<triangle> intersections;
 	vec3 corners[4];
-	corners[0].x = min_x; 	corners[0].y = min_y;
-	corners[1].x = min_x; 	corners[1].y = max_y;
-	corners[2].x = max_x; 	corners[2].y = max_y;
-	corners[3].x = max_x;	corners[3].y = min_y;
+	corners[0].x = getMinX(); 	corners[0].y = getMinY();
+	corners[1].x = getMinX(); 	corners[1].y = getMaxY();
+	corners[2].x = getMaxX(); 	corners[2].y = getMaxY();
+	corners[3].x = getMaxX();	corners[3].y = getMinY();
 
 	//Generate a series of points in the box to potentially draw supports from
-	vector<vec3> points;
-	int x_interval = abs( (abs(max_x) - abs(min_x))/10 );
-	int y_interval = abs( (abs(max_y) - abs(min_y))/10 );
+	vector<vec3> points;   
+	float x_interval = abs( (max_x - min_x)/10 );
+	float y_interval = abs( (max_y - min_y)/10 );
+	
+	cout<<"\nIntervals:"<<x_interval<<" "<<y_interval<<endl;
 
 	for(int i=min_x; i<max_x; i+=x_interval) {
 		for(int j=min_y; j<max_y; j+=y_interval) {
 			vec3 point; point.x = i; point.y = j;
 			points.push_back(point);
 		}	
-	}
-	
+	} 
+
 	//Iterate through all triangles and find points of intersection for all the points 
 	for(auto p = points.begin(); p != points.end(); p++) {
-		for(auto t = mesh.begin(); t != mesh.end(); t++) {
+		for(auto t = mesh.begin(); t != mesh.end(); t++) {		//need to find smaller set of triangles
 			if(enclosed(*p, &*t)) { 							//&*t converts iterator of triangles to a pointer to a triangle
-//				intersections.push_back(*t);
-//				cout<<"Support generated at "<<p->x<<","<<p->y<<"\n";
+				intersections.push_back(*t);
+				p->z = t->vertex[2].z;
+				cout<<"Support generated at "<<p->x<<","<<p->y<<","<<p->z<<"\n";   
 			}
 		}
 	}
-			
 }
 
 
 
 /*
-
-//return true if slice a is enclosed within slice b 
-bool enclosed(slice *a, slice *b)
-{ 
-return true;
-	//find min and max x of b  
-	int x_min_b, x_max_b, y_min_b, y_max_b;
-	int x_min_a, x_max_a, y_min_a, y_max_a;
-	x_min_b = b[0].slice[0].startpoint.x; x_max_b = x_min_b;
-        
-	for(int i=0; i< b->slice.size(); i++) {
-		x_min_b = ( b->slice[i].startpoint.x < x_min_b ) ? b->slice[i].startpoint.x : x_min_b;		
-		x_max_b = ( b->slice[i].startpoint.x > x_max_b ) ? b->slice[i].startpoint.x : x_max_b;		
-		y_min_b = ( b->slice[i].startpoint.y < y_min_b ) ? b->slice[i].startpoint.y : y_min_b;		
-		y_max_b = ( b->slice[i].startpoint.y > y_max_b ) ? b->slice[i].startpoint.y : y_max_b;		
-	}
-	
-	//find min and max x,y of a
-	for(int i=0; i< a->slice.size(); i++) {
-		x_min_a = ( a->slice[i].startpoint.x < x_min_a ) ? a->slice[i].startpoint.x : x_min_a;		
-		x_max_b = ( a->slice[i].startpoint.x > x_max_a ) ? a->slice[i].startpoint.x : x_max_a;		
-		y_min_b = ( a->slice[i].startpoint.y < y_min_a ) ? a->slice[i].startpoint.y : y_min_a;		
-		y_max_b = ( a->slice[i].startpoint.y > y_max_a ) ? a->slice[i].startpoint.y : y_max_a;		
-	}
-	
-	//check if b completey overlaps a	
-	if(x_min_b < x_min_a && x_max_b > x_max_a && y_min_b < y_min_a && y_max_b > y_max_b)
-		return true;
-	return false; 
-}
-
 //if contact area between 2 adjacent slices is small, generate support
 void stlMesh::supportGenerator( slice *sstart, int arr_len, int skipAmnt )
 {

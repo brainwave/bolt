@@ -53,7 +53,7 @@ struct triangle {
 
 		t.normal = vertex[0];	
 		for(int i=0;i<3;i++) 
-			t.vertex[i] 	= vertex[i+1];
+			t.vertex[i] = vertex[i+1];
 		
 		return t;
 	}

@@ -169,8 +169,8 @@ void generatePNG(slice s, int slice_counter, float min_x, float max_x, float min
 			
 			first = false;
 			
-			_x = (it->x - min_x)/(max_x - min_x) * SMALLER_DIM;
-			_y = (it->y - min_y)/(max_y - min_y) * SMALLER_DIM;
+			_x = (it->x - min_x)/(max_x - min_x) * (SMALLER_DIM-1);
+			_y = (it->y - min_y)/(max_y - min_y) * (SMALLER_DIM-1);
 		
 			x1 = (int)_x;
 			y1 = (int)_y;
@@ -180,8 +180,8 @@ void generatePNG(slice s, int slice_counter, float min_x, float max_x, float min
 		else{
 			first = true;
 			
-			_x = (it->x - min_x)/(max_x - min_x) * SMALLER_DIM;
-			_y = (it->y - min_y)/(max_y - min_y) * SMALLER_DIM;
+			_x = (it->x - min_x)/(max_x - min_x) * (SMALLER_DIM-1);
+			_y = (it->y - min_y)/(max_y - min_y) * (SMALLER_DIM-1);
 
 			x2 = (int)_x;
 			y2 = (int)_y;

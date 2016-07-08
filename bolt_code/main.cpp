@@ -14,14 +14,30 @@ int main ( int argc, char *argv[] ) {
 	float xrange, yrange, zrange, min_z, max_z, max_x, min_x, max_y, min_y;
 
 	stlMesh mesh;
+	stlMesh supportMesh;
+	string outputSTL = "output.stl";
 
+	
+/*
+	if ( supportMesh.readStlFile( argv[1]) ) {
+		cout << "\nProgram Failed" ;
+		return 1;
+	}
+	else {
+		//writing SCAD file
+		//supportMesh.getMinMax();
+		writeSCAD(supportMesh, argv[1], outputSTL);
+	}
+*/
 	time = clock();
-	if ( mesh.readStlFile( argv[1]) ) {
+
+	if ( mesh.readStlFile(argv[1])) {
 		cout << "\nProgram Failed" ;
 		return 1;
 	}
 	else {
 		cout<<"\nreadStlFile : "<<(double)(clock() - time)/CLOCKS_PER_SEC;
+
 
 		mesh.recenter();	
 
@@ -62,14 +78,12 @@ int main ( int argc, char *argv[] ) {
 		p=pstart;
 	
 		//Generate supports
-		mesh.boundBox();
+//		mesh.boundBox();
 
 		// slicing 
 		time = clock();
 		mesh.sliceMesh(p, s, sliceSize, arr_len);
 
-		//writing SCAD file
-		writeSCAD(mesh, argv[1], mesh.supportPoints);
 
 		cout<<"Time spent in slicing "<<(double) (clock() - time) / CLOCKS_PER_SEC;
 

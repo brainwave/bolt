@@ -169,6 +169,24 @@ float stlMesh::getMaxY(){ return max_y; }
 float stlMesh::getMinZ(){ return min_z; }
 float stlMesh::getMaxZ(){ return max_z; }
 
+void stlMesh::getMinMax() {
+
+	for ( auto meshIterator = mesh.begin(); meshIterator != mesh.end(); meshIterator++ ) 
+		for ( int i = 0; i < 3; i++ ) {
+			
+			min_z = ( min_z > meshIterator -> vertex[i].z ) ? meshIterator -> vertex[i].z : min_z;
+			max_z = ( max_z < meshIterator -> vertex[i].z ) ? meshIterator -> vertex[i].z : max_z;
+
+			min_x = ( min_x > meshIterator -> vertex[i].x ) ? meshIterator -> vertex[i].x : min_x;
+			max_x = ( max_x < meshIterator -> vertex[i].x ) ? meshIterator -> vertex[i].x : max_x;
+
+			min_y = ( min_y > meshIterator -> vertex[i].y ) ? meshIterator -> vertex[i].y : min_y;
+			max_y = ( max_y < meshIterator -> vertex[i].y ) ? meshIterator -> vertex[i].y : max_y;
+
+	}
+
+}
+
 void stlMesh::recenter() {
 
 	float xrange, yrange, zrange;

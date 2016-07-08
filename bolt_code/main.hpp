@@ -11,6 +11,7 @@
 #include "pngsupport.cpp"
 #include <stdlib.h>
 #include <array>
+#include <string>
 #include <unistd.h>
 #include <time.h>
 #include <chrono>
@@ -92,21 +93,21 @@ bool checkArguments(int argc, char *argv[], float &sliceSize, string &pngDir, in
 
 }
 
-void writeSCAD(stlMesh mesh, char* filename, vector<vec3> supportPoints){
+void writeSCAD(stlMesh mesh, string in_filename, string out_filename, float thickness = 2.0, float interval = 15.0){
+	
+	mesh.getMinMax();
+	string cmd ="openscad -o "+out_filename+" -D 'min_x ="+to_string(mesh.getMinX())+"' -D 'min_y = "+to_string(mesh.getMinY());
+	cmd += "' -D 'max_x = "+to_string(mesh.getMaxX())+"' -D 'max_y = "+to_string(mesh.getMaxY())+"' -D 'height = "+to_string(mesh.getMaxZ()-mesh.getMinZ());
+	cmd += "' -D 'thickness = "+to_string(thickness)+"' -D 'interval ="+to_string(interval)+"' -D 'infile = \""+in_filename+"\"' output.scad"; 
+	system(cmd.c_str());
 
-	//Calculate values to recenter shape by
-	float xcentre = (abs(mesh.getMinX())+mesh.getMaxX()) * -1;
-	float ycentre = (abs(mesh.getMinY())+mesh.getMaxY()) * -1;
-	float zcentre = 0;
-	
-	float h = mesh.getMaxZ() - mesh.getMinZ(), r = 2;
-	float x,y,z;	x = y = z = 0;
-	
-	fstream outfile; 	
-	
-	outfile.open("/home/nikki/bolt/bolt_code/output.scad", ios::out | ios::trunc);
+}
+
+//outfile.open("/home/nikki/bolt/bolt_code/output.scad");  //, ios::out | ios::trunc);
+/* OLD WORKING CODE
 	if(outfile.is_open()) {
-
+		
+		outfile<<mesh.getMinX()<<" "<<mesh.getMaxX()<<" "<<mesh.getMinY()<<" "<<mesh.getMaxY()<<endl;
 		outfile<<"union() { \n";
 		outfile<<"translate(["<<xcentre<<","<<ycentre<<","<<zcentre<<"]) ";	//recenter shape
 		outfile<<"import(\""<<filename<<"\");\n";
@@ -120,9 +121,9 @@ void writeSCAD(stlMesh mesh, char* filename, vector<vec3> supportPoints){
 		outfile<<"}\n";	
 		cout<<"\nWrote to file\n"; 
 	}
+//	else
+//		cout<<"ERROR: COULD NOT OPEN FILE\n";
+//	outfile.close();
+*/
 	
-	else
-		cout<<"ERROR: COULD NOT OPEN FILE\n";
-	outfile.close();
-	
-}
+

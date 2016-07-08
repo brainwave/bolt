@@ -104,6 +104,9 @@ private:
 public:
 	vector<vec3> supportPoints;  //points at which to draw supports
 
+	/** Calculates minimum and maximum X,Y,Z co-ordinates **/
+	void getMinMax();
+
 	/**
 	 \brief Returns minimum x-coordinate in the mesh after recentering.
 

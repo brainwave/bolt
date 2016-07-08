@@ -53,7 +53,7 @@ struct triangle {
 
 		t.normal = vertex[0];	
 		for(int i=0;i<3;i++) 
-			t.vertex[i] 	= vertex[i+1];
+			t.vertex[i] = vertex[i+1];
 		
 		return t;
 	}
@@ -72,6 +72,13 @@ struct triangle {
 			<<"\nNormal   : "<<t.normal.x<<"i+"<<t.normal.y<<"j+"<<t.normal.z<<"k";
 		
 		return output;
+	}
+
+	//setter to set vertices
+	void setVertices(vec3 a, vec3 b, vec3 c) {
+		vertex[0] = a;
+		vertex[1] = b;
+		vertex[2] = c;		
 	}
 	
 };
@@ -95,6 +102,11 @@ private:
 	float max_z = numeric_limits<float>::lowest(); ///< Maximum z coordinate in the mesh
 	
 public:
+	vector<vec3> supportPoints;  //points at which to draw supports
+
+	/** Calculates minimum and maximum X,Y,Z co-ordinates **/
+	void getMinMax();
+
 	/**
 	 \brief Returns minimum x-coordinate in the mesh after recentering.
 
@@ -164,7 +176,10 @@ public:
 	
 	*/
 	void sliceMesh(plane*p, slice*s,  float sliceSize, int arr_len);
+	
+	void projectTriangle(triangle *t);
 
+	void boundBox();
 };
 
 #endif

@@ -5,6 +5,8 @@
 #include <fstream>
 #include <time.h>
 #include <algorithm>
+
+
 float plane::distanceFromPoint (vec3 point) {
 	normal = glm::normalize (normal);
 	return dot(point, normal) - distance;
@@ -167,6 +169,24 @@ float stlMesh::getMaxY(){ return max_y; }
 float stlMesh::getMinZ(){ return min_z; }
 float stlMesh::getMaxZ(){ return max_z; }
 
+void stlMesh::getMinMax() {
+
+	for ( auto meshIterator = mesh.begin(); meshIterator != mesh.end(); meshIterator++ ) 
+		for ( int i = 0; i < 3; i++ ) {
+			
+			min_z = ( min_z > meshIterator -> vertex[i].z ) ? meshIterator -> vertex[i].z : min_z;
+			max_z = ( max_z < meshIterator -> vertex[i].z ) ? meshIterator -> vertex[i].z : max_z;
+
+			min_x = ( min_x > meshIterator -> vertex[i].x ) ? meshIterator -> vertex[i].x : min_x;
+			max_x = ( max_x < meshIterator -> vertex[i].x ) ? meshIterator -> vertex[i].x : max_x;
+
+			min_y = ( min_y > meshIterator -> vertex[i].y ) ? meshIterator -> vertex[i].y : min_y;
+			max_y = ( max_y < meshIterator -> vertex[i].y ) ? meshIterator -> vertex[i].y : max_y;
+
+	}
+
+}
+
 void stlMesh::recenter() {
 
 	float xrange, yrange, zrange;
@@ -273,4 +293,115 @@ void stlMesh::sliceMesh(plane *pstart, slice *sstart, float sliceSize, int arr_l
 	}
 }
 
+float sign (vec3 p1, vec3 p2, vec3 p3)
+{
+    return (p1.x - p3.x) * (p2.y - p3.y) - (p2.x - p3.x) * (p1.y - p3.y);
+}
+
+// Check if a given point lies within a triangle (2D)
+bool enclosed(vec3 point, triangle *t)
+{
+	bool b1, b2, b3;
+	
+	b1 = sign(point, t->vertex[0], t->vertex[1]) < 0.0f;
+	b2 = sign(point, t->vertex[1], t->vertex[2]) < 0.0f;
+	b3 = sign(point, t->vertex[2], t->vertex[0]) < 0.0f;
+
+	return ((b1 == b2) && (b2 == b3));
+}
+void stlMesh::boundBox()
+{
+	vector<triangle> intersections;
+	vector<vec3> points;   
+
+	vec3 corners[4];
+	corners[0].x = getMinX(); 	corners[0].y = getMinY();
+	corners[1].x = getMinX(); 	corners[1].y = getMaxY();
+	corners[2].x = getMaxX(); 	corners[2].y = getMaxY();
+	corners[3].x = getMaxX();	corners[3].y = getMinY();
+
+	//Generate a series of points in the box to potentially draw supports from
+	float x_interval = abs( (max_x - min_x)/10 );
+	float y_interval = abs( (max_y - min_y)/10 );
+	
+	cout<<"\nIntervals:"<<x_interval<<" "<<y_interval<<endl;
+
+	for(int i=min_x; i<max_x; i+=x_interval) {
+		for(int j=min_y; j<max_y; j+=y_interval) {
+			vec3 point; point.x = i; point.y = j;
+			points.push_back(point);
+		}	
+	} 
+
+	//Iterate through all triangles and find points of intersection for all the points 
+	for(auto p = points.begin(); p != points.end(); p++) {
+		for(auto t = mesh.begin(); t != mesh.end(); t++) {		//need to find smaller set of triangles
+			if(enclosed(*p, &*t)) { 							//&*t converts iterator of triangles to a pointer to a triangle
+				intersections.push_back(*t);
+				cout<<"Support generated at "<<p->x<<","<<p->y<<","<<p->z<<"\n";   
+				supportPoints.push_back(*p);
+			}
+		}
+	}
+}
+
+
+/*
+//if contact area between 2 adjacent slices is small, generate support
+void stlMesh::supportGenerator( slice *sstart, int arr_len, int skipAmnt )
+{
+//  cout<<"\nBEFORE: "<<s->slice.size()<<endl;
+  slice *top, *next;	//s is current, next is slice below it
+  top = sstart + arr_len-2;
+  vector<linesegment> points;
+  int z;
+  //iterate through all slices
+  //for(int i=arr_len; i >=0; i--) {	cout<<"\nLOOP STARTED\n";
+  for(int i=0; i<arr_len-1; i++, top--) {
+
+	next = top-1;
+	if(enclosed(next, top)) {			//if bottom layer is smaller than top layer
+		//iterate through each edge in the top slice
+	        for(int j=0; j < top->slice.size(); j++) {         
+		        //get the endpoints of each edge 
+			int x1,y1, x2, y2, l=20;
+			x1 = top->slice[j].startpoint.x; y1 = top->slice[j].startpoint.y;	
+			x2 = top->slice[j].endpoint.x; y2 = top->slice[j].endpoint.y;	
+			vec3 point[4]; 
+			point[0].x = x-l; point[0].y = y-l; point[1].x = x+l; point[1].y = y-l;
+			point[2].x = x-l; point[2].y = y+l; point[3].x = x+l; point[3].y = y+l;
+			//tiny square of length 10 mm centred at x, y
+			for(int k=0; k<4; k++)
+				points.push_back(linesegment(point[k], point[k+1]));
+			points.push_back(linesegment(point[3], point[0]));
+
+			vec3 midpoint; midpoint.x=(x1+x2)/2; midpoint.y=(y2-y1)/2;
+			vec3 point; point.x = midpoint.x+l; point.y = midpoint.y;
+			points.push_back(linesegment(midpoint, point));
+
+		}
+
+		//add the linesegments in point to the array of slices for all z till 0
+		z = top->slice[0].endpoint.z;	//current z value
+		slice *temp = top;
+		cout<<"\nZ: "<<z<<endl;
+		while(z>=0 || temp!=sstart)
+	        {
+		        cout<<"Added support point at z = "<<z<<endl;
+		 	for(int p = 0; p < points.size(); p++)
+				temp->slice.push_back(points[i]); 
+			z--;
+			temp--;
+ 		}
+	}
+	i += skipAmnt;
+	top -= skipAmnt;
+	if( i >= arr_len) break;
+  	//break; //only generate one support
+  }
+
+//  cout<<"\nAFTER: "<<s->slice.size()<<endl;
+
+}
+*/
 #endif

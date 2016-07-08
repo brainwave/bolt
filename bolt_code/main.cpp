@@ -9,22 +9,25 @@ int main ( int argc, char *argv[] ) {
 	
 	int xres, yres;
 	
-	int hollow;
+	bool hollow;
+	bool support;
 
 	float thickness;
 	
 	// time calculation
 	clock_t time, startTime = clock();
 
-	if(!checkArguments(argc, argv, fileName, sliceSize, pngDir, xres, yres, hollow, thickness))
+	if(!checkArguments(argc, argv, fileName, sliceSize, pngDir, xres, yres, hollow, thickness, support))
 		return 0;
 	
 	//ranges, min and max z values, and O(verall)scale_x, y and z
 	float xrange, yrange, zrange, min_z, max_z, max_x, min_x, max_y, min_y;
 
 	stlMesh mesh;
+	stlMesh supportMesh;
 
 	time = clock();
+
 
 	// perform hollowing routine if needed	
 	if(hollow){
@@ -35,6 +38,17 @@ int main ( int argc, char *argv[] ) {
 
 		fileName = pngDir+"/hollow.stl";
 	}
+	
+	if(support){
+	if ( supportMesh.readStlFile( fileName.c_str())) {
+		cout << "\nProgram Failed" ;
+		return 1;
+	}
+	else {
+		//writing SCAD file
+		writeSCAD(supportMesh, fileName.c_str(), fileName);
+	}
+	}
 
 	if ( mesh.readStlFile(fileName.c_str())) {
 		cout << "\nProgram Failed" ;
@@ -43,7 +57,8 @@ int main ( int argc, char *argv[] ) {
 	else {
 		cout<<"\nreadStlFile : "<<(double)(clock() - time)/CLOCKS_PER_SEC;
 
-		mesh.recenter();
+
+		mesh.recenter();	
 
 		max_x = mesh.getMaxX();
 		min_x = mesh.getMinX();
@@ -81,10 +96,13 @@ int main ( int argc, char *argv[] ) {
 		// restore first place to p
 		p=pstart;
 	
-		// slicing 
+		//Generate supports
+//		mesh.boundBox();
 
+		// slicing 
 		time = clock();
 		mesh.sliceMesh(p, s, sliceSize, arr_len);
+
 
 		cout<<"Time spent in slicing "<<(double) (clock() - time) / CLOCKS_PER_SEC;
 
@@ -101,4 +119,3 @@ int main ( int argc, char *argv[] ) {
 		cout<<"\nTotal Program time : "<<(double)(clock() - startTime)/CLOCKS_PER_SEC;
 	}
 }
-

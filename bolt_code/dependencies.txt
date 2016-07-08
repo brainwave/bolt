@@ -1,0 +1,6 @@
+To install:
+
+vim
+glew-dev
+glfw3-dev
+libpng++-dev

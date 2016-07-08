@@ -10,11 +10,13 @@ int main ( int argc, char *argv[] ) {
 	int xres, yres;
 	
 	int hollow;
+
+	float thickness;
 	
 	// time calculation
 	clock_t time, startTime = clock();
 
-	if(!checkArguments(argc, argv, fileName, sliceSize, pngDir, xres, yres, hollow))
+	if(!checkArguments(argc, argv, fileName, sliceSize, pngDir, xres, yres, hollow, thickness))
 		return 0;
 	
 	//ranges, min and max z values, and O(verall)scale_x, y and z
@@ -27,11 +29,11 @@ int main ( int argc, char *argv[] ) {
 	// perform hollowing routine if needed	
 	if(hollow){
 	
-		string hollowingCommand = "openscad -o scad/test.stl -D 'model=\""+fileName+"\"' -D 'thickness=0.1' hollow.scad";
+		string hollowingCommand = "openscad -o "+pngDir+"/hollow.stl -D 'model=\""+fileName+"\"' -D 'thickness="+to_string(thickness)+"' hollow.scad";
 
 		system(hollowingCommand.c_str());	
 
-		fileName = "scad/test.stl";
+		fileName = pngDir+"/hollow.stl";
 	}
 
 	if ( mesh.readStlFile(fileName.c_str())) {

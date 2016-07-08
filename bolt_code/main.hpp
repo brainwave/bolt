@@ -45,9 +45,11 @@ bool is_slice_size_sane ( char* sliceArgument , float& sliceSize ){
 	@param pndDir Directory where the generated PNGs will be stored.
 	@param xres X Resolution
 	@param yres Y Resolution
-	@param hollow Set to 0 if hollowing is not required. 
+	@param hollow Set to 0 if hollowing is not required.
+	@param thickness The thickness of the wall if hollowing is used.
+	 
 */	
-bool checkArguments(int argc, char *argv[], string &fileName, float &sliceSize, string &pngDir, int &xres, int &yres, int &hollow){
+bool checkArguments(int argc, char *argv[], string &fileName, float &sliceSize, string &pngDir, int &xres, int &yres, int &hollow, float &thickness){
 	
 	fileName = "";
 	sliceSize = 0.1;
@@ -55,8 +57,9 @@ bool checkArguments(int argc, char *argv[], string &fileName, float &sliceSize, 
 	xres = 800;
 	yres = 600;
 	hollow = 0;
-
-	if(argc>=13){
+	thickness = 0.1;
+	
+	if(argc>=15){
 	
 		cout<<"\n Extraneous parameters supplied! Exiting!";
 		return false;
@@ -92,6 +95,16 @@ bool checkArguments(int argc, char *argv[], string &fileName, float &sliceSize, 
 			
 			hollow = atoi(argv[i+1]);
 		}
+		else if(strcmp(argv[i],"-t") == 0){ // wall thickness
+		
+			thickness = atof(argv[i+1]);
+			
+			if(thickness<=0 || thickness == NAN){
+	
+				cout<<"\n Invalid thickness!";
+				return false;
+			}
+		}
 	}
 
 	if(fileName==""){
@@ -103,7 +116,14 @@ bool checkArguments(int argc, char *argv[], string &fileName, float &sliceSize, 
 	cout<<"\n File Name       : "<<fileName;
 	cout<<"\n Slice Size      : "<<sliceSize;
 	cout<<"\n Resolution      : "<<xres<<"*"<<yres;
-	cout<<"\n Hollowing       : ";if(hollow) cout<<"Yes"; else cout<<"No";
+	cout<<"\n Hollowing       : ";
+	if(hollow) {
+		
+		cout<<"Yes";
+		cout<<"\n Wall Thickness  : "<<thickness;
+	}
+	else
+		cout<<"No";
 	cout<<"\n Output Directory: "<<pngDir;
 	cout<<"\n";	
 	

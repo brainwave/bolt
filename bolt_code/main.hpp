@@ -31,14 +31,16 @@ bool is_slice_size_sane ( char* sliceArgument , float& sliceSize ){
 }
 
 	
-bool checkArguments(int argc, char *argv[], float &sliceSize, string &pngDir, int &xres, int &yres, int &hollow){
+bool checkArguments(int argc, char *argv[], string &fileName, float &sliceSize, string &pngDir, int &xres, int &yres, int &hollow){
 	
+	fileName = "";
 	sliceSize = 0.1;
 	pngDir = "png";
 	xres = 800;
 	yres = 600;
 	hollow = 0;
 
+	/*
 	switch(argc){
 	
 		case 1: 
@@ -107,6 +109,46 @@ bool checkArguments(int argc, char *argv[], float &sliceSize, string &pngDir, in
 			cout << "\nExtraneous parameters supplied, exiting. ";
 			return false;
 	}
+	*/	
+
+	
+	for(int i=0; i<argc; i++){
+	
+		if(strcmp(argv[i],"-f") == 0){ // file name switch
+		
+			fileName = argv[i+1];
+		}
+		else if(strcmp(argv[i],"-s") == 0){ // slice size switch
+	
+			is_slice_size_sane ( argv[i+1], sliceSize);
+		}
+		else if(strcmp(argv[i],"-o") == 0){ // png directory switch
+			
+			pngDir = argv[i+1];
+		}
+		else if(strcmp(argv[i],"-r") == 0){ // resolution switch
+	
+			xres = atoi ( argv[i+1] );
+			yres = atoi ( argv[i+2] );
+		}
+		else if(strcmp(argv[i],"-h") == 0){ // hollow swtich
+			
+			hollow = atoi(argv[i+1]);
+		}
+	}
+
+	if(fileName==""){
+	
+		cout<<"\n Please specify a file to be sliced.";
+		return false;
+	}
+		
+	cout<<"\n File Name       : "<<fileName;
+	cout<<"\n Slice Size      : "<<sliceSize;
+	cout<<"\n Resolution      : "<<xres<<"*"<<yres;
+	cout<<"\n Hollowing       : ";if(hollow) cout<<"Yes"; else cout<<"No";
+	cout<<"\n Output Directory: "<<pngDir;
+	cout<<"\n";	
 	
 	return true;
 

@@ -18,7 +18,7 @@ int main ( int argc, char *argv[] ) {
 	string outputSTL = "output.stl";
 
 	
-/*
+
 	if ( supportMesh.readStlFile( argv[1]) ) {
 		cout << "\nProgram Failed" ;
 		return 1;
@@ -28,10 +28,10 @@ int main ( int argc, char *argv[] ) {
 		//supportMesh.getMinMax();
 		writeSCAD(supportMesh, argv[1], outputSTL);
 	}
-*/
+
 	time = clock();
 
-	if ( mesh.readStlFile(argv[1])) {
+	if ( mesh.readStlFile(outputSTL.c_str())) {
 		cout << "\nProgram Failed" ;
 		return 1;
 	}

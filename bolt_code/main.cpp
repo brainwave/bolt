@@ -3,7 +3,11 @@
 
 int main ( int argc, char *argv[] ) {
 
-	float sliceSize; string pngDir,fileName; int xres, yres;
+	float sliceSize;
+	
+	string pngDir,fileName;
+	
+	int xres, yres;
 	
 	int hollow;
 	
@@ -19,18 +23,13 @@ int main ( int argc, char *argv[] ) {
 	stlMesh mesh;
 
 	time = clock();
-	
-//	string fileName = string(argv[1]);
-	
+
+	// perform hollowing routine if needed	
 	if(hollow){
 	
 		string hollowingCommand = "openscad -o scad/test.stl -D 'model=\""+fileName+"\"' -D 'thickness=0.1' hollow.scad";
 
-		clock_t t = clock();
-		
 		system(hollowingCommand.c_str());	
-
-		cout<<"\n Hollowing Time: "<<(double)(clock() - t)/CLOCKS_PER_SEC;
 
 		fileName = "scad/test.stl";
 	}

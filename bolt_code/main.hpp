@@ -15,8 +15,14 @@
 #include <time.h>
 #include <chrono>
 
+/**
+	\brief Checks if the specified slice size is acceptable.
+	
+*/
 bool is_slice_size_sane ( char* sliceArgument , float& sliceSize ){
 
+		
+	sliceSize = atof(sliceArgument);
 
 	if(sliceSize>1 || sliceSize<0.001 || sliceSize==NAN){
 
@@ -25,12 +31,22 @@ bool is_slice_size_sane ( char* sliceArgument , float& sliceSize ){
 	}
 
 	else {
-		sliceSize = atof(sliceArgument);	
 		return true;
 	}
 }
 
+/**
+	\brief 	Checks if the supplied command line arguments are valid and assigns them to variables in main. 
 	
+	@param argc Number of command line arguments.
+	@param argv Command line arguments.
+	@param fileName Name of the file to be sliced.
+	@param sliceSize Distance between two slices.	
+	@param pndDir Directory where the generated PNGs will be stored.
+	@param xres X Resolution
+	@param yres Y Resolution
+	@param hollow Set to 0 if hollowing is not required. 
+*/	
 bool checkArguments(int argc, char *argv[], string &fileName, float &sliceSize, string &pngDir, int &xres, int &yres, int &hollow){
 	
 	fileName = "";
@@ -40,78 +56,12 @@ bool checkArguments(int argc, char *argv[], string &fileName, float &sliceSize, 
 	yres = 600;
 	hollow = 0;
 
-	/*
-	switch(argc){
+	if(argc>=13){
 	
-		case 1: 
-			cout<<"\nParameter missing : filename\nExiting ";
-			return false;
-			
-		case 2:
-			cout << "\nSlicing " << argv[1] << " with default slice size of " << sliceSize
-				<< " and default png directory (" << pngDir << " )";
-			break;		
-	
-		case 3: 
-
-			is_slice_size_sane ( argv[2], sliceSize);
-
-			cout << "\nSlicing " <<argv[1] << " with supplied slice size of " << sliceSize
-				<< " and default png directory ( " << pngDir <<" ) ";
-			break;
-		case 4: 
-
-			is_slice_size_sane ( argv [2], sliceSize);
-				
-			pngDir = argv[3];
-
-			cout << "\nSlicing " <<argv[1] << " with supplied slice size of " << sliceSize
-				<< " and supplied png directory ( " << pngDir <<" ) ";
-
-
-			break;
-
-		case 6:
-			is_slice_size_sane ( argv [2], sliceSize);
-
-			pngDir = argv[3];
-
-			xres = atoi ( argv[4] );
-			yres = atoi ( argv[5] );
-
-			cout << "\nSlicing " <<argv[1] << " with supplied slice size of " << sliceSize
-				<< " and supplied png directory ( " << argv[3] <<" ) ";
-			
-			cout << "\nUsing resolutions of "<<xres<<" and "<<yres;
-			break;
-
-		case 7:
-			is_slice_size_sane ( argv [2], sliceSize);
-
-			pngDir = argv[3];
-
-			xres = atoi ( argv[4] );
-			yres = atoi ( argv[5] );
-
-			hollow = atoi( argv[6] );
-
-			cout << "\nSlicing " <<argv[1] << " with supplied slice size of " << sliceSize
-				<< " and supplied png directory ( " << argv[3] <<" ) ";
-			
-			cout << "\nUsing resolutions of "<<xres<<" and "<<yres;
-			
-			if(hollow)
-				cout << "\n Hollowing";
-			
-			break;
-
-		default: 
-			cout << "\nExtraneous parameters supplied, exiting. ";
-			return false;
+		cout<<"\n Extraneous parameters supplied! Exiting!";
+		return false;
 	}
-	*/	
 
-	
 	for(int i=0; i<argc; i++){
 	
 		if(strcmp(argv[i],"-f") == 0){ // file name switch
@@ -120,9 +70,10 @@ bool checkArguments(int argc, char *argv[], string &fileName, float &sliceSize, 
 		}
 		else if(strcmp(argv[i],"-s") == 0){ // slice size switch
 	
-			is_slice_size_sane ( argv[i+1], sliceSize);
+			if(!is_slice_size_sane ( argv[i+1], sliceSize))
+				return false;
 		}
-		else if(strcmp(argv[i],"-o") == 0){ // png directory switch
+		else if(strcmp(argv[i],"-o") == 0){ // png output directory switch
 			
 			pngDir = argv[i+1];
 		}
@@ -130,8 +81,14 @@ bool checkArguments(int argc, char *argv[], string &fileName, float &sliceSize, 
 	
 			xres = atoi ( argv[i+1] );
 			yres = atoi ( argv[i+2] );
+
+			if(xres <=0 || yres<=0){
+			
+				cout<<"\n Invalid resolution specified.";
+				return false;
+			}
 		}
-		else if(strcmp(argv[i],"-h") == 0){ // hollow swtich
+		else if(strcmp(argv[i],"-h") == 0){ // hollow switch
 			
 			hollow = atoi(argv[i+1]);
 		}

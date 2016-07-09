@@ -109,6 +109,7 @@ bool checkArguments(int argc, char *argv[], string &fileName, float &sliceSize, 
 			}
 		}
 		else if(strcmp(argv[i],"-sg") == 0){ //support generation
+
 			support = true;
 		}	
 	}

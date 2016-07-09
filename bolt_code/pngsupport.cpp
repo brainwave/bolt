@@ -16,7 +16,7 @@ string folder = "png";
 
 void initPNG (int xres, int yres, string pngDir ) {
 
-	image.resize ( xres, yres );
+	image.resize ( xres+1, yres+1 );
 
 	folder = pngDir.c_str();
 
@@ -131,7 +131,6 @@ void drawLine(int xa, int ya, int xb, int yb){
 	@param min_y Minimum y-coordinate in the mesh after recentering.
 	@param max_y Maximum y-coordinate in the mesh after recentering.
 */
-
 void generatePNG(slice s, int slice_counter, float min_x, float max_x, float min_y, float max_y){
 
 	vector<glm::vec3> vertices;
@@ -186,6 +185,9 @@ void generatePNG(slice s, int slice_counter, float min_x, float max_x, float min
 			x2 = (int)_x;
 			y2 = (int)_y;
 		
+			if(x1>SMALLER_DIM || x2>SMALLER_DIM)
+				cout<<"\n Out of bounds";
+			else	
 			drawLine(x1,y1,x2,y2);
 		}
 	}	

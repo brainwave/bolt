@@ -143,7 +143,7 @@ bool checkArguments(int argc, char *argv[], string &fileName, float &sliceSize, 
 
 }
 
-void writeSCAD(stlMesh mesh, string in_filename, string &out_filename, float thickness = 2.0, float interval = 15.0){
+void writeSCAD(stlMesh mesh, string in_filename, string &out_filename, float thickness = 2.0, float interval = 30.0){
 	
 	mesh.getMinMax();
 	string cmd ="openscad -o support.stl -D 'min_x ="+to_string(mesh.getMinX())+"' -D 'min_y = "+to_string(mesh.getMinY());

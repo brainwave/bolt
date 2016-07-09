@@ -5,10 +5,31 @@
 *	Defines methods for generating a PNG from the given file.
 */
 
-#include <png++/png.hpp>
-#include <boost/filesystem.hpp>
+//#include <boost/filesystem.hpp>
 
 #define SMALLER_DIM ( image.get_height() < image.get_width() ? image.get_height():image.get_width())
+
+#ifdef __linux__
+
+#include <png++/png.hpp>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <dirent.h>
+
+int check_and_make_directory ( const char* pngDir ) {
+
+	DIR* dir = opendir ( pngDir );
+	
+	if (dir) {
+		cout<<"\nImage destination exists, proceeding";
+	}
+	else
+	{
+		cout<<"\nDirectory absent or inaccessible, creating";
+		mkdir(pngDir, 0);
+	}
+}
+#endif
 
 
 png::image <png::rgb_pixel> image(800, 600);
@@ -18,10 +39,12 @@ void initPNG (int xres, int yres, string pngDir ) {
 
 	image.resize ( xres, yres );
 
-	folder = pngDir.c_str();
+	check_and_make_directory ( pngDir.c_str() );
 
-	boost::filesystem::path dir ( pngDir.c_str() );
-	boost::filesystem::create_directory ( dir );
+	folder = pngDir;
+
+//	boost::filesystem::path dir ( pngDir.c_str() );
+//	boost::filesystem::create_directory ( dir );
 
 }
 	

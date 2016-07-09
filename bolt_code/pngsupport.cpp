@@ -37,7 +37,7 @@ string folder = "png";
 
 void initPNG (int xres, int yres, string pngDir ) {
 
-	image.resize ( xres, yres );
+	image.resize ( xres+1, yres+1 );
 
 	check_and_make_directory ( pngDir.c_str() );
 
@@ -66,6 +66,8 @@ void drawLine(int xa, int ya, int xb, int yb){
 	dx = abs(xb - xa);
 	dy = abs(yb - ya);
 	
+	int yres = image.get_height()-1;
+
 	if(dx>=dy){
 
 		p = 2*dy -dx; //p0
@@ -88,7 +90,7 @@ void drawLine(int xa, int ya, int xb, int yb){
 			xEnd = xb;
 		}
 
-		image[y][x] = png::rgb_pixel(255,255,255);
+		image[yres-y][x] = png::rgb_pixel(255,255,255);
 
 		while(x<xEnd){
 
@@ -101,7 +103,7 @@ void drawLine(int xa, int ya, int xb, int yb){
 				p = p + 2*(dy-dx);
 			}
 
-			image[y][x] = png::rgb_pixel(255,255,255);
+			image[yres-y][x] = png::rgb_pixel(255,255,255);
 		}
 	}
 	else{
@@ -126,7 +128,7 @@ void drawLine(int xa, int ya, int xb, int yb){
 			yEnd = yb;
 		}
 
-		image[y][x] = png::rgb_pixel(255,255,255);
+		image[yres-y][x] = png::rgb_pixel(255,255,255);
 
 		while(y<yEnd){
 
@@ -139,7 +141,7 @@ void drawLine(int xa, int ya, int xb, int yb){
 				p = p + 2*(dx-dy);
 			}
 
-			image[y][x] = png::rgb_pixel(255,255,255);
+			image[yres-y][x] = png::rgb_pixel(255,255,255);
 		}
 	}
 }
@@ -154,7 +156,6 @@ void drawLine(int xa, int ya, int xb, int yb){
 	@param min_y Minimum y-coordinate in the mesh after recentering.
 	@param max_y Maximum y-coordinate in the mesh after recentering.
 */
-
 void generatePNG(slice s, int slice_counter, float min_x, float max_x, float min_y, float max_y){
 
 	vector<glm::vec3> vertices;
@@ -209,6 +210,9 @@ void generatePNG(slice s, int slice_counter, float min_x, float max_x, float min
 			x2 = (int)_x;
 			y2 = (int)_y;
 		
+			if(x1>SMALLER_DIM || x2>SMALLER_DIM)
+				cout<<"\n Out of bounds";
+			else	
 			drawLine(x1,y1,x2,y2);
 		}
 	}	

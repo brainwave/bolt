@@ -16,6 +16,7 @@
 #include <time.h>
 #include <chrono>
 #include <fstream>
+#include <math.h>
 
 /**
 	\brief Checks if the specified slice size is acceptable.
@@ -143,9 +144,12 @@ bool checkArguments(int argc, char *argv[], string &fileName, float &sliceSize, 
 
 }
 
-void writeSCAD(stlMesh mesh, string in_filename, string &out_filename, float thickness = 2.0, float interval = 30.0){
+void writeSCAD(stlMesh mesh, string in_filename, string &out_filename, float thickness = 10, int divisions = 5){
 	
 	mesh.getMinMax();
+	float interval = (mesh.getMaxX() - mesh.getMinX())/divisions;
+	cout<<"\nInterval: "<<interval<<endl;
+
 	string cmd ="openscad -o support.stl -D 'min_x ="+to_string(mesh.getMinX())+"' -D 'min_y = "+to_string(mesh.getMinY());
 	cmd += "' -D 'max_x = "+to_string(mesh.getMaxX())+"' -D 'max_y = "+to_string(mesh.getMaxY())+"' -D 'height = "+to_string(mesh.getMaxZ()-mesh.getMinZ());
 	cmd += "' -D 'thickness = "+to_string(thickness)+"' -D 'interval ="+to_string(interval)+"' -D 'infile = \""+in_filename+"\"' output.scad"; 

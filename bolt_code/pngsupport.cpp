@@ -42,14 +42,13 @@ string folder = "png";
 
 unsigned char* image;
 
+
+
 void initPNG (int xres, int yres, string pngDir ) {
 
 //	image.resize ( xres+1, yres+1 );
 
-	image = new unsigned char( (xres) * (yres) * 3 );
-	
-	for(int i=0; i<xres*yres*3; i++)
-		*(image+i) = 0;
+	image = new unsigned char[ (xres) * (yres) * 3 ];
 
 //	::yres = image.get_height() - 1;
 
@@ -92,8 +91,8 @@ void writePNG(string pngFileName){
 			
 				for(int i=0; i<3; i++){
 	
-				//	*(image_iterator) = 255;
-				//	image_iterator++;
+					*(image_iterator) = 255;
+					image_iterator++;
 				}
 				
 			}
@@ -101,8 +100,8 @@ void writePNG(string pngFileName){
 			
 				for(int i=0; i<3; i++){
 	
-				//	*(image_iterator) = 0;
-				//	image_iterator++;
+					*(image_iterator) = 0;
+					image_iterator++;
 				}
 			}
 		}

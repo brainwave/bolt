@@ -1,4 +1,11 @@
 #include "main.hpp"
+#include "boost/threadpool.hpp"
+
+void thread_function(slice s, int slice_counter, float min_x, float max_x, float min_y, float max_y){
+
+	s.fillSlice();
+	generatePNG(s,slice_counter,min_x,max_x,min_y,max_y);
+}
 
 
 int main ( int argc, char *argv[] ) {
@@ -108,11 +115,16 @@ int main ( int argc, char *argv[] ) {
 
 		initPNG ( xres, yres, pngDir );
 		
+		boost::threadpool::pool tp(boost::thread::hardware_concurrency());
+		
 		// filling and png generation
 		for(slice_counter=0;slice_counter<max_slice_no;slice_counter++){
 	
-			s->fillSlice();
-			generatePNG(*s,slice_counter,min_x,max_x,min_y,max_y);
+		//	s->fillSlice();
+		//	generatePNG(*s,slice_counter,min_x,max_x,min_y,max_y);
+	
+			tp.schedule(boost::bind(&thread_function, *s, slice_counter, min_x, max_x, min_y, max_y));
+			
 			s++;
 		}
 

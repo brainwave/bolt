@@ -5,19 +5,16 @@
 *	Defines methods for generating a PNG from the given file.
 */
 
-//#include <boost/filesystem.hpp>
 
-//#define SMALLER_DIM ( image.get_height() < image.get_width() ? image.get_height():image.get_width())
 
 #define SMALLER_DIM ( yres < xres ? yres : xres )
-
+#include "lodepng.cpp"
 #ifdef __linux__
 
 //#include <png++/png.hpp>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <dirent.h>
-#include "lodepng.cpp"
 
 int check_and_make_directory ( const char* pngDir ) {
 

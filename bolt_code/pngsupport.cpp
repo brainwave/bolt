@@ -7,14 +7,17 @@
 
 //#include <boost/filesystem.hpp>
 
-#define SMALLER_DIM ( image.get_height() < image.get_width() ? image.get_height():image.get_width())
+//#define SMALLER_DIM ( image.get_height() < image.get_width() ? image.get_height():image.get_width())
+
+#define SMALLER_DIM ( yres < xres ? yres : xres )
 
 #ifdef __linux__
 
-#include <png++/png.hpp>
+//#include <png++/png.hpp>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <dirent.h>
+#include "lodepng.cpp"
 
 int check_and_make_directory ( const char* pngDir ) {
 
@@ -32,18 +35,25 @@ int check_and_make_directory ( const char* pngDir ) {
 #endif
 
 
-png::image <png::rgb_pixel> image(800, 600);
+//png::image <png::rgb_pixel> image(800, 600);
 int pixel_buffer[2000][2000];
-int yres;
+int xres,yres;
 string folder = "png";
+
+unsigned char* image;
 
 void initPNG (int xres, int yres, string pngDir ) {
 
-	image.resize ( xres+1, yres+1 );
+//	image.resize ( xres+1, yres+1 );
 
-	::yres = image.get_height() - 1;
+	image = new unsigned char( (xres+1) * (yres+1) * 3 );
 
-	cout<<"\n Y RES = "<<yres;
+//	::yres = image.get_height() - 1;
+
+	::yres = yres;
+	::xres = xres;
+
+//	cout<<"\n Y RES = "<<yres;
 		
 	check_and_make_directory ( pngDir.c_str() );
 
@@ -57,7 +67,7 @@ void initPNG (int xres, int yres, string pngDir ) {
 
 void writePNG(string pngFileName){
 	
-	for (size_t y = 0; y < image.get_height(); y++ )
+/*	for (size_t y = 0; y < image.get_height(); y++ )
 		for (size_t x=0; x < image.get_width(); x++) {
 	
 		if(pixel_buffer[y][x] == 1)	
@@ -67,6 +77,37 @@ void writePNG(string pngFileName){
 	}
 
 	image.write(pngFileName);
+*/
+
+	unsigned char* image_iterator = image;
+
+	for(int y = 0; y<yres; y++){
+	
+		for(int x = 0; x<xres; x++){
+	
+			if(pixel_buffer[y][x] == 1){
+			
+				for(int i=0; i<3; i++){
+	
+					*(image_iterator) = 255;
+					image_iterator++;
+				}
+				
+			}
+			else{
+			
+				for(int i=0; i<3; i++){
+	
+					*(image_iterator) = 0;
+					image_iterator++;
+				}
+			}
+		}
+	}
+
+
+	unsigned f = lodepng_encode_file(pngFileName.c_str(), image, (unsigned)xres, (unsigned)yres, LCT_RGB, 8); 
+
 }
 
 /**
@@ -211,8 +252,8 @@ void generatePNG(slice s, int slice_counter, float min_x, float max_x, float min
 			
 			first = false;
 			
-			_x = (it->x - min_x)/(max_x - min_x) * (SMALLER_DIM-1);
-			_y = (it->y - min_y)/(max_y - min_y) * (SMALLER_DIM-1);
+			_x = (it->x - min_x)/(max_x - min_x) * (SMALLER_DIM);
+			_y = (it->y - min_y)/(max_y - min_y) * (SMALLER_DIM);
 		
 			x1 = (int)_x;
 			y1 = (int)_y;
@@ -222,8 +263,8 @@ void generatePNG(slice s, int slice_counter, float min_x, float max_x, float min
 		else{
 			first = true;
 			
-			_x = (it->x - min_x)/(max_x - min_x) * (SMALLER_DIM-1);
-			_y = (it->y - min_y)/(max_y - min_y) * (SMALLER_DIM-1);
+			_x = (it->x - min_x)/(max_x - min_x) * (SMALLER_DIM);
+			_y = (it->y - min_y)/(max_y - min_y) * (SMALLER_DIM);
 
 			x2 = (int)_x;
 			y2 = (int)_y;

@@ -46,7 +46,10 @@ void initPNG (int xres, int yres, string pngDir ) {
 
 //	image.resize ( xres+1, yres+1 );
 
-	image = new unsigned char( (xres+1) * (yres+1) * 3 );
+	image = new unsigned char( (xres) * (yres) * 3 );
+	
+	for(int i=0; i<xres*yres*3; i++)
+		*(image+i) = 0;
 
 //	::yres = image.get_height() - 1;
 
@@ -89,8 +92,8 @@ void writePNG(string pngFileName){
 			
 				for(int i=0; i<3; i++){
 	
-					*(image_iterator) = 255;
-					image_iterator++;
+				//	*(image_iterator) = 255;
+				//	image_iterator++;
 				}
 				
 			}
@@ -98,15 +101,15 @@ void writePNG(string pngFileName){
 			
 				for(int i=0; i<3; i++){
 	
-					*(image_iterator) = 0;
-					image_iterator++;
+				//	*(image_iterator) = 0;
+				//	image_iterator++;
 				}
 			}
 		}
 	}
 
 
-	unsigned f = lodepng_encode_file(pngFileName.c_str(), image, (unsigned)xres, (unsigned)yres, LCT_RGB, 8); 
+	unsigned f = lodepng_encode24_file(pngFileName.c_str(), image, xres, yres); 
 
 }
 

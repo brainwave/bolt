@@ -310,6 +310,8 @@ bool enclosed(vec3 point, triangle *t) {
 	t->vertex[0].y==t->vertex[1].y && t->vertex[0].y==t->vertex[2].y && t->vertex[1].y==t->vertex[2].y )
 		return false;
 
+	//Ignore faces close to the edge
+
 	float a = area(t->vertex[0], t->vertex[1], t->vertex[2]);
 	float a1 = area(point, t->vertex[1], t->vertex[2]);
 	float a2 = area(t->vertex[0], point, t->vertex[2]);

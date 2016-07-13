@@ -144,41 +144,92 @@ bool checkArguments(int argc, char *argv[], string &fileName, float &sliceSize, 
 
 }
 
-void writeSCAD(stlMesh mesh, string in_filename, string &out_filename, float thickness = 10, int divisions = 5){
+void writeSCAD(stlMesh mesh, string in_filename, string &out_filename, float thickness = 1, int divisions = 15){
 	
 	mesh.getMinMax();
-	float interval = (mesh.getMaxX() - mesh.getMinX())/divisions;
-	cout<<"\nInterval: "<<interval<<endl;
-
+	float x_interval = (mesh.getMaxX() - mesh.getMinX())/divisions;
+	float y_interval = (mesh.getMaxY() - mesh.getMinY())/divisions;
+	mesh.boundBox(x_interval,y_interval);
+/*
 	string cmd ="openscad -o support.stl -D 'min_x ="+to_string(mesh.getMinX())+"' -D 'min_y = "+to_string(mesh.getMinY());
-	cmd += "' -D 'max_x = "+to_string(mesh.getMaxX())+"' -D 'max_y = "+to_string(mesh.getMaxY())+"' -D 'height = "+to_string(mesh.getMaxZ()-mesh.getMinZ());
-	cmd += "' -D 'thickness = "+to_string(thickness)+"' -D 'interval ="+to_string(interval)+"' -D 'infile = \""+in_filename+"\"' output.scad"; 
+	cmd += "' -D 'max_x = "+to_string(mesh.getMaxX())+"' -D 'max_y = "+to_string(mesh.getMaxY())+"' -D 'height = "+to_string(mesh.getMaxZ());
+	cmd += "' -D 'thickness = "+to_string(thickness)+"' -D 'x_interval ="+to_string(x_interval)+"' -D 'y_interval ="+to_string(y_interval)+"' -D 'infile = \""+in_filename+"\"'";
+
+	cmd += " -D 'list_x = ["+to_string(mesh.supportPoints.at(0).x);
+	for(int i=1; i<mesh.supportPoints.size(); i++)
+		cmd += ","+to_string(mesh.supportPoints[i].x);
+	cmd += "]' ";
+
+	cmd += " -D 'list_y = ["+to_string(mesh.supportPoints.at(0).y);
+	for(int i=1; i<mesh.supportPoints.size(); i++)
+		cmd += ","+to_string(mesh.supportPoints[i].y);
+	cmd += "]' ";
+
+	cmd += " -D 'list_z = ["+to_string(mesh.supportPoints.at(0).z);
+	for(int i=1; i<20; i++)
+		cmd += ","+to_string(mesh.supportPoints[i].z);
+	cmd += "]' ";
+
+
+	//Convert the z-list to a 2D array for instant lookup (instead of iteration)
+	vector<vector<float>> z_array( mesh.supportPoints.size(), vector<float>(mesh.supportPoints.size())); 
+	int k=0;
+	for(int i=0; i<mesh.supportPoints.size(); i++, k++){
+		for(int j=0; j<mesh.supportPoints.size(); j++){
+			z_array[i][j] = mesh.supportPoints.at(k).z;
+		}
+	}
+	cmd += " -D 'list_z = [ ";
+	for(int i=0; i<z_array.size(); i++){
+		for(int j=0; j<z_array.at(i).size(); j++){
+			if(j==0)
+				cmd += "["+to_string(z_array[i][j]);
+			else
+				cmd += ","+to_string(z_array[i][j]);
+		}
+		if(i==z_array.size()-1)
+			cmd += "] ";
+		else
+			cmd += "],";
+	}
+	cmd += "]' ";
+
+	cmd += " support.scad"; 
 	out_filename = "support.stl";
 	system(cmd.c_str());
 
-}
 
-//outfile.open("/home/nikki/bolt/bolt_code/output.scad");  //, ios::out | ios::trunc);
-/* OLD WORKING CODE
+}*/
+
+float x,y,z,h,r;
+r = thickness;
+fstream outfile;
+outfile.open("/home/nikki/bolt/bolt_code/support.scad", ios::out | ios::trunc);
+// OLD WORKING CODE
+
 	if(outfile.is_open()) {
 		
-		outfile<<mesh.getMinX()<<" "<<mesh.getMaxX()<<" "<<mesh.getMinY()<<" "<<mesh.getMaxY()<<endl;
+		//outfile<<mesh.getMinX()<<" "<<mesh.getMaxX()<<" "<<mesh.getMinY()<<" "<<mesh.getMaxY()<<endl;
 		outfile<<"union() { \n";
-		outfile<<"translate(["<<xcentre<<","<<ycentre<<","<<zcentre<<"]) ";	//recenter shape
-		outfile<<"import(\""<<filename<<"\");\n";
+	//	outfile<<"translate(["<<xcentre<<","<<ycentre<<","<<zcentre<<"]) ";	//recenter shape
+		outfile<<"import(\""<<in_filename<<"\");\n";
 		
 		//For loop
-		for(auto it = supportPoints.begin(); it!=supportPoints.end(); it++) {	
-			x = it->x; y = it->y; z = it->z;
+		for(auto it = mesh.supportPoints.begin(); it!=mesh.supportPoints.end(); it++) {	
+			x = it->x; y = it->y; z = 0;
+			h = it->z;
 			outfile<<"translate(["<<x<<","<<y<<","<<z<<"]) ";
 			outfile<<"cylinder("<<h<<","<<r<<","<<r<<");\n";
 		}
 		outfile<<"}\n";	
 		cout<<"\nWrote to file\n"; 
 	}
-//	else
-//		cout<<"ERROR: COULD NOT OPEN FILE\n";
-//	outfile.close();
-*/
+	else
+		cout<<"ERROR: COULD NOT OPEN FILE\n";
+	outfile.close();
+
+	string cmd ="openscad -o support.stl support.scad";
+	system(cmd.c_str());
+}
 	
 

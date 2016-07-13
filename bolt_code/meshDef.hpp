@@ -16,6 +16,7 @@
 #include "glm/gtx/string_cast.hpp"
 #include "slicer.hpp"
 #include <vector>
+#include <list>
 
 using namespace std;
 using namespace glm;
@@ -102,8 +103,8 @@ private:
 	float max_z = numeric_limits<float>::lowest(); ///< Maximum z coordinate in the mesh
 	
 public:
-	vector<vec3> supportPoints;  //points at which to draw supports
-
+	
+	vector<vec3> supportPoints;  //holds x,y, and max z
 	/** Calculates minimum and maximum X,Y,Z co-ordinates **/
 	void getMinMax();
 
@@ -179,7 +180,7 @@ public:
 	
 	void projectTriangle(triangle *t);
 
-	void boundBox();
+	void boundBox(int,int);
 };
 
 #endif

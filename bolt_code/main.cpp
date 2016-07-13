@@ -110,8 +110,10 @@ int main ( int argc, char *argv[] ) {
 		for(slice_counter=0;slice_counter<max_slice_no;slice_counter++){
 	
 	
-			tp.schedule(boost::bind(&thread_function, *s, slice_counter, min_x, max_x, min_y, max_y));
-			
+			tp.schedule(boost::bind(&thread_function, *s, slice_counter, min_x, max_x, min_y, max_y, xres, yres));
+
+	//		s->fillSlice();
+	//		generatePNG(*s, slice_counter, min_x, max_x, min_y, max_y);
 			s++;
 		}
 

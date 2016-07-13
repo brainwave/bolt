@@ -82,7 +82,7 @@ struct slice {
 		Uses the <i>Scan Line Algorithm</i> along with <i>Global</i> and <i>Active</i> Edge Table data structures.
 		Each fill line is broken down into line segments and are pushed into the <c>fill</c> vector.
 	*/
-	void fillSlice();
+	void fillSlice(int, int);
 	
 };
 

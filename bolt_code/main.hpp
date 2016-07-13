@@ -160,9 +160,9 @@ void writeSCAD(stlMesh mesh, string in_filename, string &out_filename, float thi
 	
 	Fills a slice and generates a PNG for it.
 */
-void thread_function(slice s, int slice_counter, float min_x, float max_x, float min_y, float max_y){
+void thread_function(slice s, int slice_counter, float min_x, float max_x, float min_y, float max_y, int xres, int yres){
 
-	s.fillSlice();
+	s.fillSlice(xres, yres);
 	generatePNG(s,slice_counter,min_x,max_x,min_y,max_y);
 }
 

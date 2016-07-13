@@ -76,7 +76,7 @@ bool globalEdgeTableComparision (const EdgeTableRecord &a, const EdgeTableRecord
 			return false;
 }
 
-void slice::fillSlice() {
+void slice::fillSlice(int xres, int yres) {
 
 	if(isFilled)
 		return;
@@ -109,7 +109,7 @@ void slice::fillSlice() {
 		xMin = (it->x < xMin) ? it->x : xMin; xMax = (it->x > xMax) ? it->x : xMax;
 	}
 
-	step =(yMax - yMin)/600/1.1;
+	step =(yMax - yMin) / ( xres<yres ?xres:yres )/1.1;
 	
 	// EDGE TABLE ALGORITHM
 

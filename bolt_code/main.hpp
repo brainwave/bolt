@@ -14,6 +14,7 @@
 #include <string>
 #include <time.h>
 #include <fstream>
+#include "boost/threadpool.hpp"
 
 /**
 	\brief Checks if the specified slice size is acceptable.
@@ -153,27 +154,17 @@ void writeSCAD(stlMesh mesh, string in_filename, string &out_filename, float thi
 
 }
 
-//outfile.open("/home/nikki/bolt/bolt_code/output.scad");  //, ios::out | ios::trunc);
-/* OLD WORKING CODE
-	if(outfile.is_open()) {
-		
-		outfile<<mesh.getMinX()<<" "<<mesh.getMaxX()<<" "<<mesh.getMinY()<<" "<<mesh.getMaxY()<<endl;
-		outfile<<"union() { \n";
-		outfile<<"translate(["<<xcentre<<","<<ycentre<<","<<zcentre<<"]) ";	//recenter shape
-		outfile<<"import(\""<<filename<<"\");\n";
-		
-		//For loop
-		for(auto it = supportPoints.begin(); it!=supportPoints.end(); it++) {	
-			x = it->x; y = it->y; z = it->z;
-			outfile<<"translate(["<<x<<","<<y<<","<<z<<"]) ";
-			outfile<<"cylinder("<<h<<","<<r<<","<<r<<");\n";
-		}
-		outfile<<"}\n";	
-		cout<<"\nWrote to file\n"; 
-	}
-//	else
-//		cout<<"ERROR: COULD NOT OPEN FILE\n";
-//	outfile.close();
+
+/**
+	\brief Function that is multi-threaded.
+	
+	Fills a slice and generates a PNG for it.
 */
+void thread_function(slice s, int slice_counter, float min_x, float max_x, float min_y, float max_y){
+
+	s.fillSlice();
+	generatePNG(s,slice_counter,min_x,max_x,min_y,max_y);
+}
+
 	
 

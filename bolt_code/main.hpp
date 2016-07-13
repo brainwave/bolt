@@ -144,7 +144,7 @@ bool checkArguments(int argc, char *argv[], string &fileName, float &sliceSize, 
 
 }
 
-void writeSCAD(stlMesh mesh, string in_filename, string &out_filename, float thickness = 1, int divisions = 15){
+void writeSCAD(stlMesh mesh, string in_filename, string &out_filename, float thickness = 1, int divisions = 3){
 	
 	mesh.getMinMax();
 	float x_interval = (mesh.getMaxX() - mesh.getMinX())/divisions;
@@ -197,9 +197,9 @@ void writeSCAD(stlMesh mesh, string in_filename, string &out_filename, float thi
 	cmd += " support.scad"; 
 	out_filename = "support.stl";
 	system(cmd.c_str());
+}
+*/
 
-
-}*/
 
 float x,y,z,h,r;
 r = thickness;
@@ -213,14 +213,37 @@ outfile.open("/home/nikki/bolt/bolt_code/support.scad", ios::out | ios::trunc);
 		outfile<<"union() { \n";
 	//	outfile<<"translate(["<<xcentre<<","<<ycentre<<","<<zcentre<<"]) ";	//recenter shape
 		outfile<<"import(\""<<in_filename<<"\");\n";
-		
+	
 		//For loop
-		for(auto it = mesh.supportPoints.begin(); it!=mesh.supportPoints.end(); it++) {	
-			x = it->x; y = it->y; z = 0;
-			h = it->z;
-			outfile<<"translate(["<<x<<","<<y<<","<<z<<"]) ";
-			outfile<<"cylinder("<<h<<","<<r<<","<<r<<");\n";
+		//for(auto it = mesh.supportPoints.begin(); it!=mesh.supportPoints.end(); it++) {	
+		for(auto it = mesh.supports.begin(); it!=mesh.supports.end(); it++) {
+			x = it->xy_point.x; y = it->xy_point.y;
+				
+//			for(auto jt = it->z_vector.begin(); jt!= it->z_vector.end(); jt++) 
+//				cout<<*jt<<endl;
+//			cout<<endl;
+
+			if(it->z_vector.size() % 2 == 0) {	//even
+				for(auto jt = it->z_vector.begin(); jt!= it->z_vector.end(); jt+=2) {
+					z = *jt;
+					h = *(jt+1);
+					outfile<<"translate(["<<x<<","<<y<<","<<z<<"]) ";
+					outfile<<"cylinder("<<h-z<<","<<r<<","<<r<<");\n";
+cout<<"z: "<<z<<" h: "<<h<<"\n";
+				}
+			}
+			else {					//odd
+				for(auto jt = it->z_vector.begin(); jt!= it->z_vector.end()-1; jt+=2) {
+					h = *(jt+1);
+					outfile<<"translate(["<<x<<","<<y<<","<<z<<"]) ";
+					outfile<<"cylinder("<<h-z<<","<<r<<","<<r<<");\n";
+	cout<<"z: "<<z<<" h: "<<h<<"\n";				z = *jt;
+				}
+			}
+					
+		
 		}
+	
 		outfile<<"}\n";	
 		cout<<"\nWrote to file\n"; 
 	}

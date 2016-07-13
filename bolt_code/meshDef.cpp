@@ -337,6 +337,7 @@ void stlMesh::boundBox(int x_interval, int y_interval)
 	//Generate a series of points in the box to potentially draw supports from
 
 	vector<float> z_list;
+	z_list.push_back(0);
 	for(int i=min_x; i<=max_x; i+=x_interval) {
 		for(int j=min_y; j<=max_y; j+=y_interval) {
 			bool xyFlag = false;
@@ -346,19 +347,22 @@ void stlMesh::boundBox(int x_interval, int y_interval)
 					//float z = ((t->vertex[0].z+t->vertex[1].z+t->vertex[2].z)/3);
 					float z = maxZ(t->vertex[0].z,t->vertex[1].z,t->vertex[2].z); 
 					z_list.push_back(z);
-					cout<<"Z: "<<z<<endl;
 					xyFlag=true;
 				}
 			}
 			//Sort z-list in ascending order and get the highest z
 			if(xyFlag == true) {
 				//point.z = *std::max_element(z_list.begin(), z_list.end());
+				sort(z_list.begin(), z_list.end());
+				supports.push_back(support(point,z_list));
+				/*
 				for(auto it = z_list.begin(); it!=z_list.end(); z_list++) {
 					point.z = *it;
 					supportPoints.push_back(point);
-				}
+				}*/
 			}
 			z_list.clear();
+			z_list.push_back(0);
 				
 		}	
 	} 

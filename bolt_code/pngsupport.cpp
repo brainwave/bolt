@@ -33,11 +33,11 @@ int check_and_make_directory ( const char* pngDir ) {
 
 
 //png::image <png::rgb_pixel> image(800, 600);
-int pixel_buffer[2000][2000];
-int xres,yres;
+//int pixel_buffer[1000][1000];
+//int xres,yres;
 string folder = "png";
 
-unsigned char* image;
+//unsigned char* image;
 
 
 
@@ -45,12 +45,12 @@ void initPNG (int xres, int yres, string pngDir ) {
 
 //	image.resize ( xres+1, yres+1 );
 
-	image = new unsigned char[ (xres) * (yres) * 3 ];
+//	image = new unsigned char[ (xres) * (yres) * 3 ];
 
 //	::yres = image.get_height() - 1;
 
-	::yres = yres;
-	::xres = xres;
+//	::yres = yres;
+//	::xres = xres;
 
 //	cout<<"\n Y RES = "<<yres;
 		
@@ -64,7 +64,7 @@ void initPNG (int xres, int yres, string pngDir ) {
 }
 
 
-void writePNG(string pngFileName){
+void writePNG(string pngFileName, int **pixel_buffer, int xres, int yres){
 	
 /*	for (size_t y = 0; y < image.get_height(); y++ )
 		for (size_t x=0; x < image.get_width(); x++) {
@@ -77,6 +77,8 @@ void writePNG(string pngFileName){
 
 	image.write(pngFileName);
 */
+
+	unsigned char* image = new unsigned char [xres*yres*3];
 
 	unsigned char* image_iterator = image;
 
@@ -106,7 +108,7 @@ void writePNG(string pngFileName){
 
 
 	unsigned f = lodepng_encode24_file(pngFileName.c_str(), image, xres, yres); 
-
+	delete image;
 }
 
 /**
@@ -120,7 +122,7 @@ void writePNG(string pngFileName){
 	@param xb x-coordinate of second point.
 	@param yb y-coordinate of second point.
 */
-void drawLine(int xa, int ya, int xb, int yb){
+void drawLine(int xa, int ya, int xb, int yb, int **pixel_buffer, int yres){
 	
 	int dx,dy,p,x,y,xStart,yStart,xEnd,yEnd;
 
@@ -215,9 +217,14 @@ void drawLine(int xa, int ya, int xb, int yb){
 	@param min_y Minimum y-coordinate in the mesh after recentering.
 	@param max_y Maximum y-coordinate in the mesh after recentering.
 */
-void generatePNG(slice s, int slice_counter, float min_x, float max_x, float min_y, float max_y){
+void generatePNG(slice s, int slice_counter, float min_x, float max_x, float min_y, float max_y, int xres, int yres){
 
 	vector<glm::vec3> vertices;
+
+	int **pixel_buffer = new int * [yres+1];
+	
+	for(int i=0;i<yres+1;i++)
+		pixel_buffer[i] = new int [xres+1];
 	
 	for ( auto it = s.boundary.begin(); it != s.boundary.end(); it++ ) {
 	
@@ -236,8 +243,8 @@ void generatePNG(slice s, int slice_counter, float min_x, float max_x, float min
 
 	bool first = true;	
 	
-	for (int y = 0; y < 2000; y++ )
-		for (int x=0; x < 2000; x++) {
+	for (int y = 0; y < yres; y++ )
+		for (int x=0; x < xres; x++) {
 		
 		pixel_buffer[y][x] = 0;
 	}
@@ -268,11 +275,15 @@ void generatePNG(slice s, int slice_counter, float min_x, float max_x, float min
 			x2 = (int)_x;
 			y2 = (int)_y;
 		
-			drawLine(x1,y1,x2,y2);
+			drawLine(x1,y1,x2,y2,pixel_buffer,yres);
 		}
 	}	
 	
 	string pngFileName=folder+"/slice_"+(to_string(slice_counter))+".png";
 
-	writePNG(pngFileName);
+	writePNG(pngFileName,pixel_buffer,xres,yres);
+
+	for(int i=0;i<yres+1;i++)
+		delete[] pixel_buffer[i];
+	delete pixel_buffer;
 }

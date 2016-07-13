@@ -144,7 +144,7 @@ bool checkArguments(int argc, char *argv[], string &fileName, float &sliceSize, 
 
 }
 
-void writeSCAD(stlMesh mesh, string in_filename, string &out_filename, float thickness = 1, int divisions = 3){
+void writeSCAD(stlMesh mesh, string in_filename, string &out_filename, float thickness = 1, int divisions = 10, float tip_height = 10){
 	
 	mesh.getMinMax();
 	float x_interval = (mesh.getMaxX() - mesh.getMinX())/divisions;
@@ -226,18 +226,23 @@ outfile.open("/home/nikki/bolt/bolt_code/support.scad", ios::out | ios::trunc);
 			if(it->z_vector.size() % 2 == 0) {	//even
 				for(auto jt = it->z_vector.begin(); jt!= it->z_vector.end(); jt+=2) {
 					z = *jt;
-					h = *(jt+1);
+					h = *(jt+1);	tip_height = h/5;
+					h = h-tip_height-z;
 					outfile<<"translate(["<<x<<","<<y<<","<<z<<"]) ";
-					outfile<<"cylinder("<<h-z<<","<<r<<","<<r<<");\n";
-cout<<"z: "<<z<<" h: "<<h<<"\n";
+					outfile<<"cylinder("<<h<<","<<r<<","<<r<<");\n";
+					outfile<<"translate(["<<x<<","<<y<<","<<z+h<<"])";
+					outfile<<"cylinder("<<tip_height<<","<<r<<", 0);\n";
 				}
 			}
 			else {					//odd
 				for(auto jt = it->z_vector.begin(); jt!= it->z_vector.end()-1; jt+=2) {
-					h = *(jt+1);
+					z = *jt;
+					h = *(jt+1);	tip_height = h/5;
+					h = h-tip_height-z;
 					outfile<<"translate(["<<x<<","<<y<<","<<z<<"]) ";
-					outfile<<"cylinder("<<h-z<<","<<r<<","<<r<<");\n";
-	cout<<"z: "<<z<<" h: "<<h<<"\n";				z = *jt;
+					outfile<<"cylinder("<<h<<","<<r<<","<<r<<");\n";
+					outfile<<"translate(["<<x<<","<<y<<","<<z+h<<"])";
+					outfile<<"cylinder("<<tip_height<<","<<r<<", 0);\n";
 				}
 			}
 					
@@ -252,6 +257,7 @@ cout<<"z: "<<z<<" h: "<<h<<"\n";
 	outfile.close();
 
 	string cmd ="openscad -o support.stl support.scad";
+	out_filename = "support.stl";
 	system(cmd.c_str());
 }
 	

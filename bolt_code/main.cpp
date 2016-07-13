@@ -102,7 +102,7 @@ int main ( int argc, char *argv[] ) {
 		// slicing 
 		time = clock();
 		mesh.sliceMesh(p, s, sliceSize, arr_len);
-
+		
 
 		cout<<"Time spent in slicing "<<(double) (clock() - time) / CLOCKS_PER_SEC;
 

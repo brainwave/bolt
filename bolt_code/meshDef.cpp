@@ -302,6 +302,7 @@ float area (vec3 p1, vec3 p2, vec3 p3)
    return abs((p1.x*(p2.y-p3.y) + p2.x*(p3.y-p1.y)+ p3.x*(p1.y-p2.y))/2.0);
 }
 
+/*
 // Check if a given point lies within a triangle (2D)
 bool enclosed(vec3 point, triangle *t) {
 
@@ -318,8 +319,6 @@ bool enclosed(vec3 point, triangle *t) {
 	float a3 = area(t->vertex[0], t->vertex[1], point);
 	return (a==a1+a2+a3);
 }
-
-/*
 	triangle temp = *t;
 	//Project triangle to 2D
 	for(int i=0; i<3; i++)
@@ -330,10 +329,46 @@ bool enclosed(vec3 point, triangle *t) {
 	b3 = sign(point, temp.vertex[2], temp.vertex[0]) < 0.0f;
 	return ((b1 == b2) && (b2 == b3));
 */
+
+//Substitute a point p onto a line ab to see which side it lies on
+int equality(vec3 p, vec3 a, vec3 b) {
+	float m = (b.y-a.y)/(b.x-a.x);
+	return b.y-p.y - m*(b.x-p.x);
+}
+// Check if a given point lies within a triangle (2D)
+bool enclosed(vec3 point, triangle *t) {
+	vec3 centroid;
+	centroid.x = (t->vertex[0].x + t->vertex[1].x + t->vertex[2].x)/3.0;
+	centroid.y = (t->vertex[0].y + t->vertex[1].y + t->vertex[2].y)/3.0;
+
+	int sameSide = 0;
+	for(int i=0; i<3; i++) {
+		int e1 = equality(centroid, t->vertex[i%3], t->vertex[(i+1)%3]);
+		int e2 = equality(point, t->vertex[i%3], t->vertex[(i+1)%3]);
+		if(e1*e2>0)
+			sameSide++;
+	}
+	return (sameSide == 3);
+}
+
 float maxZ(float a, float b, float c) {
 	float max_ab = std::max(a,b);
 	return std::max(max_ab, c);
 }
+
+float findZ(vec3 point, triangle *t) {
+	float a,b,c,d;
+	a = t->normal.x; b = t->normal.y; c = t->normal.z;
+
+	float x,y,z,x1,y1,z1;	
+	x1 = t->vertex[0].x; y1 = t->vertex[0].y; z1 = t->vertex[0].z;
+	x = point.x; y = point.y;
+
+	d = a*x1 + b*y1 + c*z1;
+	z = (d-(a*x+b*y))/c;
+
+}
+
 void stlMesh::boundBox(int x_interval, int y_interval)
 {
 	//Generate a series of points in the box to potentially draw supports from
@@ -346,8 +381,10 @@ void stlMesh::boundBox(int x_interval, int y_interval)
 			vec3 point; point.x = i; point.y = j;
 			for(auto t = mesh.begin(); t != mesh.end(); t++) {		//need to find smaller set of triangles
 				if(enclosed(point,&*t)) {
-					float z = maxZ(t->vertex[0].z,t->vertex[1].z,t->vertex[2].z); 
-					if(z_list.back() == z)	//duplicate Z value
+					//float z = maxZ(t->vertex[0].z,t->vertex[1].z,t->vertex[2].z); 
+					float z = findZ(point, &*t); 
+					//if(z_list.back() == z)	//duplicate Z value
+					if(find(z_list.begin(), z_list.end(), z) != z_list.end())
 						cout<<"Double Z\n";
 					else 
 						z_list.push_back(z);

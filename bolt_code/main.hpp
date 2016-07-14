@@ -144,7 +144,7 @@ bool checkArguments(int argc, char *argv[], string &fileName, float &sliceSize, 
 
 }
 
-void writeSCAD(stlMesh mesh, string in_filename, string &out_filename, float thickness = 0.75, int divisions = 10, float tip_height = 10){
+void writeSCAD(stlMesh mesh, string in_filename, string &out_filename, float thickness = 0.75, int divisions = 15, float tip_height = 10){
 	
 	mesh.getMinMax();
 	float x_interval = (mesh.getMaxX() - mesh.getMinX())/divisions;
@@ -167,12 +167,9 @@ void writeSCAD(stlMesh mesh, string in_filename, string &out_filename, float thi
 
 			if(it->z_vector.size() % 2 == 0) {	//even
 				for(auto jt = it->z_vector.begin(); jt!= it->z_vector.end(); jt+=2) {
-					//Top cone
+
 					z = *jt;
 					h = *(jt+1);	tip_height = h/10;
-					h = h-tip_height-z;
-					outfile<<"translate(["<<x<<","<<y<<","<<z+h<<"])";
-					outfile<<"cylinder("<<tip_height<<","<<r<<","<<r/5<<");\n";
 
 					//Bottom cone
 					if(z!=0) {
@@ -183,27 +180,31 @@ void writeSCAD(stlMesh mesh, string in_filename, string &out_filename, float thi
 						outfile<<"translate(["<<x<<","<<y<<","<<z<<"]) ";
 						outfile<<"cylinder("<<tip_height<<","<<r<<","<<r<<");\n";
 					}
-						
+
 					//Main support
 					z = z+tip_height;
-					h = h-tip_height;
+					h = h-tip_height-z;
 					outfile<<"translate(["<<x<<","<<y<<","<<z<<"]) ";
 					outfile<<"cylinder("<<h<<","<<r<<","<<r<<");\n";
+
+					//Top cone
+					z = z + h;
+					outfile<<"translate(["<<x<<","<<y<<","<<z<<"])";
+					outfile<<"cylinder("<<tip_height<<","<<r<<","<<r/5<<");\n";
+
+						
 				}
 			}
 			else {					//odd
 				for(auto jt = it->z_vector.begin(); jt!= it->z_vector.end()-1; jt+=2) {
-					//Top cone
+
 					z = *jt;
 					h = *(jt+1);	tip_height = h/10;
-					h = h-tip_height-z;
-					outfile<<"translate(["<<x<<","<<y<<","<<z+h<<"])";
-					outfile<<"cylinder("<<tip_height<<","<<r<<","<<r/5<<");\n";
 
 					//Bottom cone
-					if(z!=0){
-					outfile<<"translate(["<<x<<","<<y<<","<<z<<"]) ";
-					outfile<<"cylinder("<<tip_height<<","<<r/5<<","<<r<<");\n";
+					if(z!=0) {
+						outfile<<"translate(["<<x<<","<<y<<","<<z<<"]) ";
+						outfile<<"cylinder("<<tip_height<<","<<r/5<<","<<r<<");\n";
 					}
 					else {
 						outfile<<"translate(["<<x<<","<<y<<","<<z<<"]) ";
@@ -212,9 +213,14 @@ void writeSCAD(stlMesh mesh, string in_filename, string &out_filename, float thi
 
 					//Main support
 					z = z+tip_height;
-					h = h-tip_height;
+					h = h-tip_height-z;
 					outfile<<"translate(["<<x<<","<<y<<","<<z<<"]) ";
 					outfile<<"cylinder("<<h<<","<<r<<","<<r<<");\n";
+
+					//Top cone
+					z = z + h;
+					outfile<<"translate(["<<x<<","<<y<<","<<z<<"])";
+					outfile<<"cylinder("<<tip_height<<","<<r<<","<<r/5<<");\n";
 				}
 			}
 					

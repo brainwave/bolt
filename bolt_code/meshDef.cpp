@@ -346,22 +346,18 @@ void stlMesh::boundBox(int x_interval, int y_interval)
 			vec3 point; point.x = i; point.y = j;
 			for(auto t = mesh.begin(); t != mesh.end(); t++) {		//need to find smaller set of triangles
 				if(enclosed(point,&*t)) {
-					//float z = ((t->vertex[0].z+t->vertex[1].z+t->vertex[2].z)/3);
 					float z = maxZ(t->vertex[0].z,t->vertex[1].z,t->vertex[2].z); 
-					z_list.push_back(z);
+					if(z_list.back() == z)	//duplicate Z value
+						cout<<"Double Z\n";
+					else 
+						z_list.push_back(z);
 					xyFlag=true;
 				}
 			}
-			//Sort z-list in ascending order and get the highest z
+			//Sort z-list in ascending order and link with the xy point
 			if(xyFlag == true) {
-				//point.z = *std::max_element(z_list.begin(), z_list.end());
 				sort(z_list.begin(), z_list.end());
 				supports.push_back(support(point,z_list));
-				/*
-				for(auto it = z_list.begin(); it!=z_list.end(); z_list++) {
-					point.z = *it;
-					supportPoints.push_back(point);
-				}*/
 			}
 			z_list.clear();
 			z_list.push_back(0);

@@ -331,9 +331,9 @@ bool enclosed(vec3 point, triangle *t) {
 */
 
 //Substitute a point p onto a line ab to see which side it lies on
-int equality(vec3 p, vec3 a, vec3 b) {
+float equality(vec3 p, vec3 a, vec3 b) {
 	float m = (b.y-a.y)/(b.x-a.x);
-	return b.y-p.y - m*(b.x-p.x);
+	return a.y-p.y - m*(a.x-p.x);
 }
 // Check if a given point lies within a triangle (2D)
 bool enclosed(vec3 point, triangle *t) {
@@ -343,9 +343,9 @@ bool enclosed(vec3 point, triangle *t) {
 
 	int sameSide = 0;
 	for(int i=0; i<3; i++) {
-		int e1 = equality(centroid, t->vertex[i%3], t->vertex[(i+1)%3]);
-		int e2 = equality(point, t->vertex[i%3], t->vertex[(i+1)%3]);
-		if(e1*e2>0)
+		float e1 = equality(centroid, t->vertex[i%3], t->vertex[(i+1)%3]);
+		float e2 = equality(point, t->vertex[i%3], t->vertex[(i+1)%3]);
+		if(e1*e2>0 || e2==0)
 			sameSide++;
 	}
 	return (sameSide == 3);

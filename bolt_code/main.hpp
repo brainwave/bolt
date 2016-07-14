@@ -144,7 +144,7 @@ bool checkArguments(int argc, char *argv[], string &fileName, float &sliceSize, 
 
 }
 
-void writeSCAD(stlMesh mesh, string in_filename, string &out_filename, float thickness = 0.75, int divisions = 6, float tip_height = 10){
+void writeSCAD(stlMesh mesh, string in_filename, string &out_filename, float thickness = 0.75, int divisions = 5, float tip_height = 10){
 	
 	mesh.getMinMax();
 	float x_interval = (mesh.getMaxX() - mesh.getMinX())/divisions;

@@ -15,6 +15,7 @@
 #include "glm/glm.hpp"
 #include "glm/gtx/string_cast.hpp"
 #include "slicer.hpp"
+#include "exceptions.hpp"
 #include <vector>
 
 using namespace std;

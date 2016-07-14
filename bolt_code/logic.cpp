@@ -1,6 +1,7 @@
-#include "main.hpp"
+#include <Python.h>
+#include "logic.hpp"
 
-int main ( int argc, char *argv[] ) {
+int logic ( int argc, char *argv[] ) {
 
 	float sliceSize;
 	
@@ -119,3 +120,38 @@ int main ( int argc, char *argv[] ) {
 
 	}
 }
+
+static PyObject *
+main_logic (PyObject *self, PyObject *args) {
+
+	char **command;
+	int isSucessful, no_of_args, counter = 0;
+
+	if( !PyArg_ParseTuple ( args, "is", no_of_args, command ) ) {
+
+		return NULL;
+	}
+	
+	isSucessful = logic(no_of_args, command);
+
+	return PyLong_FromLong ( isSucessful ) ;
+}
+
+static PyMethodDef methods[] = {
+
+	{"logic", main_logic, METH_VARARGS, "Run the main logic"},
+	{NULL, NULL, 0, NULL}
+};
+
+static struct PyModuleDef module = {
+	PyModuleDef_HEAD_INIT,
+	"logic",
+	NULL,
+	-1,
+	methods
+};
+
+PyMODINIT_FUNC PyInit_test(void) {
+	return PyModule_Create(&module);
+}
+

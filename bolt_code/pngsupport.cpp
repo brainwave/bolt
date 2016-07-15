@@ -63,7 +63,6 @@ void initPNG (int xres, int yres, string pngDir ) {
 
 }
 
-
 void writePNG(string pngFileName, int **pixel_buffer, int xres, int yres){
 	
 	unsigned char* image = new unsigned char [xres*yres*3];
@@ -74,7 +73,7 @@ void writePNG(string pngFileName, int **pixel_buffer, int xres, int yres){
 	
 		for(int x = 0; x<xres; x++){
 	
-			if(pixel_buffer[y][x] == 1){
+			if(pixel_buffer[y][x] > 0){
 			
 				for(int i=0; i<3; i++){
 	
@@ -196,6 +195,65 @@ void drawLine(int xa, int ya, int xb, int yb, int **pixel_buffer, int yres){
 }
 
 /**
+ \brief Diagnostic function for bit representation.
+*/
+void findPixelBufferRepresentation(int **pixel_buffer, unsigned char* bits, int xres, int yres){
+	
+	int x=0,y=0;
+		
+	int size = yres * (xres + xres%8) / 8;
+	
+	for(int i = 0; i < size; i++){	
+	
+		unsigned char byte = bits[i];
+		
+		for(int j=0;j<8;j++){
+	
+			pixel_buffer[y][x] = byte & ((unsigned char)1)<<j;
+			x++;
+			if(x==xres){
+				
+				x=0;
+				y++;
+				break;
+			}
+		}
+	}	
+}
+
+/**
+ \brief Converts pixel buffer data into bit data.
+	
+	@param bits Bit representation of image buffer.
+	@param pixel_buffer Integer pixel buffer.
+	@param xres X-Resolution.
+	@param yres Y-Resolution.
+*/
+void findBitRepresentation(unsigned char* bits, int **pixel_buffer, int xres, int yres){
+
+	int count = 0;
+	int bit = 0;	
+	unsigned char k = 0;
+
+	for(int y = 0; y < yres; y++){	
+	
+		for(int x = 0; x < xres; x++){	
+	
+			if(bit==8){	
+				
+				bits[count++] = k;
+				bit = k = 0;
+			}	
+			
+			k = k | ((unsigned char)pixel_buffer[y][x])<<bit;
+			bit++;
+		}
+	}
+}
+
+
+
+/**
  \brief Generates a PNG for the given slice.
 
 	@param s Slice for which PNG is to be generated.
@@ -269,8 +327,22 @@ void generatePNG(slice s, int slice_counter, float min_x, float max_x, float min
 	
 	string pngFileName=folder+"/slice_"+(to_string(slice_counter))+".png";
 
-	writePNG(pngFileName,pixel_buffer,xres,yres);
+	unsigned char* bits = new unsigned char [yres * (xres+xres%8) / 8];
 
+	findBitRepresentation(bits,pixel_buffer,xres,yres);
+
+	for (int y = 0; y < yres; y++ )
+		for (int x=0; x < xres; x++) {
+		
+		pixel_buffer[y][x] = 0;
+	}
+	
+	findPixelBufferRepresentation(pixel_buffer,bits,xres,yres);
+	
+	writePNG(pngFileName,pixel_buffer,xres,yres);
+	
+	delete bits;
+	
 	for(int i=0;i<yres;i++)
 		delete[] pixel_buffer[i];
 	delete pixel_buffer;

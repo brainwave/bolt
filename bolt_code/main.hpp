@@ -36,6 +36,16 @@ bool is_slice_size_sane ( char* sliceArgument , float& sliceSize ){
 	}
 }
 
+
+bool isswitch(char *a){
+	
+	if( 	strcmp(a,"-f") == 0 || strcmp(a,"-s") == 0 || strcmp(a,"-h") == 0 || strcmp(a,"-o") == 0 || strcmp(a,"-sg") == 0
+		|| strcmp(a,"-r") == 0 || strcmp(a,"-t") == 0 )
+		return true;
+	else
+		return false;
+}
+
 /**
 	\brief 	Checks if the supplied command line arguments are valid and assigns them to variables in main. 
 	
@@ -50,7 +60,7 @@ bool is_slice_size_sane ( char* sliceArgument , float& sliceSize ){
 	@param thickness The thickness of the wall if hollowing is used.
 	 
 */	
-bool checkArguments(int argc, char *argv[], string &fileName, float &sliceSize, string &pngDir, int &xres, int &yres, bool &hollow, float &thickness, bool &support){
+void setArguments(int argc, char *argv[], string &fileName, float &sliceSize, string &pngDir, int &xres, int &yres, bool &hollow, float &thickness, bool &support){
 	
 	fileName = "";
 	sliceSize = 0.1;
@@ -63,34 +73,57 @@ bool checkArguments(int argc, char *argv[], string &fileName, float &sliceSize, 
 	
 	if(argc>=15){
 	
-		cout<<"\n Extraneous parameters supplied! Exiting!";
-		return false;
+		//cout<<"\n Extraneous parameters supplied! Exiting!";
+		//return false;
+	
+		throw Exception("EXTRANEOUS_PARAMETERS");
 	}
 
 	for(int i=0; i<argc; i++){
 	
 		if(strcmp(argv[i],"-f") == 0){ // file name switch
 		
+			if(i==argc-1 || (i!=argc-1 && isswitch(argv[i+1]))){
+	
+				throw Exception("MISSING_FILE_NAME");
+			}
 			fileName = argv[i+1];
 		}
 		else if(strcmp(argv[i],"-s") == 0){ // slice size switch
 	
-			if(!is_slice_size_sane ( argv[i+1], sliceSize))
-				return false;
+			if(i==argc-1 || (i!=argc-1 && isswitch(argv[i+1]))){
+	
+				throw Exception("MISSING_SLICE_SIZE");
+			}
+			if(!is_slice_size_sane ( argv[i+1], sliceSize)){
+				
+				throw Exception("BAD_SLICE_SIZE");
+			}
 		}
 		else if(strcmp(argv[i],"-o") == 0){ // png output directory switch
+			
+			if(i==argc-1 || (i!=argc-1 && isswitch(argv[i+1]))){
+	
+				throw Exception("MISSING_OUTPUT_DIRECTORY");
+			}
 			
 			pngDir = argv[i+1];
 		}
 		else if(strcmp(argv[i],"-r") == 0){ // resolution switch
 	
+			if(i>=argc-2 || (i<argc-2 && (isswitch(argv[i+1]) || isswitch(argv[i+2]) ))){
+	
+				throw Exception("MISSING_RESOLUTION");
+			}
+
 			xres = atoi ( argv[i+1] );
 			yres = atoi ( argv[i+2] );
 
 			if(xres <=0 || yres<=0){
 			
-				cout<<"\n Invalid resolution specified.";
-				return false;
+				//cout<<"\n Invalid resolution specified.";
+				//return false;
+				throw Exception ("BAD_RESOLUTION");
 			}
 		}
 		else if(strcmp(argv[i],"-h") == 0){ // hollow switch
@@ -99,12 +132,19 @@ bool checkArguments(int argc, char *argv[], string &fileName, float &sliceSize, 
 		}
 		else if(strcmp(argv[i],"-t") == 0){ // wall thickness
 		
+			if(i==argc-1 || (i!=argc-1 && isswitch(argv[i+1]))){
+	
+				throw Exception("MISSING_THICKNESS");
+			}
+			
+
 			thickness = atof(argv[i+1]);
 			
 			if(thickness<=0 || thickness == NAN){
 	
-				cout<<"\n Invalid thickness!";
-				return false;
+				//cout<<"\n Invalid thickness!";
+				//return false;
+				throw Exception ("BAD_THICKNESS");
 			}
 		}
 		else if(strcmp(argv[i],"-sg") == 0){ //support generation
@@ -113,12 +153,6 @@ bool checkArguments(int argc, char *argv[], string &fileName, float &sliceSize, 
 		}	
 	}
 
-	if(fileName==""){
-	
-		cout<<"\n Please specify a file to be sliced.";
-		return false;
-	}
-		
 	cout<<"\n File Name             : "<<fileName;
 	cout<<"\n Slice Size            : "<<sliceSize;
 	cout<<"\n Resolution            : "<<xres<<"*"<<yres;
@@ -138,8 +172,6 @@ bool checkArguments(int argc, char *argv[], string &fileName, float &sliceSize, 
 	else
 		cout<<"No";
 	cout<<"\n";	
-	
-	return true;
 
 }
 

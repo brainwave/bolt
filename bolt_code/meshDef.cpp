@@ -22,10 +22,15 @@ int stlMesh::readStlFile ( const char *filename ) {
 		//detect if the file is ASCII or not
 		int parser;
 		
-		FILE *file = fopen(filename, "r");
-			//Using C style file IO over C++ style streams, as streams cause data corruption.
-			//May be fixable, need to check advantages of both approaches
-			
+		FILE *file;
+	
+		file = fopen(filename, "r");
+		//Using C style file IO over C++ style streams, as streams cause data corruption.
+		//May be fixable, need to check advantages of both approaches
+	
+		if(file==NULL)
+			throw Exception("FILE_NOT_FOUND");
+		
 		do{
 			parser=fgetc(file);
 		}while((parser!=EOF) && parser<=127 );

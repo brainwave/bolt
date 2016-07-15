@@ -2,58 +2,67 @@
 
 int main ( int argc, char *argv[] ) {
 
-	float sliceSize;
+	try{
+
+		float sliceSize;
 	
-	string pngDir,fileName;
+		string pngDir,fileName;
+		
+		int xres, yres;
 	
-	int xres, yres;
+		bool hollow;
+		bool support;
+
+		float thickness;
 	
-	bool hollow;
-	bool support;
+		// time calculation
+		clock_t time, startTime = clock();
 
-	float thickness;
+		//if(!checkArguments(argc, argv, fileName, sliceSize, pngDir, xres, yres, hollow, thickness, support))
+		//	return 0;
 	
-	// time calculation
-	clock_t time, startTime = clock();
+		setArguments(argc, argv, fileName, sliceSize, pngDir, xres, yres, hollow, thickness, support);
 
-	if(!checkArguments(argc, argv, fileName, sliceSize, pngDir, xres, yres, hollow, thickness, support))
-		return 0;
+		//ranges, min and max z values, and O(verall)scale_x, y and z
+		float xrange, yrange, zrange, min_z, max_z, max_x, min_x, max_y, min_y;
+
+		stlMesh mesh;
+		stlMesh supportMesh;
+
+		time = clock();
+
+
+		// perform hollowing routine if needed	
+		if(hollow){
 	
-	//ranges, min and max z values, and O(verall)scale_x, y and z
-	float xrange, yrange, zrange, min_z, max_z, max_x, min_x, max_y, min_y;
+			string hollowingCommand = "openscad -o "+pngDir+"/hollow.stl -D 'model=\""+fileName+"\"' -D 'thickness="+to_string(thickness)+"' hollow.scad";
 
-	stlMesh mesh;
-	stlMesh supportMesh;
+			system(hollowingCommand.c_str());	
 
-	time = clock();
-
-
-	// perform hollowing routine if needed	
-	if(hollow){
+			fileName = pngDir+"/hollow.stl";
+		}
 	
-		string hollowingCommand = "openscad -o "+pngDir+"/hollow.stl -D 'model=\""+fileName+"\"' -D 'thickness="+to_string(thickness)+"' hollow.scad";
+		if(support){
+		
+			if ( supportMesh.readStlFile( fileName.c_str())) {
+				cout << "\nProgram Failed" ;
+				return 1;
+			}
+			else {
+				//writing SCAD file
+					writeSCAD(supportMesh, fileName.c_str(), fileName);
+			}
+		}
 
-		system(hollowingCommand.c_str());	
-
-		fileName = pngDir+"/hollow.stl";
-	}
+//	if ( mesh.readStlFile(fileName.c_str())) {
+//		cout << "\nProgram Failed" ;
+//		return 1;
+//	}
+//	else {
 	
-	if(support){
-	if ( supportMesh.readStlFile( fileName.c_str())) {
-		cout << "\nProgram Failed" ;
-		return 1;
-	}
-	else {
-		//writing SCAD file
-		writeSCAD(supportMesh, fileName.c_str(), fileName);
-	}
-	}
 
-	if ( mesh.readStlFile(fileName.c_str())) {
-		cout << "\nProgram Failed" ;
-		return 1;
-	}
-	else {
+		mesh.readStlFile(fileName.c_str());
+
 		cout<<"\nreadStlFile : "<<(double)(clock() - time)/CLOCKS_PER_SEC;
 
 
@@ -118,4 +127,13 @@ int main ( int argc, char *argv[] ) {
 		}
 
 	}
+	catch (exception &e){
+	
+		cout<<"\n Exception - "<<e.what()<<"\n Exiting!";
+	}
+	catch(...) { 
+	
+		cout<<"\n An exception has occured! Exiting!";
+	}
+	return 0;
 }

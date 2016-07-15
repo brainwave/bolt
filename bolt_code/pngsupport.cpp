@@ -66,18 +66,6 @@ void initPNG (int xres, int yres, string pngDir ) {
 
 void writePNG(string pngFileName, int **pixel_buffer, int xres, int yres){
 	
-/*	for (size_t y = 0; y < image.get_height(); y++ )
-		for (size_t x=0; x < image.get_width(); x++) {
-	
-		if(pixel_buffer[y][x] == 1)	
-			image[y][x] = png::rgb_pixel(255,255,255);
-		else
-			image[y][x] = png::rgb_pixel(0,0,0);
-	}
-
-	image.write(pngFileName);
-*/
-
 	unsigned char* image = new unsigned char [xres*yres*3];
 
 	unsigned char* image_iterator = image;
@@ -221,10 +209,10 @@ void generatePNG(slice s, int slice_counter, float min_x, float max_x, float min
 
 	vector<glm::vec3> vertices;
 
-	int **pixel_buffer = new int * [yres+1];
+	int **pixel_buffer = new int * [yres];
 	
 	for(int i=0;i<yres+1;i++)
-		pixel_buffer[i] = new int [xres+1];
+		pixel_buffer[i] = new int [xres];
 	
 	for ( auto it = s.boundary.begin(); it != s.boundary.end(); it++ ) {
 	
@@ -258,8 +246,8 @@ void generatePNG(slice s, int slice_counter, float min_x, float max_x, float min
 			
 			first = false;
 			
-			_x = (it->x - min_x)/(max_x - min_x) * (SMALLER_DIM);
-			_y = (it->y - min_y)/(max_y - min_y) * (SMALLER_DIM);
+			_x = (it->x - min_x)/(max_x - min_x) * (SMALLER_DIM-1);
+			_y = (it->y - min_y)/(max_y - min_y) * (SMALLER_DIM-1);
 		
 			x1 = (int)_x;
 			y1 = (int)_y;
@@ -269,8 +257,8 @@ void generatePNG(slice s, int slice_counter, float min_x, float max_x, float min
 		else{
 			first = true;
 			
-			_x = (it->x - min_x)/(max_x - min_x) * (SMALLER_DIM);
-			_y = (it->y - min_y)/(max_y - min_y) * (SMALLER_DIM);
+			_x = (it->x - min_x)/(max_x - min_x) * (SMALLER_DIM-1);
+			_y = (it->y - min_y)/(max_y - min_y) * (SMALLER_DIM-1);
 
 			x2 = (int)_x;
 			y2 = (int)_y;
@@ -283,7 +271,7 @@ void generatePNG(slice s, int slice_counter, float min_x, float max_x, float min
 
 	writePNG(pngFileName,pixel_buffer,xres,yres);
 
-	for(int i=0;i<yres+1;i++)
+	for(int i=0;i<yres;i++)
 		delete[] pixel_buffer[i];
 	delete pixel_buffer;
 }

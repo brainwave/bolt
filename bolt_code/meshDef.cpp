@@ -350,7 +350,7 @@ bool enclosed(vec3 point, triangle *t) {
 		
 		//Ignore points at vertices of the triangle - in the RARE case that this ever happens
 		if(point.x == t->vertex[i].x && point.y == t->vertex[i].y && point.z == t->vertex[i].z)
-			cout<<"\nAt vertex\n";
+		{	cout<<"\nAt vertex\n"; return false;	}
 	}
 
 	//Ignore vertical faces

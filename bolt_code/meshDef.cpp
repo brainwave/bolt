@@ -348,6 +348,12 @@ bool enclosed(vec3 point, triangle *t) {
 		if(e1*e2>0 || e2==0)
 			sameSide++;
 	}
+
+	//Ignore vertical faces
+	if(t->vertex[0].x==t->vertex[1].x && t->vertex[0].x==t->vertex[2].x && t->vertex[1].x==t->vertex[2].x || 
+	t->vertex[0].y==t->vertex[1].y && t->vertex[0].y==t->vertex[2].y && t->vertex[1].y==t->vertex[2].y )
+		return false;
+
 	return (sameSide == 3);
 }
 
@@ -384,7 +390,7 @@ void stlMesh::boundBox(int x_interval, int y_interval)
 					//float z = maxZ(t->vertex[0].z,t->vertex[1].z,t->vertex[2].z); 
 					float z = findZ(point, &*t); 
 					//if(z_list.back() == z)	//duplicate Z value
-					if(find(z_list.begin(), z_list.end(), z) != z_list.end())
+					if(find(z_list.begin(), z_list.end(), z) != z_list.end() && z!=min_z) //second case fixes floating shapes
 						cout<<"Double Z\n";
 					else 
 						z_list.push_back(z);

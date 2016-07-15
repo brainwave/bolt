@@ -144,7 +144,7 @@ bool checkArguments(int argc, char *argv[], string &fileName, float &sliceSize, 
 
 }
 
-void writeSCAD(stlMesh mesh, string in_filename, string &out_filename, float thickness = 0.75, int divisions = 8, float tip_height = 10){
+void writeSCAD(stlMesh mesh, string in_filename, string &out_filename, float thickness = 0.75, int divisions = 6, float tip_height = 10){
 	
 	mesh.getMinMax();
 	float x_interval = (mesh.getMaxX() - mesh.getMinX())/divisions;
@@ -159,6 +159,8 @@ void writeSCAD(stlMesh mesh, string in_filename, string &out_filename, float thi
 	if(outfile.is_open()) {
 		
 		outfile<<"union() { \n";
+		if(mesh.getMinZ() < 0)
+			outfile<<"translate([0,0,"<<abs(mesh.getMinZ())<<"]) ";
 		outfile<<"import(\""<<in_filename<<"\");\n";
 	
 		//For loop

@@ -347,12 +347,18 @@ bool enclosed(vec3 point, triangle *t) {
 		float e2 = equality(point, t->vertex[i%3], t->vertex[(i+1)%3]);
 		if(e1*e2>0 || e2==0)
 			sameSide++;
+		
+		//Ignore points at vertices of the triangle - in the RARE case that this ever happens
+		if(point.x == t->vertex[i].x && point.y == t->vertex[i].y && point.z == t->vertex[i].z)
+			cout<<"\nAt vertex\n";
 	}
 
 	//Ignore vertical faces
-	if(t->vertex[0].x==t->vertex[1].x && t->vertex[0].x==t->vertex[2].x && t->vertex[1].x==t->vertex[2].x || 
-	t->vertex[0].y==t->vertex[1].y && t->vertex[0].y==t->vertex[2].y && t->vertex[1].y==t->vertex[2].y )
+//	if(t->vertex[0].x==t->vertex[1].x && t->vertex[0].x==t->vertex[2].x && t->vertex[1].x==t->vertex[2].x || 
+//	t->vertex[0].y==t->vertex[1].y && t->vertex[0].y==t->vertex[2].y && t->vertex[1].y==t->vertex[2].y ) 
+	if(t->normal.z == 0)	
 		return false;
+
 
 	return (sameSide == 3);
 }
@@ -381,6 +387,13 @@ void stlMesh::boundBox(int x_interval, int y_interval)
 
 	vector<float> z_list;
 	z_list.push_back(0);
+
+	//If shape falls below z=0, push it to z=0
+	if(min_z < 0) 
+		for(auto t = mesh.begin(); t != mesh.end(); t++) 
+			for(int i=0; i<3; i++)
+				t->vertex[i].z += abs(min_z);
+
 	for(int i=min_x; i<=max_x; i+=x_interval) {
 		for(int j=min_y; j<=max_y; j+=y_interval) {
 			bool xyFlag = false;
@@ -389,8 +402,7 @@ void stlMesh::boundBox(int x_interval, int y_interval)
 				if(enclosed(point,&*t)) {
 					//float z = maxZ(t->vertex[0].z,t->vertex[1].z,t->vertex[2].z); 
 					float z = findZ(point, &*t); 
-					//if(z_list.back() == z)	//duplicate Z value
-					if(find(z_list.begin(), z_list.end(), z) != z_list.end() && z!=min_z) //second case fixes floating shapes
+					if(find(z_list.begin(), z_list.end(), z) != z_list.end() && z!=0) //second case fixes floating shapes and on-ground shapes
 						cout<<"Double Z\n";
 					else 
 						z_list.push_back(z);

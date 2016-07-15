@@ -1,23 +1,17 @@
 #include <Python.h>
 #include "logic.hpp"
 
-int logic ( int argc, char *argv[] ) {
+int logic ( char filename[200], float sliceSize = 0.1, char pngdir[200] = "png", int xres = 800, int yres = 600, bool hollow = false, float thickness = 0.05, bool support = false ) {
 
-	float sliceSize;
-	
-	string pngDir,fileName;
-	
-	int xres, yres;
-	
-	bool hollow;
-	bool support;
+	std::string fileName(filename), pngDir(pngdir);
 
-	float thickness;
-	
+	cout<<"\nFilename"<<filename<<"\nSlice Size "<<sliceSize<<"\nPngDirectory "<<pngDir;
+	cout<<"\nFilename"<<fileName<<"\nPng Directory "<<pngDir;
+
 	// time calculation
 	clock_t time, startTime = clock();
 
-	if(!checkArguments(argc, argv, fileName, sliceSize, pngDir, xres, yres, hollow, thickness, support))
+//	if(!checkArguments(argc, argv, fileName, sliceSize, pngDir, xres, yres, hollow, thickness, support))
 		return 0;
 	
 	//ranges, min and max z values, and O(verall)scale_x, y and z
@@ -123,16 +117,22 @@ int logic ( int argc, char *argv[] ) {
 
 static PyObject *
 main_logic (PyObject *self, PyObject *args) {
+= 0;
+	
 
-	char **command;
-	int isSucessful, no_of_args, counter = 0;
+//	if( !PyArg_ParseTuple ( args, "sfsiiifi", filename, sliceSize, pngDir, xres, yres, hollow, thickness, support ) ) {
 
-	if( !PyArg_ParseTuple ( args, "is", no_of_args, command ) ) {
+//		return NULL;
+//	}
+	
+	if ( !PyArg_ParseTuple ( args, "ss", filename, pngdir ) ) {
 
 		return NULL;
 	}
-	
-	isSucessful = logic(no_of_args, command);
+
+
+	int isSucessful = logic( filename, 0.1, pngdir );
+		//, sliceSize, pngDir, xres, yres, hollow, thickness, support);
 
 	return PyLong_FromLong ( isSucessful ) ;
 }
@@ -151,7 +151,7 @@ static struct PyModuleDef module = {
 	methods
 };
 
-PyMODINIT_FUNC PyInit_test(void) {
+PyMODINIT_FUNC PyInit_slicer(void) {
 	return PyModule_Create(&module);
 }
 

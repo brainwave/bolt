@@ -20,7 +20,7 @@
 	\brief Checks if the specified slice size is acceptable.
 	
 */
-bool is_slice_size_sane ( char* sliceArgument , float& sliceSize ){
+bool is_slice_size_sane ( const char* sliceArgument , float& sliceSize ){
 
 		
 	sliceSize = atof(sliceArgument);
@@ -50,7 +50,7 @@ bool is_slice_size_sane ( char* sliceArgument , float& sliceSize ){
 	@param thickness The thickness of the wall if hollowing is used.
 	 
 */	
-bool checkArguments(int argc, char *argv[], string &fileName, float &sliceSize, string &pngDir, int &xres, int &yres, bool &hollow, float &thickness, bool &support){
+bool checkArguments(int argc, const char *argv[], string &fileName, float &sliceSize, string &pngDir, int &xres, int &yres, bool &hollow, float &thickness, bool &support){
 	
 	fileName = "";
 	sliceSize = 0.1;

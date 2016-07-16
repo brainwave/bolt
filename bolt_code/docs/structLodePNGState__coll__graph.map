@@ -1,0 +1,9 @@
+<map id="LodePNGState" name="LodePNGState">
+<area shape="rect" id="node2" href="$structLodePNGInfo.html" title="LodePNGInfo" alt="" coords="90,95,191,121"/>
+<area shape="rect" id="node3" href="$structLodePNGTime.html" title="LodePNGTime" alt="" coords="5,5,113,32"/>
+<area shape="rect" id="node4" href="$structLodePNGColorMode.html" title="LodePNGColorMode" alt="" coords="137,5,280,32"/>
+<area shape="rect" id="node5" href="$structLodePNGDecoderSettings.html" title="LodePNGDecoderSettings" alt="" coords="317,95,493,121"/>
+<area shape="rect" id="node6" href="$structLodePNGDecompressSettings.html" title="LodePNGDecompressSettings" alt="" coords="304,5,505,32"/>
+<area shape="rect" id="node7" href="$structLodePNGEncoderSettings.html" title="LodePNGEncoderSettings" alt="" coords="527,95,701,121"/>
+<area shape="rect" id="node8" href="$structLodePNGCompressSettings.html" title="LodePNGCompressSettings" alt="" coords="530,5,717,32"/>
+</map>

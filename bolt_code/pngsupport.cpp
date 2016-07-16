@@ -28,6 +28,8 @@ int check_and_make_directory ( const char* pngDir ) {
 		cout<<"\nDirectory absent or inaccessible, creating";
 		mkdir(pngDir, 0);
 	}
+
+	return 0;
 }
 #endif
 
@@ -106,6 +108,7 @@ void writePNG(string pngFileName){
 
 
 	unsigned f = lodepng_encode24_file(pngFileName.c_str(), image, xres, yres); 
+	if ( f == f);
 
 }
 

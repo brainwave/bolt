@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['distance',['distance',['../structplane.html#ab210f4fa3dc0b0d559e6bea476267d3a',1,'plane']]]
+  ['endpoint',['endpoint',['../structlinesegment.html#ad70451d14926e0f35b4b523acc1f7f23',1,'linesegment']]]
 ];

@@ -1,7 +1,7 @@
 #include <Python.h>
 #include "logic.hpp"
 
-int logic ( int argc, char* argv[] ) {
+int logic ( int argc, const char* argv[] ) {
 
 	string fileName, pngDir;
 	float sliceSize, thickness;
@@ -11,7 +11,8 @@ int logic ( int argc, char* argv[] ) {
 	bool hollow, support;
 
 	// time calculation
-	clock_t time, startTime = clock();
+	clock_t startTime = clock();
+	clock_t time = startTime;
 
 	if(!checkArguments(argc, argv, fileName, sliceSize, pngDir, xres, yres, hollow, thickness, support))
 		return 0;
@@ -52,7 +53,6 @@ int logic ( int argc, char* argv[] ) {
 	}
 	else {
 		cout<<"\nreadStlFile : "<<(double)(clock() - time)/CLOCKS_PER_SEC;
-
 
 		mesh.recenter();	
 
@@ -97,11 +97,13 @@ int logic ( int argc, char* argv[] ) {
 		mesh.sliceMesh(p, s, sliceSize, arr_len);
 
 
-		cout<<"Time spent in slicing "<<(double) (clock() - time) / CLOCKS_PER_SEC;
+		cout<<"\nTime spent in slicing "<<(double) (clock() - time) / CLOCKS_PER_SEC;
 
 		initPNG ( xres, yres, pngDir );
 		
 		boost::threadpool::pool tp(boost::thread::hardware_concurrency());
+
+		time = clock();
 		
 		// filling and png generation
 		for(slice_counter=0;slice_counter<max_slice_no;slice_counter++){
@@ -113,6 +115,8 @@ int logic ( int argc, char* argv[] ) {
 	//		generatePNG(*s, slice_counter, min_x, max_x, min_y, max_y);
 			s++;
 		}
+		cout<<"\nTime spent in storing "<<(double) ( clock() - time ) / CLOCKS_PER_SEC;
+		cout<<"\nTotal Program Execution Time "<<(double)(clock() - startTime)/CLOCKS_PER_SEC;
 
 	}
 
@@ -129,7 +133,7 @@ main_logic (PyObject *self, PyObject *args) {
 
 	int xres, yres, hollow, thickness, support;
 */
-	char* argv[16]; 
+	const char* argv[16]; 
 
 	argv[0] = "Slicer Program";
 	argv[1] = "-f";

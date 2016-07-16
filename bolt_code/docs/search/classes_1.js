@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['linesegment',['linesegment',['../structlinesegment.html',1,'']]]
+  ['colortree',['ColorTree',['../structColorTree.html',1,'']]]
 ];

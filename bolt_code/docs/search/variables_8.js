@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['startpoint',['startpoint',['../structlinesegment.html#a02d1026b472f4124403a5011d025acf2',1,'linesegment']]]
+  ['vertex',['vertex',['../structtriangle.html#a63bc040901da96b0919ea4d561342db4',1,'triangle']]]
 ];

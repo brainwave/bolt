@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['x_5fy_5fmax',['x_y_max',['../structEdgeTableRecord.html#ab07defb9d39c83f4e5b8c919c1bb2ef8',1,'EdgeTableRecord']]],
-  ['x_5fy_5fmin',['x_y_min',['../structEdgeTableRecord.html#aa81e4df00e9a63de5d3e5bf4569e3a86',1,'EdgeTableRecord']]]
+  ['y_5fmax',['y_max',['../structEdgeTableRecord.html#a9bf0a00bff92991a37751e56b6d7a867',1,'EdgeTableRecord']]],
+  ['y_5fmin',['y_min',['../structEdgeTableRecord.html#a1a9418b64d0362152b7a2f13bec986c2',1,'EdgeTableRecord']]]
 ];

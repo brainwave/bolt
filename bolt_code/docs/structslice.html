@@ -97,9 +97,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a650453451971f292d4b5d725c6dd3bcc"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structslice.html#a650453451971f292d4b5d725c6dd3bcc">fillSlice</a> ()</td></tr>
-<tr class="memdesc:a650453451971f292d4b5d725c6dd3bcc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fills the slice.  <a href="#a650453451971f292d4b5d725c6dd3bcc">More...</a><br /></td></tr>
-<tr class="separator:a650453451971f292d4b5d725c6dd3bcc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0eb87089382df1c65bb5300d1b498949"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structslice.html#a0eb87089382df1c65bb5300d1b498949">fillSlice</a> (int, int)</td></tr>
+<tr class="memdesc:a0eb87089382df1c65bb5300d1b498949"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fills the slice.  <a href="#a0eb87089382df1c65bb5300d1b498949">More...</a><br /></td></tr>
+<tr class="separator:a0eb87089382df1c65bb5300d1b498949"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
@@ -113,22 +113,33 @@ vector&lt; <a class="el" href="structlinesegment.html">linesegment</a> &gt;&#160
 <tr class="separator:a042405940c062f85282c6953fdc64592"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9ad8421b1fb7aa21169932fa88e4c713"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9ad8421b1fb7aa21169932fa88e4c713"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structslice.html#a9ad8421b1fb7aa21169932fa88e4c713">isFilled</a> = false</td></tr>
-<tr class="memdesc:a9ad8421b1fb7aa21169932fa88e4c713"><td class="mdescLeft">&#160;</td><td class="mdescRight">True if <code><a class="el" href="structslice.html#a650453451971f292d4b5d725c6dd3bcc" title="Fills the slice. ">fillSlice()</a></code> has been called once on this slice. <br /></td></tr>
+<tr class="memdesc:a9ad8421b1fb7aa21169932fa88e4c713"><td class="mdescLeft">&#160;</td><td class="mdescRight">True if <code><a class="el" href="structslice.html#a0eb87089382df1c65bb5300d1b498949" title="Fills the slice. ">fillSlice()</a></code> has been called once on this slice. <br /></td></tr>
 <tr class="separator:a9ad8421b1fb7aa21169932fa88e4c713"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Slice. </p>
 <p>Represents a 2D cross section of the model. </p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
-<a class="anchor" id="a650453451971f292d4b5d725c6dd3bcc"></a>
+<a class="anchor" id="a0eb87089382df1c65bb5300d1b498949"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">void slice::fillSlice </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>xres</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>yres</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">

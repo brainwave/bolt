@@ -18,4 +18,4 @@ setup (name = 'Slicer',
                         library_dirs = ["/home/brainwave/slicer/libs"]
                         )
 
-       ])
+       ]) 

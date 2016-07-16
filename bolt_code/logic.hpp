@@ -61,7 +61,7 @@ bool checkArguments(int argc, char *argv[], string &fileName, float &sliceSize, 
 	support = false;
 	thickness = 0.1;
 	
-	if(argc>=15){
+	if(argc>=17){
 	
 		cout<<"\n Extraneous parameters supplied! Exiting!";
 		return false;
@@ -93,11 +93,11 @@ bool checkArguments(int argc, char *argv[], string &fileName, float &sliceSize, 
 				return false;
 			}
 		}
-		else if(strcmp(argv[i],"-h") == 0){ // hollow switch
-			
+		else if( (strcmp(argv[i],"-h") == 0) && ( atoi(argv[i+1]) !=0 ) ) { // hollow switch
+
 			hollow = true;
 		}
-		else if(strcmp(argv[i],"-t") == 0){ // wall thickness
+		else if ( (strcmp(argv[i],"-t") == 0) && hollow == true ) { // wall thickness
 		
 			thickness = atof(argv[i+1]);
 			
@@ -107,7 +107,7 @@ bool checkArguments(int argc, char *argv[], string &fileName, float &sliceSize, 
 				return false;
 			}
 		}
-		else if(strcmp(argv[i],"-sg") == 0){ //support generation
+		else if ( (strcmp(argv[i],"-sg") == 0 ) && ( atoi ( argv[i+1]) != 0) )  { //support generation
 
 			support = true;
 		}	

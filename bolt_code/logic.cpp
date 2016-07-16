@@ -1,17 +1,19 @@
 #include <Python.h>
 #include "logic.hpp"
 
-int logic ( char filename[200], float sliceSize = 0.1, char pngdir[200] = "png", int xres = 800, int yres = 600, bool hollow = false, float thickness = 0.05, bool support = false ) {
+int logic ( int argc, char* argv[] ) {
 
-	std::string fileName(filename), pngDir(pngdir);
+	string fileName, pngDir;
+	float sliceSize, thickness;
 
-	cout<<"\nFilename"<<filename<<"\nSlice Size "<<sliceSize<<"\nPngDirectory "<<pngDir;
-	cout<<"\nFilename"<<fileName<<"\nPng Directory "<<pngDir;
+	int xres, yres;
+
+	bool hollow, support;
 
 	// time calculation
 	clock_t time, startTime = clock();
 
-//	if(!checkArguments(argc, argv, fileName, sliceSize, pngDir, xres, yres, hollow, thickness, support))
+	if(!checkArguments(argc, argv, fileName, sliceSize, pngDir, xres, yres, hollow, thickness, support))
 		return 0;
 	
 	//ranges, min and max z values, and O(verall)scale_x, y and z
@@ -113,28 +115,41 @@ int logic ( char filename[200], float sliceSize = 0.1, char pngdir[200] = "png",
 		}
 
 	}
+
+	return 0;
 }
 
 static PyObject *
 main_logic (PyObject *self, PyObject *args) {
-= 0;
+
+/*
+	char* fileName, pngDir;
+	
+	float sliceSize;
+
+	int xres, yres, hollow, thickness, support;
+*/
+	char* argv[16]; 
+
+	argv[0] = "Slicer Program";
+	argv[1] = "-f";
+	argv[3] = "-s";
+	argv[5] = "-o";
+	argv[7] = "-r";
+	argv[10] = "-h";
+	argv[12] = "-t";
+	argv[14] = "-sg";
 	
 
-//	if( !PyArg_ParseTuple ( args, "sfsiiifi", filename, sliceSize, pngDir, xres, yres, hollow, thickness, support ) ) {
-
-//		return NULL;
-//	}
-	
-	if ( !PyArg_ParseTuple ( args, "ss", filename, pngdir ) ) {
+	if( !PyArg_ParseTuple ( args, "ssssssss", &argv[2], &argv[4], &argv[6], &argv[8], &argv[9], &argv[11], &argv[13], &argv[15] )) {
 
 		return NULL;
 	}
+	
 
+	int isSuccessful = logic( 16, argv );
 
-	int isSucessful = logic( filename, 0.1, pngdir );
-		//, sliceSize, pngDir, xres, yres, hollow, thickness, support);
-
-	return PyLong_FromLong ( isSucessful ) ;
+	return PyLong_FromLong ( isSuccessful ) ;
 }
 
 static PyMethodDef methods[] = {

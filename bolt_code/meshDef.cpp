@@ -297,57 +297,133 @@ void stlMesh::sliceMesh(plane *pstart, slice *sstart, float sliceSize, int arr_l
  		}
 	}
 }
-
+/*
 float sign (vec3 p1, vec3 p2, vec3 p3)
 {
     return (p1.x - p3.x) * (p2.y - p3.y) - (p2.x - p3.x) * (p1.y - p3.y);
+}*/
+float area (vec3 p1, vec3 p2, vec3 p3)
+{
+   return abs((p1.x*(p2.y-p3.y) + p2.x*(p3.y-p1.y)+ p3.x*(p1.y-p2.y))/2.0);
 }
 
+/*
 // Check if a given point lies within a triangle (2D)
-bool enclosed(vec3 point, triangle *t)
-{
-	bool b1, b2, b3;
-	
-	b1 = sign(point, t->vertex[0], t->vertex[1]) < 0.0f;
-	b2 = sign(point, t->vertex[1], t->vertex[2]) < 0.0f;
-	b3 = sign(point, t->vertex[2], t->vertex[0]) < 0.0f;
+bool enclosed(vec3 point, triangle *t) {
 
-	return ((b1 == b2) && (b2 == b3));
+	//Ignore vertical faces
+	if(t->vertex[0].x==t->vertex[1].x && t->vertex[0].x==t->vertex[2].x && t->vertex[1].x==t->vertex[2].x || 
+	t->vertex[0].y==t->vertex[1].y && t->vertex[0].y==t->vertex[2].y && t->vertex[1].y==t->vertex[2].y )
+		return false;
+
+	//Ignore faces close to the edge
+
+	float a = area(t->vertex[0], t->vertex[1], t->vertex[2]);
+	float a1 = area(point, t->vertex[1], t->vertex[2]);
+	float a2 = area(t->vertex[0], point, t->vertex[2]);
+	float a3 = area(t->vertex[0], t->vertex[1], point);
+	return (a==a1+a2+a3);
 }
-void stlMesh::boundBox()
+	triangle temp = *t;
+	//Project triangle to 2D
+	for(int i=0; i<3; i++)
+		temp.vertex[i].z=0;
+	bool b1, b2, b3;
+	b1 = sign(point, temp.vertex[0], temp.vertex[1]) < 0.0f;
+	b2 = sign(point, temp.vertex[1], temp.vertex[2]) < 0.0f;
+	b3 = sign(point, temp.vertex[2], temp.vertex[0]) < 0.0f;
+	return ((b1 == b2) && (b2 == b3));
+*/
+
+//Substitute a point p onto a line ab to see which side it lies on
+float equality(vec3 p, vec3 a, vec3 b) {
+	float m = (b.y-a.y)/(b.x-a.x);
+	return a.y-p.y - m*(a.x-p.x);
+}
+// Check if a given point lies within a triangle (2D)
+bool enclosed(vec3 point, triangle *t) {
+	vec3 centroid;
+	centroid.x = (t->vertex[0].x + t->vertex[1].x + t->vertex[2].x)/3.0;
+	centroid.y = (t->vertex[0].y + t->vertex[1].y + t->vertex[2].y)/3.0;
+
+	int sameSide = 0;
+	for(int i=0; i<3; i++) {
+		float e1 = equality(centroid, t->vertex[i%3], t->vertex[(i+1)%3]);
+		float e2 = equality(point, t->vertex[i%3], t->vertex[(i+1)%3]);
+		if(e1*e2>0 || e2==0)
+			sameSide++;
+		
+		//Ignore points at vertices of the triangle - in the RARE case that this ever happens
+		if(point.x == t->vertex[i].x && point.y == t->vertex[i].y && point.z == t->vertex[i].z)
+		{	cout<<"\nAt vertex\n"; return false;	}
+	}
+
+	//Ignore vertical faces
+//	if(t->vertex[0].x==t->vertex[1].x && t->vertex[0].x==t->vertex[2].x && t->vertex[1].x==t->vertex[2].x || 
+//	t->vertex[0].y==t->vertex[1].y && t->vertex[0].y==t->vertex[2].y && t->vertex[1].y==t->vertex[2].y ) 
+	if(t->normal.z == 0)	
+		return false;
+
+
+	return (sameSide == 3);
+}
+
+float maxZ(float a, float b, float c) {
+	float max_ab = std::max(a,b);
+	return std::max(max_ab, c);
+}
+
+float findZ(vec3 point, triangle *t) {
+	float a,b,c,d;
+	a = t->normal.x; b = t->normal.y; c = t->normal.z;
+
+	float x,y,z,x1,y1,z1;	
+	x1 = t->vertex[0].x; y1 = t->vertex[0].y; z1 = t->vertex[0].z;
+	x = point.x; y = point.y;
+
+	d = a*x1 + b*y1 + c*z1;
+	z = (d-(a*x+b*y))/c;
+
+}
+
+void stlMesh::boundBox(int x_interval, int y_interval)
 {
-	vector<triangle> intersections;
-	vector<vec3> points;   
-
-	vec3 corners[4];
-	corners[0].x = getMinX(); 	corners[0].y = getMinY();
-	corners[1].x = getMinX(); 	corners[1].y = getMaxY();
-	corners[2].x = getMaxX(); 	corners[2].y = getMaxY();
-	corners[3].x = getMaxX();	corners[3].y = getMinY();
-
 	//Generate a series of points in the box to potentially draw supports from
-	float x_interval = abs( (max_x - min_x)/10 );
-	float y_interval = abs( (max_y - min_y)/10 );
-	
-	cout<<"\nIntervals:"<<x_interval<<" "<<y_interval<<endl;
 
-	for(int i=min_x; i<max_x; i+=x_interval) {
-		for(int j=min_y; j<max_y; j+=y_interval) {
+	vector<float> z_list;
+	z_list.push_back(0);
+
+	//If shape falls below z=0, push it to z=0
+	if(min_z < 0) 
+		for(auto t = mesh.begin(); t != mesh.end(); t++) 
+			for(int i=0; i<3; i++)
+				t->vertex[i].z += abs(min_z);
+
+	for(int i=min_x; i<=max_x; i+=x_interval) {
+		for(int j=min_y; j<=max_y; j+=y_interval) {
+			bool xyFlag = false;
 			vec3 point; point.x = i; point.y = j;
-			points.push_back(point);
+			for(auto t = mesh.begin(); t != mesh.end(); t++) {		//need to find smaller set of triangles
+				if(enclosed(point,&*t)) {
+					//float z = maxZ(t->vertex[0].z,t->vertex[1].z,t->vertex[2].z); 
+					float z = findZ(point, &*t); 
+					if(find(z_list.begin(), z_list.end(), z) != z_list.end() && z!=0) //second case fixes floating shapes and on-ground shapes
+						cout<<"Double Z\n";
+					else 
+						z_list.push_back(z);
+					xyFlag=true;
+				}
+			}
+			//Sort z-list in ascending order and link with the xy point
+			if(xyFlag == true) {
+				sort(z_list.begin(), z_list.end());
+				supports.push_back(support(point,z_list));
+			}
+			z_list.clear();
+			z_list.push_back(0);
+				
 		}	
 	} 
-
-	//Iterate through all triangles and find points of intersection for all the points 
-	for(auto p = points.begin(); p != points.end(); p++) {
-		for(auto t = mesh.begin(); t != mesh.end(); t++) {		//need to find smaller set of triangles
-			if(enclosed(*p, &*t)) { 							//&*t converts iterator of triangles to a pointer to a triangle
-				intersections.push_back(*t);
-				cout<<"Support generated at "<<p->x<<","<<p->y<<","<<p->z<<"\n";   
-				supportPoints.push_back(*p);
-			}
-		}
-	}
 }
 
 

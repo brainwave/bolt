@@ -17,6 +17,7 @@
 #include "slicer.hpp"
 #include "exceptions.hpp"
 #include <vector>
+#include <list>
 
 using namespace std;
 using namespace glm;
@@ -101,9 +102,28 @@ private:
 	float max_x = numeric_limits<float>::lowest(); ///< Maximum x coordinate in the mesh
 	float max_y = numeric_limits<float>::lowest(); ///< Maximum y coordniate in the mesh
 	float max_z = numeric_limits<float>::lowest(); ///< Maximum z coordinate in the mesh
+
+	struct support {
+		vec3 xy_point;
+		vector<float> z_vector;
+	
+		support(vec3 p, vector<float> v) {
+			xy_point.x = p.x ;
+			xy_point.y = p.y;
+			z_vector = v;
+		}
+
+		void add(vec3 p, vector<float> v) {
+			xy_point.x = p.x ;
+			xy_point.y = p.y;
+			z_vector = v;
+		}
+	};
 	
 public:
-	vector<vec3> supportPoints;  //points at which to draw supports
+	
+	vector<vec3> supportPoints;  //holds x,y, and max z
+	vector<support> supports;
 
 	/** Calculates minimum and maximum X,Y,Z co-ordinates **/
 	void getMinMax();
@@ -180,7 +200,7 @@ public:
 	
 	void projectTriangle(triangle *t);
 
-	void boundBox();
+	void boundBox(int,int);
 };
 
 #endif

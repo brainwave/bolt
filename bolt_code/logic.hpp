@@ -15,6 +15,7 @@
 #include <time.h>
 #include <fstream>
 #include "boost/threadpool.hpp"
+#include <math.h>
 
 /**
 	\brief Checks if the specified slice size is acceptable.
@@ -176,16 +177,24 @@ bool setArguments(int argc, const char *argv[], string &fileName, float &sliceSi
 
 }
 
-void writeSCAD(stlMesh mesh, string in_filename, string &out_filename, float thickness = 2.0, float interval = 15.0){
+void thread_function(slice s, int slice_counter, float min_x, float max_x, float min_y, float max_y, int xres, int yres){
+
+	s.fillSlice(xres, yres);
+	generatePNG(s,slice_counter,min_x,max_x,min_y,max_y,xres,yres);
+}
+
+
+void writeSCAD(stlMesh mesh, string in_filename, string &out_filename, float thickness = 0.75, int divisions = 30, float tip_height = 10){
 	
 	mesh.getMinMax();
-	string cmd ="openscad -o support.stl -D 'min_x ="+to_string(mesh.getMinX())+"' -D 'min_y = "+to_string(mesh.getMinY());
-	cmd += "' -D 'max_x = "+to_string(mesh.getMaxX())+"' -D 'max_y = "+to_string(mesh.getMaxY())+"' -D 'height = "+to_string(mesh.getMaxZ()-mesh.getMinZ());
-	cmd += "' -D 'thickness = "+to_string(thickness)+"' -D 'interval ="+to_string(interval)+"' -D 'infile = \""+in_filename+"\"' output.scad"; 
-	out_filename = "support.stl";
-	system(cmd.c_str());
+	float x_interval = (mesh.getMaxX() - mesh.getMinX())/divisions;
+	float y_interval = (mesh.getMaxY() - mesh.getMinY())/divisions;
+	mesh.boundBox(x_interval,y_interval);
 
-}
+	float x,y,z,h,r;
+	r = thickness;
+	fstream outfile;
+	outfile.open("/home/nikki/bolt/bolt_code/support.scad", ios::out | ios::trunc);
 
 
 /**
@@ -193,11 +202,88 @@ void writeSCAD(stlMesh mesh, string in_filename, string &out_filename, float thi
 	
 	Fills a slice and generates a PNG for it.
 */
-void thread_function(slice s, int slice_counter, float min_x, float max_x, float min_y, float max_y, int xres, int yres){
-
-	s.fillSlice(xres, yres);
-	generatePNG(s,slice_counter,min_x,max_x,min_y,max_y,xres,yres);
-}
-
+	if(outfile.is_open()) {
+		
+		outfile<<"union() { \n";
+		if(mesh.getMinZ() < 0)
+			outfile<<"translate([0,0,"<<abs(mesh.getMinZ())<<"]) ";
+		outfile<<"import(\""<<in_filename<<"\");\n";
 	
+		//For loop
+		for(auto it = mesh.supports.begin(); it!=mesh.supports.end(); it++) {
+			x = it->xy_point.x; y = it->xy_point.y;
+
+			if(it->z_vector.size() % 2 == 0) {	//even
+				for(auto jt = it->z_vector.begin(); jt!= it->z_vector.end(); jt+=2) {
+
+					z = *jt;
+					h = *(jt+1);	tip_height = h/10;
+
+					//Bottom cone
+					if(z!=0) {
+						outfile<<"translate(["<<x<<","<<y<<","<<z<<"]) ";
+						outfile<<"cylinder("<<tip_height<<","<<r/5<<","<<r<<");\n";
+					}
+					else {
+						outfile<<"translate(["<<x<<","<<y<<","<<z<<"]) ";
+						outfile<<"cylinder("<<tip_height<<","<<r<<","<<r<<");\n";
+					}
+
+					//Main support
+					z = z+tip_height;
+					h = h-tip_height-z;
+					outfile<<"translate(["<<x<<","<<y<<","<<z<<"]) ";
+					outfile<<"cylinder("<<h<<","<<r<<","<<r<<");\n";
+
+					//Top cone
+					z = z + h;
+					outfile<<"translate(["<<x<<","<<y<<","<<z<<"])";
+					outfile<<"cylinder("<<tip_height<<","<<r<<","<<r/5<<");\n";
+
+						
+				}
+			}
+			else {					//odd
+				for(auto jt = it->z_vector.begin(); jt!= it->z_vector.end()-1; jt+=2) {
+
+					z = *jt;
+					h = *(jt+1);	tip_height = h/10;
+
+					//Bottom cone
+					if(z!=0) {
+						outfile<<"translate(["<<x<<","<<y<<","<<z<<"]) ";
+						outfile<<"cylinder("<<tip_height<<","<<r/5<<","<<r<<");\n";
+					}
+					else {
+						outfile<<"translate(["<<x<<","<<y<<","<<z<<"]) ";
+						outfile<<"cylinder("<<tip_height<<","<<r<<","<<r<<");\n";
+					}
+
+					//Main support
+					z = z+tip_height;
+					h = h-tip_height-z;
+					outfile<<"translate(["<<x<<","<<y<<","<<z<<"]) ";
+					outfile<<"cylinder("<<h<<","<<r<<","<<r<<");\n";
+
+					//Top cone
+					z = z + h;
+					outfile<<"translate(["<<x<<","<<y<<","<<z<<"])";
+					outfile<<"cylinder("<<tip_height<<","<<r<<","<<r/5<<");\n";
+				}
+			}
+					
+		
+		}
+	
+		outfile<<"}\n";	
+		cout<<"\nWrote to file\n"; 
+	}
+	else
+		cout<<"ERROR: COULD NOT OPEN FILE\n";
+	outfile.close();
+
+	string cmd ="openscad -o support.stl support.scad";
+	out_filename = "support.stl";
+	system(cmd.c_str());
+}
 

@@ -3,9 +3,6 @@
 
 int logic ( int argc, const char* argv[] ) {
 
-	string fileName, pngDir;
-	float sliceSize, thickness;
-
 	try{
 
 		float sliceSize;
@@ -58,13 +55,6 @@ int logic ( int argc, const char* argv[] ) {
 			}
 		}
 
-//	if ( mesh.readStlFile(fileName.c_str())) {
-//		cout << "\nProgram Failed" ;
-//		return 1;
-//	}
-//	else {
-	
-
 		mesh.readStlFile(fileName.c_str());
 
 		cout<<"\nreadStlFile : "<<(double)(clock() - time)/CLOCKS_PER_SEC;
@@ -111,7 +101,6 @@ int logic ( int argc, const char* argv[] ) {
 		time = clock();
 		mesh.sliceMesh(p, s, sliceSize, arr_len);
 
-
 		cout<<"\nTime spent in slicing "<<(double) (clock() - time) / CLOCKS_PER_SEC;
 
 		initPNG ( xres, yres, pngDir );
@@ -134,18 +123,19 @@ int logic ( int argc, const char* argv[] ) {
 		cout<<"\nTotal Program Execution Time "<<(double)(clock() - startTime)/CLOCKS_PER_SEC;
 
 	}
-
-	return 0;
-	}
-
-catch (exception &e){
+	
+	catch (exception &e){
 	
 		cout<<"\n Exception - "<<e.what()<<"\n Exiting!";
+		return 1;
 	}
+
 	catch(...) { 
 	
 		cout<<"\n An exception has occured! Exiting!";
+		return 1;
 	}
+
 	return 0;
 }
 

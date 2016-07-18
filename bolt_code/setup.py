@@ -1,6 +1,13 @@
 import os
 from distutils.core import setup, Extension
 
+import distutils.sysconfig
+
+cfg_vars = distutils.sysconfig.get_config_vars()
+
+for key, value in cfg_vars.items():
+    if type(value) == str
+
 
 os.environ['CC'] = 'g++';
 os.environ['CXX'] = 'g++';

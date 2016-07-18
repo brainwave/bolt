@@ -38,7 +38,7 @@ bool is_slice_size_sane ( const char* sliceArgument , float& sliceSize ){
 }
 
 
-bool isswitch(char *a){
+bool isswitch(const char *a){
 	
 	if( 	strcmp(a,"-f") == 0 || strcmp(a,"-s") == 0 || strcmp(a,"-h") == 0 || strcmp(a,"-o") == 0 || strcmp(a,"-sg") == 0
 		|| strcmp(a,"-r") == 0 || strcmp(a,"-t") == 0 )
@@ -174,6 +174,8 @@ bool setArguments(int argc, const char *argv[], string &fileName, float &sliceSi
 	else
 		cout<<"No";
 	cout<<"\n";	
+
+	return true;
 
 }
 

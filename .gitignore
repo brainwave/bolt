@@ -11,3 +11,4 @@ Makefile
 png/
 dat/
 scripts/
+build/

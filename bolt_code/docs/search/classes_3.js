@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['slice',['slice',['../structslice.html',1,'']]],
-  ['stlmesh',['stlMesh',['../classstlMesh.html',1,'']]]
+  ['hash',['Hash',['../structHash.html',1,'']]],
+  ['huffmantree',['HuffmanTree',['../structHuffmanTree.html',1,'']]]
 ];

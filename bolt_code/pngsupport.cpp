@@ -28,6 +28,8 @@ int check_and_make_directory ( const char* pngDir ) {
 		cout<<"\nDirectory absent or inaccessible, creating";
 		mkdir(pngDir, 0);
 	}
+
+	return 0;
 }
 #endif
 

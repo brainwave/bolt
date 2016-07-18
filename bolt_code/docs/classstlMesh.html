@@ -83,6 +83,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pub-attribs">Public Attributes</a> &#124;
 <a href="#pri-attribs">Private Attributes</a> &#124;
 <a href="classstlMesh-members.html">List of all members</a>  </div>
   <div class="headertitle">
@@ -97,6 +98,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
+<tr class="memitem:ae4dbf8004b468dc5b2eaff4e0b979d42"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstlMesh.html#ae4dbf8004b468dc5b2eaff4e0b979d42">getMinMax</a> ()</td></tr>
+<tr class="separator:ae4dbf8004b468dc5b2eaff4e0b979d42"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2e52230b96056486e76494b173c1b36a"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstlMesh.html#a2e52230b96056486e76494b173c1b36a">getMinX</a> ()</td></tr>
 <tr class="memdesc:a2e52230b96056486e76494b173c1b36a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns minimum x-coordinate in the mesh after recentering.  <a href="#a2e52230b96056486e76494b173c1b36a">More...</a><br /></td></tr>
 <tr class="separator:a2e52230b96056486e76494b173c1b36a"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -122,6 +125,18 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a901e4f99a7e1423a98c50afbd9eafd67"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstlMesh.html#a901e4f99a7e1423a98c50afbd9eafd67">sliceMesh</a> (<a class="el" href="structplane.html">plane</a> *p, <a class="el" href="structslice.html">slice</a> *s, float sliceSize, int arr_len)</td></tr>
 <tr class="memdesc:a901e4f99a7e1423a98c50afbd9eafd67"><td class="mdescLeft">&#160;</td><td class="mdescRight">Slices the model to obtain 2D slices.  <a href="#a901e4f99a7e1423a98c50afbd9eafd67">More...</a><br /></td></tr>
 <tr class="separator:a901e4f99a7e1423a98c50afbd9eafd67"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9ed595e6f70579e5781f8374d93290a8"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9ed595e6f70579e5781f8374d93290a8"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>projectTriangle</b> (<a class="el" href="structtriangle.html">triangle</a> *t)</td></tr>
+<tr class="separator:a9ed595e6f70579e5781f8374d93290a8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af693d1ffb14c08dda3f9e2dc2890d527"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af693d1ffb14c08dda3f9e2dc2890d527"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>boundBox</b> ()</td></tr>
+<tr class="separator:af693d1ffb14c08dda3f9e2dc2890d527"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
+Public Attributes</h2></td></tr>
+<tr class="memitem:a9e444fc8c2286977c801f40ee434098f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9e444fc8c2286977c801f40ee434098f"></a>
+vector&lt; vec3 &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>supportPoints</b></td></tr>
+<tr class="separator:a9e444fc8c2286977c801f40ee434098f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-attribs"></a>
 Private Attributes</h2></td></tr>
@@ -209,6 +224,22 @@ float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cla
 
 <p>Returns maximum z-coordniate in the mesh after recentering. </p>
 <p><code><a class="el" href="classstlMesh.html#a7040c6b333e2abdbbca7e9ccbca9d6b8">recenter()</a></code> needs to be called atleast once before this. </p>
+
+</div>
+</div>
+<a class="anchor" id="ae4dbf8004b468dc5b2eaff4e0b979d42"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void stlMesh::getMinMax </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Calculates minimum and maximum X,Y,Z co-ordinates </p>
 
 </div>
 </div>

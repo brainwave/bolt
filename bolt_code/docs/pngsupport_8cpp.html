@@ -81,7 +81,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- top -->
 <div class="header">
   <div class="summary">
-<a href="#func-members">Functions</a>  </div>
+<a href="#define-members">Macros</a> &#124;
+<a href="#func-members">Functions</a> &#124;
+<a href="#var-members">Variables</a>  </div>
   <div class="headertitle">
 <div class="title">pngsupport.cpp File Reference</div>  </div>
 </div><!--header-->
@@ -89,33 +91,54 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 <p>PNG Support File.  
 <a href="#details">More...</a></p>
-<div class="textblock"><code>#include &lt;png++/png.hpp&gt;</code><br />
-</div><div class="textblock"><div class="dynheader">
-Include dependency graph for pngsupport.cpp:</div>
-<div class="dyncontent">
-<div class="center"><img src="pngsupport_8cpp__incl.png" border="0" usemap="#pngsupport_8cpp" alt=""/></div>
-<map name="pngsupport_8cpp" id="pngsupport_8cpp">
-</map>
-</div>
+<div class="textblock"><code>#include &quot;lodepng.cpp&quot;</code><br />
 </div><div class="textblock"><div class="dynheader">
 This graph shows which files directly or indirectly include this file:</div>
 <div class="dyncontent">
 <div class="center"><img src="pngsupport_8cpp__dep__incl.png" border="0" usemap="#pngsupport_8cppdep" alt=""/></div>
 <map name="pngsupport_8cppdep" id="pngsupport_8cppdep">
+<area shape="rect" id="node2" href="logic_8hpp_source.html" title="logic.hpp" alt="" coords="23,80,98,107"/>
 </map>
 </div>
 </div><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
+Macros</h2></td></tr>
+<tr class="memitem:a18b1fa8e73268d708a222b902cf0ee78"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a18b1fa8e73268d708a222b902cf0ee78"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>SMALLER_DIM</b>&#160;&#160;&#160;( yres &lt; xres ? yres : xres )</td></tr>
+<tr class="separator:a18b1fa8e73268d708a222b902cf0ee78"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a4931fc4807ce792e3ac49253044a3717"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4931fc4807ce792e3ac49253044a3717"></a>
-png::image&lt; png::rgb_pixel &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>image</b> (800, 600)</td></tr>
-<tr class="separator:a4931fc4807ce792e3ac49253044a3717"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a038e38c7506484e3d2faa5d6522ef330"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a038e38c7506484e3d2faa5d6522ef330"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>initPNG</b> (int xres, int yres, string pngDir)</td></tr>
+<tr class="separator:a038e38c7506484e3d2faa5d6522ef330"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3beb7f13aebe0a4211ea6a0f591a9c7c"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a3beb7f13aebe0a4211ea6a0f591a9c7c"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>writePNG</b> (string pngFileName)</td></tr>
+<tr class="separator:a3beb7f13aebe0a4211ea6a0f591a9c7c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac88ba4dc864e59b29cd464210df2a8f6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pngsupport_8cpp.html#ac88ba4dc864e59b29cd464210df2a8f6">drawLine</a> (int xa, int ya, int xb, int yb)</td></tr>
 <tr class="memdesc:ac88ba4dc864e59b29cd464210df2a8f6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Draws a line between the points (xa,ya) and (xb,yb).  <a href="#ac88ba4dc864e59b29cd464210df2a8f6">More...</a><br /></td></tr>
 <tr class="separator:ac88ba4dc864e59b29cd464210df2a8f6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aef3d38c253d7515973b5055264880bbe"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pngsupport_8cpp.html#aef3d38c253d7515973b5055264880bbe">generatePNG</a> (<a class="el" href="structslice.html">slice</a> s, int slice_counter, float min_x, float max_x, float min_y, float max_y)</td></tr>
 <tr class="memdesc:aef3d38c253d7515973b5055264880bbe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generates a PNG for the given slice.  <a href="#aef3d38c253d7515973b5055264880bbe">More...</a><br /></td></tr>
 <tr class="separator:aef3d38c253d7515973b5055264880bbe"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
+Variables</h2></td></tr>
+<tr class="memitem:ad37d8f1f48f670a8fa5356d6388e4573"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad37d8f1f48f670a8fa5356d6388e4573"></a>
+int&#160;</td><td class="memItemRight" valign="bottom"><b>pixel_buffer</b> [2000][2000]</td></tr>
+<tr class="separator:ad37d8f1f48f670a8fa5356d6388e4573"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a64bd209719805b927440b59fa98dfeb5"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a64bd209719805b927440b59fa98dfeb5"></a>
+int&#160;</td><td class="memItemRight" valign="bottom"><b>xres</b></td></tr>
+<tr class="separator:a64bd209719805b927440b59fa98dfeb5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa56a403ffdfe2aec14965c0b618de1c1"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa56a403ffdfe2aec14965c0b618de1c1"></a>
+int&#160;</td><td class="memItemRight" valign="bottom"><b>yres</b></td></tr>
+<tr class="separator:aa56a403ffdfe2aec14965c0b618de1c1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0fe97abb1a8f961a289d91524e8e6429"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0fe97abb1a8f961a289d91524e8e6429"></a>
+string&#160;</td><td class="memItemRight" valign="bottom"><b>folder</b> = &quot;png&quot;</td></tr>
+<tr class="separator:a0fe97abb1a8f961a289d91524e8e6429"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af673cb5418d7f684e255beb5c190260e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af673cb5418d7f684e255beb5c190260e"></a>
+unsigned char *&#160;</td><td class="memItemRight" valign="bottom"><b>image</b></td></tr>
+<tr class="separator:af673cb5418d7f684e255beb5c190260e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>PNG Support File. </p>

@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['edgetablerecord',['EdgeTableRecord',['../structEdgeTableRecord.html',1,'']]]
+  ['bpmlists',['BPMLists',['../structBPMLists.html',1,'']]],
+  ['bpmnode',['BPMNode',['../structBPMNode.html',1,'']]]
 ];
